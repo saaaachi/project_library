@@ -517,3 +517,84 @@ Sidebar
     color:#4CAF50;
 
 }
+/* ==========================
+   Work Card
+========================== */
+
+.card{
+
+    background:#fff;
+
+    border:1px solid #E5E5E5;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+}
+
+.card img{
+
+    aspect-ratio:1 / 1;
+
+    object-fit:cover;
+
+    background:#F8F8F8;
+
+}
+
+.card-body{
+
+    padding:12px;
+
+}
+
+.card-title{
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    line-height:1.4;
+
+    height:2.8em;
+
+    overflow:hidden;
+
+}
+
+.card-level{
+
+    margin-top:8px;
+
+    color:#FF9800;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+}
+
+.card-tags{
+
+    margin-top:10px;
+
+}
+
+.card-tags .tag{
+
+    margin-right:4px;
+
+    margin-bottom:4px;
+
+}
