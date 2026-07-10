@@ -598,3 +598,52 @@ Sidebar
     margin-bottom:4px;
 
 }
+/* ==========================
+   Breadcrumb
+========================== */
+
+.breadcrumb{
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin:20px 0;
+
+    font-size:14px;
+
+    color:#666;
+
+}
+
+.breadcrumb a{
+
+    color:#4CAF50;
+
+    transition:.2s;
+
+}
+
+.breadcrumb a:hover{
+
+    text-decoration:underline;
+
+}
+
+.breadcrumb span{
+
+    color:#999;
+
+}
+
+.current{
+
+    color:#333;
+
+    font-weight:bold;
+
+}
