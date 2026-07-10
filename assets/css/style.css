@@ -311,3 +311,102 @@ footer{
 }
 
 }
+/* ==========================
+   Header
+========================== */
+
+.site-header{
+
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    background:#ffffff;
+
+    border-bottom:1px solid #E5E5E5;
+
+}
+
+.header-inner{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding:14px 18px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+}
+
+.site-title{
+
+    text-align:center;
+
+    flex:1;
+
+}
+
+.site-title h1{
+
+    font-size:24px;
+
+    color:#333;
+
+}
+
+.site-title p{
+
+    font-size:13px;
+
+    color:#777;
+
+    margin-top:3px;
+
+}
+
+.menu-button{
+
+    background:none;
+
+    border:none;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+}
+
+.admin-button{
+
+    font-size:22px;
+
+    padding:8px;
+
+}
+
+.admin-button:hover{
+
+    opacity:.7;
+
+}
+
+@media(max-width:768px){
+
+.site-title h1{
+
+    font-size:19px;
+
+}
+
+.site-title p{
+
+    display:none;
+
+}
+
+}
