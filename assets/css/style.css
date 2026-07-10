@@ -410,3 +410,110 @@ footer{
 }
 
 }
+/* ==========================
+Sidebar
+========================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:0;
+
+    left:-300px;
+
+    width:280px;
+
+    height:100%;
+
+    background:white;
+
+    box-shadow:3px 0 15px rgba(0,0,0,.15);
+
+    transition:.3s;
+
+    overflow:auto;
+
+    z-index:2000;
+
+}
+
+.sidebar.open{
+
+    left:0;
+
+}
+
+.sidebar-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:20px;
+
+    border-bottom:1px solid #E5E5E5;
+
+}
+
+.sidebar-header button{
+
+    border:none;
+
+    background:none;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+}
+
+.search-box{
+
+    padding:20px;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #DDD;
+
+    border-radius:8px;
+
+}
+
+.menu-group{
+
+    padding:20px;
+
+}
+
+.menu-group h3{
+
+    margin-bottom:10px;
+
+    color:#4CAF50;
+
+}
+
+.menu-group a{
+
+    display:block;
+
+    padding:8px 0;
+
+    color:#333;
+
+}
+
+.menu-group a:hover{
+
+    color:#4CAF50;
+
+}
