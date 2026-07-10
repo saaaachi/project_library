@@ -1,1 +1,264 @@
 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>作品カード比較</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:sans-serif;
+}
+
+body{
+    background:#f8f8f8;
+    padding:20px;
+}
+
+h1{
+    margin-bottom:30px;
+}
+
+h2{
+    margin:40px 0 15px;
+}
+
+.grid2,
+.grid3{
+
+    display:grid;
+    gap:12px;
+
+}
+
+.grid2{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.grid3{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+
+}
+
+.thumb{
+
+    aspect-ratio:1 / 1.414;
+
+    background:#ddd;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#777;
+
+    font-size:18px;
+
+}
+
+.info{
+
+    padding:10px;
+
+}
+
+.title{
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    line-height:1.4;
+
+    height:40px;
+
+    overflow:hidden;
+
+}
+
+.level{
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    color:#666;
+
+}
+
+.tags{
+
+    margin-top:8px;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:5px;
+
+}
+
+.tag{
+
+    background:#eef4ff;
+
+    color:#355;
+
+    border-radius:20px;
+
+    padding:4px 8px;
+
+    font-size:11px;
+
+}
+
+@media(min-width:900px){
+
+.grid2{
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+.grid3{
+
+    grid-template-columns:repeat(5,1fr);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📚 Project Library UI比較</h1>
+
+<h2>① スマホ2列イメージ</h2>
+
+<div class="grid2">
+
+<!-- 10枚 -->
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">夏のまちがいさがし①</div>
+<div class="level">難易度：初級</div>
+<div class="tags">
+<div class="tag">大人向け</div>
+<div class="tag">夏</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">恐竜ぬりえ</div>
+<div class="level">難易度：初級</div>
+<div class="tags">
+<div class="tag">子供向け</div>
+<div class="tag">恐竜</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">数字をつなごう</div>
+<div class="level">難易度：中級</div>
+<div class="tags">
+<div class="tag">幼児</div>
+<div class="tag">数字</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">消防車シール貼り</div>
+<div class="level">難易度：初級</div>
+<div class="tags">
+<div class="tag">幼児</div>
+<div class="tag">消防車</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">漢字クイズ</div>
+<div class="level">難易度：上級</div>
+<div class="tags">
+<div class="tag">大人向け</div>
+<div class="tag">漢字</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="thumb">SAMPLE PDF</div>
+<div class="info">
+<div class="title">点つなぎ</div>
+<div class="level">難易度：初級</div>
+<div class="tags">
+<div class="tag">子供向け</div>
+<div class="tag">動物</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<h2>② スマホ3列イメージ</h2>
+
+<div class="grid3">
+
+<!-- 上のカードをそのままコピー -->
+<!-- とりあえず6枚だけで比較OK -->
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">夏のまちがいさがし①</div><div class="level">難易度：初級</div><div class="tags"><div class="tag">大人向け</div><div class="tag">夏</div></div></div></div>
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">恐竜ぬりえ</div><div class="level">難易度：初級</div><div class="tags"><div class="tag">子供向け</div><div class="tag">恐竜</div></div></div></div>
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">数字をつなごう</div><div class="level">難易度：中級</div><div class="tags"><div class="tag">幼児</div><div class="tag">数字</div></div></div></div>
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">消防車シール貼り</div><div class="level">難易度：初級</div><div class="tags"><div class="tag">幼児</div><div class="tag">消防車</div></div></div></div>
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">漢字クイズ</div><div class="level">難易度：上級</div><div class="tags"><div class="tag">大人向け</div><div class="tag">漢字</div></div></div></div>
+
+<div class="card"><div class="thumb">SAMPLE PDF</div><div class="info"><div class="title">点つなぎ</div><div class="level">難易度：初級</div><div class="tags"><div class="tag">子供向け</div><div class="tag">動物</div></div></div></div>
+
+</div>
+
+</body>
+</html>
