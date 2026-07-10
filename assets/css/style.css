@@ -646,4 +646,76 @@ Sidebar
 
     font-weight:bold;
 
+
+}
+/* ==========================
+   Footer
+========================== */
+
+.site-footer{
+
+    background:#F7F7F7;
+
+    border-top:1px solid #E5E5E5;
+
+    margin-top:60px;
+
+}
+
+.footer-inner{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding:40px 20px;
+
+    text-align:center;
+
+}
+
+.footer-inner h3{
+
+    font-size:22px;
+
+    margin-bottom:12px;
+
+    color:#333;
+
+}
+
+.footer-inner p{
+
+    color:#666;
+
+    margin-bottom:16px;
+
+}
+
+.footer-links{
+
+    margin:20px 0;
+
+}
+
+.footer-links a{
+
+    color:#4CAF50;
+
+    margin:0 8px;
+
+}
+
+.footer-links a:hover{
+
+    text-decoration:underline;
+
+}
+
+.copyright{
+
+    font-size:13px;
+
+    color:#999;
+
 }
