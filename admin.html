@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>管理画面 | Project Library</title>
+
+<link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+<div class="header-inner">
+
+<h1>🔐 管理画面</h1>
+
+<a href="index.html" class="button">
+図書館へ戻る
+</a>
+
+</div>
+
+</header>
+
+<div class="admin-container">
+
+<h2>新しい作品を投稿</h2>
+
+<form>
+
+<label>タイトル</label>
+
+<input
+type="text"
+placeholder="例：消防車ぬりえ①">
+
+<label>PDF</label>
+
+<input
+type="file"
+accept=".pdf">
+
+<div class="preview-box">
+
+<p>サムネイル（自動生成予定）</p>
+
+<div class="thumbnail-preview">
+
+プレビュー
+
+</div>
+
+</div>
+
+<label>カテゴリ</label>
+
+<div class="check-group">
+
+<label><input type="checkbox"> 幼児向け</label>
+
+<label><input type="checkbox"> 子ども向け</label>
+
+<label><input type="checkbox"> 大人向け</label>
+
+<label><input type="checkbox"> シニア・リハビリ</label>
+
+</div>
+
+<label>固定タグ</label>
+
+<select>
+
+<option>ぬりえ</option>
+
+<option>迷路</option>
+
+<option>間違い探し</option>
+
+<option>シール貼り</option>
+
+<option>工作</option>
+
+</select>
+
+<label>自由タグ</label>
+
+<input
+type="text"
+placeholder="夏・車・消防車">
+
+<div class="tag-history">
+
+<span class="tag">夏</span>
+
+<span class="tag">車</span>
+
+<span class="tag">消防車</span>
+
+<span class="tag">初級</span>
+
+</div>
+
+<label>難易度</label>
+
+<div class="level-select">
+
+<label><input type="radio" name="level"> ★☆☆ 初級</label>
+
+<label><input type="radio" name="level"> ★★☆ 中級</label>
+
+<label><input type="radio" name="level"> ★★★ 上級</label>
+
+</div>
+
+<label>対象年齢</label>
+
+<input
+type="text"
+placeholder="例：3〜6歳">
+
+<label>印刷サイズ</label>
+
+<select>
+
+<option>A4</option>
+
+<option>A3</option>
+
+<option>B5</option>
+
+</select>
+
+<label>必要な道具</label>
+
+<div class="check-group">
+
+<label><input type="checkbox"> 色えんぴつ</label>
+
+<label><input type="checkbox"> クレヨン</label>
+
+<label><input type="checkbox"> はさみ</label>
+
+<label><input type="checkbox"> のり</label>
+
+<label><input type="checkbox"> シール</label>
+
+</div>
+
+<label>説明</label>
+
+<textarea
+rows="5"
+placeholder="作品の説明"></textarea>
+
+<details>
+
+<summary>⚙ 詳細設定</summary>
+
+<br>
+
+<label>
+
+<input type="checkbox">
+
+前回の設定を引き継ぐ
+
+</label>
+
+<br><br>
+
+<label>
+
+おすすめ作品
+
+</label>
+
+<input type="text">
+
+<label>
+
+関連記事
+
+</label>
+
+<input type="text">
+
+<label>
+
+Etsyリンク
+
+</label>
+
+<input type="text">
+
+<label>
+
+SEOタイトル
+
+</label>
+
+<input type="text">
+
+</details>
+
+</form>
+
+</div>
+
+<div class="admin-bottom-bar">
+
+<button class="draft">
+
+💾 下書き保存
+
+</button>
+
+<button class="publish">
+
+🌎 公開する
+
+</button>
+
+</div>
+
+<script src="assets/js/common.js"></script>
+
+</body>
+
+</html>
