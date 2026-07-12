@@ -1,13 +1,11 @@
 const works = [
 
 {
-    id: "PL-000001",
+    id: 1,
 
-    title: "消防車ぬりえ",
+    workNo: "PL-000001",
 
-    description: "消防車のぬりえです。"
-
-    ,
+    title: "消防車ぬりえ①",
 
     category: [
         "子ども向け"
@@ -18,74 +16,44 @@ const works = [
     ],
 
     freeTags: [
+        "車",
         "消防車",
-        "車"
+        "働く車"
     ],
 
-    series: "はたらく車",
+    series: "消防車シリーズ",
 
-    difficulty: 1,
+    level: 1,
 
-    age: "3歳〜",
+    age: "3〜6歳",
 
-    paper: "A4",
+    size: "A4",
 
-    tools: "クレヨン・色鉛筆",
+    tools: [
+        "色えんぴつ"
+    ],
+
+    description:
+        "消防車のぬりえです。",
 
     thumbnail:
-    "assets/images/thumbnail/firetruck.jpg",
+        "assets/images/sample.jpg",
 
     pdf:
-    "assets/pdf/firetruck.pdf",
-
-    recommend: true,
+        "assets/pdf/firetruck01.pdf",
 
     isNew: true,
 
-    date: "2026-07-11"
-},
-
-{
-    id: "PL-000002",
-
-    title: "パトカーぬりえ",
-
-    description: "パトカーのぬりえです。",
-
-    category: [
-        "子ども向け"
-    ],
-
-    fixedTags: [
-        "ぬりえ"
-    ],
-
-    freeTags: [
-        "パトカー",
-        "車"
-    ],
-
-    series: "はたらく車",
-
-    difficulty: 1,
-
-    age: "3歳〜",
-
-    paper: "A4",
-
-    tools: "クレヨン・色鉛筆",
-
-    thumbnail:
-    "assets/images/thumbnail/police.jpg",
-
-    pdf:
-    "assets/pdf/police.pdf",
-
     recommend: true,
 
-    isNew: true,
+    publishDate: "2026-07-12",
 
-    date: "2026-07-11"
+    updateDate: "2026-07-12",
+
+    etsy: "",
+
+    related: []
+
 }
 
 ];
