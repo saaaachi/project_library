@@ -26,7 +26,7 @@ function createCard(work){
 
             <h3>${work.title}</h3>
 
-            <p>${createStars(work.difficulty)}</p>
+            <p>${createStars(work.level)}</p>
 
         </div>
 
