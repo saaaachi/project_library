@@ -1,9 +1,19 @@
+// ==========================
+// Project Library
+// works.js
+// Version 2.0
+// ==========================
+
 const works = [
 
 {
+
     id: 1,
 
     title: "消防車ぬりえ①",
+
+    description:
+        "消防車のぬりえです。",
 
     category: [
         "子ども向け"
@@ -19,28 +29,54 @@ const works = [
         "働く車"
     ],
 
+    series:
+        "はたらく車",
+
     level: 1,
 
-    age: "3〜6歳",
+    age:
+        "3〜6歳",
 
-    size: "A4",
+    size:
+        "A4",
 
     tools: [
         "色えんぴつ"
     ],
 
-    description:
-        "消防車のぬりえです。",
-
     thumbnail:
         "assets/images/sample.jpg",
+
+    watermark:
+        "assets/images/watermark/firetruck01.jpg",
 
     pdf:
         "assets/pdf/firetruck01.pdf",
 
+    recommend: true,
+
     isNew: true,
 
-    recommend: true
+    publishDate:
+        "2026-07-13",
+
+    updateDate:
+        "2026-07-13",
+
+    etsy:
+        "",
+
+    related: [
+        2,
+        3
+    ],
+
+    author:
+        "あたまのストレッチ",
+
+    status:
+        "public"
+
 }
 
 ];
