@@ -1,342 +1,108 @@
-<!DOCTYPE html>
-<html lang="ja">
+// ==========================
+// Project Library
+// work.js
+// Version 1.0
+// ==========================
 
-<head>
+const params = new URLSearchParams(location.search);
+const workId = Number(params.get("id"));
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+const work = works.find(w => w.id === workId);
 
-<title>作品ページ | あたまのストレッチ プリント館</title>
+const area = document.getElementById("workArea");
 
-<link rel="stylesheet" href="assets/css/style.css">
+if (!work) {
 
-</head>
+    area.innerHTML = `
+        <h2>作品が見つかりません。</h2>
+    `;
 
-<body>
+} else {
 
-<!-- ===== Header ===== -->
+    area.innerHTML = `
 
-<header class="site-header">
+        <div class="breadcrumb">
+            <a href="index.html">ホーム</a>
+            ＞
+            <a href="library.html">作品一覧</a>
+            ＞
+            ${work.title}
+        </div>
 
-<div class="header-inner">
+        <h1>${work.title}</h1>
 
-<button class="menu-button" id="menuButton">
-☰
-</button>
+        <img
+            src="${work.thumbnail}"
+            class="work-image"
+            alt="${work.title}"
+        >
 
-<div class="site-title">
+        <div class="info-box">
 
-<h1>あたまのストレッチ プリント館</h1>
+            <div class="info-item">
+                難易度<br>
+                ${createStars(work.level)}
+            </div>
 
-<p>無料でダウンロードできる脳トレ・知育プリント</p>
+            <div class="info-item">
+                対象年齢<br>
+                ${work.age}
+            </div>
 
-</div>
+            <div class="info-item">
+                サイズ<br>
+                ${work.size}
+            </div>
 
-<a href="admin.html" class="admin-button">
-🔐
-</a>
+            <div class="info-item">
+                道具<br>
+                ${work.tools.join("・")}
+            </div>
 
-</div>
+        </div>
 
-</header>
+        <p class="work-description">
+            ${work.description}
+        </p>
 
-<!-- ===== Sidebar ===== -->
+        <div class="card-tags">
+            ${createTags(work.freeTags)}
+        </div>
 
-<aside class="sidebar" id="sidebar">
+        <div class="ad-box">
+            横長広告
+        </div>
 
-<div class="sidebar-header">
+        <a
+            class="button download-button"
+            href="${work.pdf}"
+            target="_blank"
+        >
+            PDFをダウンロード
+        </a>
 
-<h2>探す</h2>
+    `;
 
-<button id="closeMenu">✕</button>
+}
 
-</div>
+// ---------- 共通 ----------
 
-<div class="search-box">
+function createStars(level){
 
-<input
-type="text"
-placeholder="🔍 キーワード検索">
+    if(level==1) return "★☆☆";
+    if(level==2) return "★★☆";
+    if(level==3) return "★★★";
 
-</div>
+    return "";
 
-<div class="menu-group">
+}
 
-<h3>対象者</h3>
+function createTags(tags){
 
-<a href="#">幼児向け</a>
+    return tags.map(tag=>{
 
-<a href="#">子ども向け</a>
+        return `<span class="tag">${tag}</span>`;
 
-<a href="#">大人向け</a>
+    }).join("");
 
-<a href="#">シニア・リハビリ</a>
-
-</div>
-
-<div class="menu-group">
-
-<h3>ジャンル</h3>
-
-<a href="#">ぬりえ</a>
-
-<a href="#">間違い探し</a>
-
-<a href="#">迷路</a>
-
-<a href="#">シール貼り</a>
-
-</div>
-
-</aside>
-
-<!-- ===== Main ===== -->
-
-<div class="container">
-
-<nav class="breadcrumb">
-
-<a href="index.html">ホーム</a>
-
->
-
-<a href="library.html">車</a>
-
->
-
-<span class="current">
-消防車ぬりえ①
-</span>
-
-</nav>
-
-<h2 class="work-title">
-
-消防車ぬりえ①
-
-</h2>
-
-<div class="category">
-
-車
-
-</div>
-
-<div class="category">
-
-ぬりえ
-
-</div>
-
-<div style="margin-top:10px;">
-
-<span class="tag">消防車</span>
-
-<span class="tag">働く車</span>
-
-<span class="tag">夏</span>
-
-</div>
-
-<div style="margin-top:25px;">
-
-<img
-src="assets/images/sample.jpg"
-alt="サンプル">
-
-</div>
-
-<p style="margin-top:20px;">
-
-消防車のぬりえです。
-
-A4サイズで印刷できます。
-
-ご家庭・施設・学校などでご利用ください。
-
-</p>
-
-<div class="info-box">
-
-<div class="info-item">
-
-難易度
-
-<br>
-
-★☆☆ 初級
-
-</div>
-
-<div class="info-item">
-
-対象
-
-<br>
-
-幼児〜小学生
-
-</div>
-
-<div class="info-item">
-
-サイズ
-
-<br>
-
-A4
-
-</div>
-
-<div class="info-item">
-
-道具
-
-<br>
-
-色えんぴつ
-
-</div>
-
-</div>
-
-<div class="ad-box">
-
-横長広告
-
-</div>
-
-<a href="#" class="button download-button">
-
-📄 PDFをダウンロード
-
-</a>
-
-<div class="section">
-
-<h2 class="section-title">
-
-おすすめ作品
-
-</h2>
-
-<div class="card">
-
-<img
-src="assets/images/sample.jpg">
-
-<div class="card-body">
-
-<h3 class="card-title">
-
-パトカーぬりえ
-
-</h3>
-
-<div class="card-level">
-
-★☆☆ 初級
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="section">
-
-<h2 class="section-title">
-
-関連カテゴリ
-
-</h2>
-
-<span class="tag">
-
-車
-
-</span>
-
-<span class="tag">
-
-ぬりえ
-
-</span>
-
-<span class="tag">
-
-働く車
-
-</span>
-
-</div>
-
-<div class="section">
-
-<div style="display:flex;justify-content:space-between;">
-
-<a href="#" class="button">
-
-← 前の作品
-
-</a>
-
-<a href="#" class="button">
-
-次の作品 →
-
-</a>
-
-</div>
-
-</div>
-
-<div class="ad-box">
-
-ページ下部広告
-
-</div>
-
-<p style="margin-top:30px;text-align:center;color:#777;">
-
-💡 個人・施設で無料でご利用いただけます。
-
-再配布・販売はご遠慮ください。
-
-</p>
-
-</div>
-
-<footer class="site-footer">
-
-<div class="footer-inner">
-
-<h3>
-
-あたまのストレッチ プリント館
-
-</h3>
-
-<p>
-
-無料でダウンロードできる脳トレ・知育プリント
-
-</p>
-
-<p>
-
-©2026 あたまのストレッチ プリント館
-
-</p>
-
-</div>
-
-</footer>
-
-<script src="assets/js/common.js"></script>
-
-</body>
-
-</html>
+}
