@@ -1,87 +1,186 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>あたまのストレッチ プリント館</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description" content="無料で印刷できる脳トレ・知育プリントを公開しています。幼児から大人・シニアまで楽しめるPDFをダウンロードできます。">
+<title>あたまのストレッチ プリント館</title>
 
-  <link rel="stylesheet" href="assets/css/style.css">
+<meta
+name="description"
+content="無料で印刷できる脳トレ・知育プリント。幼児からシニアまで楽しめるPDFを無料公開しています。">
+
+<link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
 <body>
 
-<header>
-  <div>
-    <h1>🧠 あたまのストレッチ プリント館</h1>
-    <p class="subtitle">
-      毎日5分の脳トレを、無料で。<br>
-      印刷してすぐ遊べる脳トレ・知育プリントを公開しています。
-    </p>
-  </div>
+<header id="header"></header>
 
-  <button id="adminButton" title="管理画面">
-    🔐
-  </button>
-</header>
+<div class="container">
 
-<main>
+    <aside id="sidebar"></aside>
 
-  <aside>
+    <main>
 
-    <input
-      type="text"
-      placeholder="検索..."
-      id="searchBox">
+        <!-- ヒーロー -->
 
-    <nav>
+        <section class="hero">
 
-      <h3>カテゴリ</h3>
+            <h1>🧠 あたまのストレッチ プリント館</h1>
 
-      <ul>
+            <p class="hero-subtitle">
 
-        <li>👶 幼児向け</li>
+                無料で印刷できる脳トレ・知育プリント。<br>
+                幼児からシニアまで楽しめるPDFを公開中。
 
-        <li>🧒 子供向け</li>
+            </p>
 
-        <li>👩 大人向け</li>
+        </section>
 
-        <li>👵 シニア・リハビリ</li>
+        <!-- NEW -->
 
-      </ul>
+        <section class="home-section">
 
-    </nav>
+            <div class="section-title">
 
-  </aside>
+                <h2>🆕 新着プリント</h2>
 
-  <section>
+                <a href="library.html">
+                    一覧を見る →
+                </a>
 
-    <h2>🌟 NEW</h2>
+            </div>
 
-    <div class="card-area">
-      （ここに最新作品が表示されます）
-    </div>
+            <div
+                id="newArea"
+                class="card-grid">
+            </div>
 
-    <h2>⭐ おすすめ</h2>
+            <p class="home-message">
 
-    <div class="card-area">
-      （ここにおすすめ作品が表示されます）
-    </div>
+                この図書館は少しずつ作品が増えています。<br>
+                気に入っていただけたら、また遊びに来てください😊
 
-  </section>
+            </p>
 
-</main>
+        </section>
 
-<footer>
+        <!-- おすすめ -->
 
-  <a href="#">🎮 あたまのストレッチはこちら</a>
+        <section class="home-section">
 
-  <a href="#">🛒 Etsyはこちら</a>
+            <div class="section-title">
 
-</footer>
+                <h2>⭐ おすすめ</h2>
+
+            </div>
+
+            <div
+                id="recommendArea"
+                class="card-grid">
+            </div>
+
+        </section>
+
+        <!-- カテゴリ -->
+
+        <section class="home-section">
+
+            <div class="section-title">
+
+                <h2>👶 カテゴリ別おすすめ</h2>
+
+            </div>
+
+            <div class="category-links">
+
+                <a href="library.html?category=幼児向け">
+                    幼児向け
+                </a>
+
+                <a href="library.html?category=子ども向け">
+                    子ども向け
+                </a>
+
+                <a href="library.html?category=大人向け">
+                    大人向け
+                </a>
+
+                <a href="library.html?category=シニア・リハビリ">
+                    シニア・リハビリ
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- バナー -->
+
+        <section class="banner-area">
+
+            <a
+                class="banner"
+                href="#">
+
+                🧠 毎日脳トレはこちら
+
+            </a>
+
+            <a
+                class="banner"
+                href="#">
+
+                🛒 Etsyまとめ購入はこちら
+
+            </a>
+
+        </section>
+
+    </main>
+
+</div>
+
+<footer id="footer"></footer>
+
+<script src="assets/data/works.js"></script>
 
 <script src="assets/js/common.js"></script>
+
+<script src="assets/js/library.js"></script>
+
+<script>
+
+const newArea = document.getElementById("newArea");
+const recommendArea = document.getElementById("recommendArea");
+
+if(typeof works !== "undefined"){
+
+    const newWorks =
+        works.filter(work=>work.isNew).slice(0,2);
+
+    const recommendWorks =
+        works.filter(work=>work.recommend).slice(0,4);
+
+    if(newArea){
+
+        newArea.innerHTML =
+            newWorks.map(createCard).join("");
+
+    }
+
+    if(recommendArea){
+
+        recommendArea.innerHTML =
+            recommendWorks.map(createCard).join("");
+
+    }
+
+}
+
+</script>
+
 </body>
 </html>
