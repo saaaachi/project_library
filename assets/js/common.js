@@ -1,34 +1,78 @@
 // ==========================
 // Project Library
 // common.js
-// Version 1.0
+// Version 1.1
 // ==========================
+
+// --------------------------
+// 共通パーツ読込
+// --------------------------
+
+async function loadComponent(id, file){
+
+    const target = document.getElementById(id);
+
+    if(!target) return;
+
+    try{
+
+        const response = await fetch(file);
+
+        target.innerHTML = await response.text();
+
+    }catch(error){
+
+        console.error(file + " の読み込みに失敗しました");
+
+    }
+
+}
+
+window.addEventListener("DOMContentLoaded", async ()=>{
+
+    await loadComponent("header","components/header.html");
+
+    await loadComponent("sidebar","components/sidebar.html");
+
+    await loadComponent("footer","components/footer.html");
+
+    setupMenu();
+
+    setupSearch();
+
+});
 
 // --------------------------
 // メニュー開閉
 // --------------------------
 
-const menuButton = document.getElementById("menuButton");
-const sidebar = document.getElementById("sidebar");
-const closeMenu = document.getElementById("closeMenu");
+function setupMenu(){
 
-if(menuButton){
+    const menuButton = document.getElementById("menuButton");
 
-    menuButton.onclick = () => {
+    const sidebar = document.getElementById("sidebar");
 
-        sidebar.classList.add("open");
+    const closeMenu = document.getElementById("closeMenu");
 
-    };
+    if(menuButton){
 
-}
+        menuButton.onclick = ()=>{
 
-if(closeMenu){
+            sidebar.classList.add("open");
 
-    closeMenu.onclick = () => {
+        };
 
-        sidebar.classList.remove("open");
+    }
 
-    };
+    if(closeMenu){
+
+        closeMenu.onclick = ()=>{
+
+            sidebar.classList.remove("open");
+
+        };
+
+    }
 
 }
 
@@ -36,9 +80,11 @@ if(closeMenu){
 // 共通検索
 // --------------------------
 
-const searchInput = document.getElementById("searchInput");
+function setupSearch(){
 
-if(searchInput){
+    const searchInput = document.getElementById("searchInput");
+
+    if(!searchInput) return;
 
     searchInput.addEventListener("focus",()=>{
 
