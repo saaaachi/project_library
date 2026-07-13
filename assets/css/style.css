@@ -874,3 +874,150 @@ background:#4CAF50;
 color:white;
 
 }
+/* ==========================
+   Library Layout
+========================== */
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fill,minmax(220px,1fr));
+
+    gap:20px;
+
+}
+
+.pageTitle{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.count{
+
+    color:#777;
+
+    font-size:14px;
+
+}
+
+.sort{
+
+    margin-bottom:25px;
+
+}
+
+.sort select{
+
+    padding:10px 15px;
+
+    border:1px solid #DDD;
+
+    border-radius:10px;
+
+    background:white;
+
+}
+
+/* ==========================
+   NEW Badge
+========================== */
+
+.badge{
+
+    display:inline-block;
+
+    padding:4px 8px;
+
+    border-radius:999px;
+
+    font-size:11px;
+
+    font-weight:bold;
+
+    margin-right:6px;
+
+}
+
+.badge-new{
+
+    background:#FF5252;
+
+    color:white;
+
+}
+
+.badge-recommend{
+
+    background:#4CAF50;
+
+    color:white;
+
+}
+
+/* ==========================
+   Work Detail
+========================== */
+
+.work-image{
+
+    max-width:600px;
+
+    margin:25px auto;
+
+}
+
+.work-description{
+
+    margin:25px 0;
+
+    line-height:1.9;
+
+}
+
+.related-area{
+
+    margin-top:50px;
+
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media(max-width:768px){
+
+.grid{
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:14px;
+
+}
+
+.pageTitle{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:10px;
+
+}
+
+.info-box{
+
+flex-direction:column;
+
+}
+
+}
