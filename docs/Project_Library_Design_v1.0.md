@@ -1812,3 +1812,33 @@ Project Libraryは
 2026年7月11日
 
 Project Library Version1.0 完成
+
+----
+
+Version1.0 追記（Version2.2実装）
+
+検索機能仕様
+
+対象ページ
+
+* library.html
+
+検索対象
+
+* タイトル
+* カテゴリ
+* 固定タグ
+* 自由タグ
+
+URLパラメータ
+
+* ?search=キーワード
+* ?category=カテゴリ名
+* ?tag=タグ名
+
+検索結果
+
+* 条件に一致した作品のみ表示
+* 一致件数を表示
+* 条件なしの場合は全作品表示
+
