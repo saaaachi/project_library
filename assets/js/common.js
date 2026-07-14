@@ -86,9 +86,24 @@ function setupSearch(){
 
     if(!searchInput) return;
 
-    searchInput.addEventListener("focus",()=>{
+    // Enterキーで検索
 
-        console.log("検索開始");
+    searchInput.addEventListener("keydown",(event)=>{
+
+        if(event.key !== "Enter") return;
+
+        const keyword = searchInput.value.trim();
+
+        if(keyword===""){
+
+            location.href="library.html";
+
+            return;
+
+        }
+
+        location.href =
+            `library.html?search=${encodeURIComponent(keyword)}`;
 
     });
 
