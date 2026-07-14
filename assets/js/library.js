@@ -54,7 +54,9 @@ function loadWorks(){
 
     const category = params.get("category");
 
-    const keyword = params.get("search");
+const keyword = params.get("search");
+
+const tag = params.get("tag");
 
     let result = works;
 
@@ -69,6 +71,20 @@ function loadWorks(){
         );
 
     }
+
+    // タグ検索
+
+if(tag){
+
+    result = result.filter(work=>
+
+        work.fixedTags.includes(tag) ||
+
+        work.freeTags.includes(tag)
+
+    );
+
+}
 
     // キーワード検索
 
