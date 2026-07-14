@@ -1,10 +1,14 @@
 // ==========================
-// Project Library
+// あたまのストレッチ プリント館
 // library.js
-// Version 1.0
+// Version 2.0
 // ==========================
 
 const cardArea = document.getElementById("cardArea");
+
+// --------------------------
+// ★表示
+// --------------------------
 
 function createStars(level){
 
@@ -13,7 +17,12 @@ function createStars(level){
     if(level === 3) return "★★★";
 
     return "";
+
 }
+
+// --------------------------
+// カード作成
+// --------------------------
 
 function createCard(work){
 
@@ -32,13 +41,76 @@ function createCard(work){
 
     </a>
     `;
+
 }
+
+// --------------------------
+// 一覧表示
+// --------------------------
 
 function loadWorks(){
 
+    const params = new URLSearchParams(location.search);
+
+    const category = params.get("category");
+
+    const keyword = params.get("search");
+
+    let result = works;
+
+    // カテゴリ検索
+
+    if(category){
+
+        result = result.filter(work=>
+
+            work.category.includes(category)
+
+        );
+
+    }
+
+    // キーワード検索
+
+    if(keyword){
+
+        const word = keyword.toLowerCase();
+
+        result = result.filter(work=>{
+
+            return (
+
+                work.title.toLowerCase().includes(word) ||
+
+                work.description.toLowerCase().includes(word) ||
+
+                work.freeTags.some(tag=>
+
+                    tag.toLowerCase().includes(word)
+
+                )
+
+            );
+
+        });
+
+    }
+
+    // 件数表示
+
+    const count = document.querySelector(".count");
+
+    if(count){
+
+        count.textContent = `作品${result.length}件`;
+
+    }
+
+    // カード生成
+
     let html = "";
 
-    works.forEach(work=>{
+    result.forEach(work=>{
 
         html += createCard(work);
 
