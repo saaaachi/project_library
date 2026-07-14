@@ -54,6 +54,10 @@ function setupMenu(){
 
     const closeMenu = document.getElementById("closeMenu");
 
+    console.log(menuButton);
+    console.log(sidebar);
+    console.log(closeMenu);
+
     if(menuButton){
 
         menuButton.onclick = ()=>{
