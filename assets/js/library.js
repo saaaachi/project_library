@@ -1,11 +1,12 @@
 // ==========================
 // あたまのストレッチ プリント館
 // library.js
-// Version 2.2
+// Version 2.3
 // ==========================
 
 const cardArea = document.getElementById("cardArea");
 const countArea = document.getElementById("countArea");
+const sortSelect = document.getElementById("sortSelect");
 
 // --------------------------
 // ★表示
@@ -125,6 +126,62 @@ function loadWorks(){
     }
 
     // --------------------------
+    // 並び替え
+    // --------------------------
+
+    if(sortSelect){
+
+        switch(sortSelect.value){
+
+            case "old":
+
+                result.sort((a,b)=>
+
+                    new Date(a.publishDate) -
+
+                    new Date(b.publishDate)
+
+                );
+
+                break;
+
+            case "easy":
+
+                result.sort((a,b)=>
+
+                    a.level - b.level
+
+                );
+
+                break;
+
+            case "hard":
+
+                result.sort((a,b)=>
+
+                    b.level - a.level
+
+                );
+
+                break;
+
+            default:
+
+                result.sort((a,b)=>
+
+                    new Date(b.publishDate) -
+
+                    new Date(a.publishDate)
+
+                );
+
+                break;
+
+        }
+
+    }
+
+    // --------------------------
     // 件数表示
     // --------------------------
 
@@ -177,7 +234,21 @@ function loadWorks(){
 }
 
 // --------------------------
-// 実行
+// 初回表示
 // --------------------------
 
 loadWorks();
+
+// --------------------------
+// 並び替え変更
+// --------------------------
+
+if(sortSelect){
+
+    sortSelect.addEventListener("change",()=>{
+
+        loadWorks();
+
+    });
+
+}
