@@ -1021,3 +1021,84 @@ flex-direction:column;
 }
 
 }
+/* ==========================
+   Card Grid
+========================== */
+
+.card-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:16px;
+
+    margin-top:20px;
+
+}
+
+@media(min-width:768px){
+
+.card-grid{
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+}
+
+/* ==========================
+   Card
+========================== */
+
+.card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    height:100%;
+
+}
+
+.card img{
+
+    width:100%;
+
+    aspect-ratio:1/1;
+
+    object-fit:cover;
+
+}
+
+.card-body{
+
+    padding:12px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex:1;
+
+}
+
+.card-body h3{
+
+    font-size:15px;
+
+    line-height:1.5;
+
+    min-height:48px;
+
+}
+
+.card-body p{
+
+    margin-top:auto;
+
+    color:#FF9800;
+
+    font-weight:bold;
+
+}
