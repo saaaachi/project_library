@@ -1,46 +1,93 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>作品一覧 | Project Library</title>
+
 <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
+
 <body>
 
 <header id="header"></header>
 
 <div class="container">
-  <aside id="sidebar"></aside>
 
-  <main>
-    <div class="breadcrumb">ホーム ＞ 一覧</div>
+    <aside id="sidebar"></aside>
 
-    <div class="pageTitle">
-      <h1>作品一覧</h1>
-      <div class="count">作品0件</div>
-    </div>
+    <main>
 
-    <div class="sort">
-      <select>
-        <option>新しい順</option>
-        <option>古い順</option>
-      </select>
-    </div>
+        <!-- パンくず -->
 
-    <div class="grid">
-      <div id="cardArea"></div>
-    </div>
+        <div class="breadcrumb">
 
-    <div class="ad">広告</div>
+            <a href="index.html">ホーム</a>
 
-  </main>
+            ＞
+
+            <span>作品一覧</span>
+
+        </div>
+
+        <!-- タイトル -->
+
+        <div class="pageTitle">
+
+            <h1>作品一覧</h1>
+
+            <div
+                class="count"
+                id="countArea">
+
+                作品0件
+
+            </div>
+
+        </div>
+
+        <!-- 並び替え -->
+
+        <div class="sort">
+
+            <select>
+
+                <option>新しい順</option>
+                <option>古い順</option>
+
+            </select>
+
+        </div>
+
+        <!-- 一覧 -->
+
+        <div
+            id="cardArea"
+            class="grid">
+
+        </div>
+
+        <!-- 広告 -->
+
+        <div class="ad-box">
+
+            広告
+
+        </div>
+
+    </main>
+
 </div>
-  
+
 <footer id="footer"></footer>
-  
+
 <script src="assets/js/common.js"></script>
+
 <script src="assets/data/works.js"></script>
+
 <script src="assets/js/library.js"></script>
 
 </body>
