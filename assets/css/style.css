@@ -353,9 +353,15 @@ footer{
 
 .site-title h1{
 
-    font-size:24px;
+    font-size:22px;
 
-    color:#333;
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
 
 }
 
@@ -399,7 +405,11 @@ footer{
 
 .site-title h1{
 
-    font-size:19px;
+    font-size:18px;
+
+}
+
+}
 
 }
 
