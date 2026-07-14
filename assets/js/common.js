@@ -50,7 +50,7 @@ function setupMenu(){
 
     const menuButton = document.getElementById("menuButton");
 
-    const sidebar = document.getElementById("sidebar");
+    const sidebar = document.querySelector(".sidebar");
 
     const closeMenu = document.getElementById("closeMenu");
 
