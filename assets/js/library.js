@@ -1,10 +1,11 @@
 // ==========================
 // あたまのストレッチ プリント館
 // library.js
-// Version 2.0
+// Version 2.2
 // ==========================
 
 const cardArea = document.getElementById("cardArea");
+const countArea = document.getElementById("countArea");
 
 // --------------------------
 // ★表示
@@ -29,7 +30,10 @@ function createCard(work){
     return `
     <a href="work.html?id=${work.id}" class="card">
 
-        <img src="${work.thumbnail}" alt="${work.title}">
+        <img
+            src="${work.thumbnail}"
+            alt="${work.title}"
+        >
 
         <div class="card-body">
 
@@ -53,14 +57,14 @@ function loadWorks(){
     const params = new URLSearchParams(location.search);
 
     const category = params.get("category");
+    const keyword = params.get("search");
+    const tag = params.get("tag");
 
-const keyword = params.get("search");
+    let result = [...works];
 
-const tag = params.get("tag");
-
-    let result = works;
-
+    // --------------------------
     // カテゴリ検索
+    // --------------------------
 
     if(category){
 
@@ -72,21 +76,25 @@ const tag = params.get("tag");
 
     }
 
+    // --------------------------
     // タグ検索
+    // --------------------------
 
-if(tag){
+    if(tag){
 
-    result = result.filter(work=>
+        result = result.filter(work=>
 
-        work.fixedTags.includes(tag) ||
+            work.fixedTags.includes(tag) ||
 
-        work.freeTags.includes(tag)
+            work.freeTags.includes(tag)
 
-    );
+        );
 
-}
+    }
 
+    // --------------------------
     // キーワード検索
+    // --------------------------
 
     if(keyword){
 
@@ -94,11 +102,15 @@ if(tag){
 
         result = result.filter(work=>{
 
-            return (
+            return(
 
-                work.title.toLowerCase().includes(word) ||
+                work.title.toLowerCase().includes(word)
 
-                work.description.toLowerCase().includes(word) ||
+                ||
+
+                work.description.toLowerCase().includes(word)
+
+                ||
 
                 work.freeTags.some(tag=>
 
@@ -112,17 +124,45 @@ if(tag){
 
     }
 
+    // --------------------------
     // 件数表示
+    // --------------------------
 
-    const count = document.querySelector(".count");
+    if(countArea){
 
-    if(count){
-
-        count.textContent = `作品${result.length}件`;
+        countArea.textContent = `作品${result.length}件`;
 
     }
 
-    // カード生成
+    // --------------------------
+    // 0件表示
+    // --------------------------
+
+    if(result.length === 0){
+
+        cardArea.innerHTML = `
+
+            <div class="no-result">
+
+                <h2>🔍 検索結果がありません</h2>
+
+                <p>
+
+                    条件を変えて検索してみてください😊
+
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    // --------------------------
+    // カード表示
+    // --------------------------
 
     let html = "";
 
@@ -135,5 +175,9 @@ if(tag){
     cardArea.innerHTML = html;
 
 }
+
+// --------------------------
+// 実行
+// --------------------------
 
 loadWorks();
