@@ -320,9 +320,7 @@ footer{
     position:sticky;
     top:0;
     z-index:1000;
-
     background:#ffffff;
-
     border-bottom:1px solid #E5E5E5;
 
 }
@@ -330,47 +328,35 @@ footer{
 .header-inner{
 
     max-width:1200px;
-
     margin:auto;
-
     padding:14px 18px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
 
 }
 
 .site-title{
 
-    text-align:center;
-
     flex:1;
+    text-align:center;
 
 }
 
 .site-title h1{
 
-    font-size:22px;
-
+    font-size:20px;
     white-space:nowrap;
-
     overflow:hidden;
-
     text-overflow:ellipsis;
-
-}
 
 }
 
 .site-title p{
 
     font-size:13px;
-
     color:#777;
-
     margin-top:3px;
 
 }
@@ -378,11 +364,8 @@ footer{
 .menu-button{
 
     background:none;
-
     border:none;
-
     font-size:28px;
-
     cursor:pointer;
 
 }
@@ -390,7 +373,6 @@ footer{
 .admin-button{
 
     font-size:22px;
-
     padding:8px;
 
 }
@@ -405,11 +387,7 @@ footer{
 
 .site-title h1{
 
-    font-size:18px;
-
-}
-
-}
+    font-size:17px;
 
 }
 
