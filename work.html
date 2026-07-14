@@ -1,108 +1,43 @@
-// ==========================
-// Project Library
-// work.js
-// Version 1.0
-// ==========================
+<!DOCTYPE html>
+<html lang="ja">
+<head>
 
-const params = new URLSearchParams(location.search);
-const workId = Number(params.get("id"));
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const work = works.find(w => w.id === workId);
+<title>作品詳細 | あたまのストレッチ プリント館</title>
 
-const area = document.getElementById("workArea");
+<meta
+name="description"
+content="脳トレ・知育プリントの詳細ページです。無料でPDFをダウンロードできます。">
 
-if (!work) {
+<link rel="stylesheet" href="assets/css/style.css">
 
-    area.innerHTML = `
-        <h2>作品が見つかりません。</h2>
-    `;
+</head>
 
-} else {
+<body>
 
-    area.innerHTML = `
+<header id="header"></header>
 
-        <div class="breadcrumb">
-            <a href="index.html">ホーム</a>
-            ＞
-            <a href="library.html">作品一覧</a>
-            ＞
-            ${work.title}
-        </div>
+<div class="container">
 
-        <h1>${work.title}</h1>
+    <aside id="sidebar"></aside>
 
-        <img
-            src="${work.thumbnail}"
-            class="work-image"
-            alt="${work.title}"
-        >
+    <main>
 
-        <div class="info-box">
+        <div id="workArea"></div>
 
-            <div class="info-item">
-                難易度<br>
-                ${createStars(work.level)}
-            </div>
+    </main>
 
-            <div class="info-item">
-                対象年齢<br>
-                ${work.age}
-            </div>
+</div>
 
-            <div class="info-item">
-                サイズ<br>
-                ${work.size}
-            </div>
+<footer id="footer"></footer>
 
-            <div class="info-item">
-                道具<br>
-                ${work.tools.join("・")}
-            </div>
+<script src="assets/data/works.js"></script>
 
-        </div>
+<script src="assets/js/common.js"></script>
 
-        <p class="work-description">
-            ${work.description}
-        </p>
+<script src="assets/js/work.js"></script>
 
-        <div class="card-tags">
-            ${createTags(work.freeTags)}
-        </div>
-
-        <div class="ad-box">
-            横長広告
-        </div>
-
-        <a
-            class="button download-button"
-            href="${work.pdf}"
-            target="_blank"
-        >
-            PDFをダウンロード
-        </a>
-
-    `;
-
-}
-
-// ---------- 共通 ----------
-
-function createStars(level){
-
-    if(level==1) return "★☆☆";
-    if(level==2) return "★★☆";
-    if(level==3) return "★★★";
-
-    return "";
-
-}
-
-function createTags(tags){
-
-    return tags.map(tag=>{
-
-        return `<span class="tag">${tag}</span>`;
-
-    }).join("");
-
-}
+</body>
+</html>
