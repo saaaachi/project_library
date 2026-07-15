@@ -1,12 +1,13 @@
 // ==========================
 // あたまのストレッチ プリント館
 // library.js
-// Version 2.3
+// Version 2.6
 // ==========================
 
 const cardArea = document.getElementById("cardArea");
 const countArea = document.getElementById("countArea");
 const sortSelect = document.getElementById("sortSelect");
+const breadcrumbArea = document.getElementById("breadcrumbArea");
 
 // --------------------------
 // ★表示
@@ -50,10 +51,80 @@ function createCard(work){
 }
 
 // --------------------------
+// パンくず生成
+// --------------------------
+
+function createBreadcrumb(){
+
+    if(!breadcrumbArea) return;
+
+    const params = new URLSearchParams(location.search);
+
+    const category = params.get("category");
+    const tag = params.get("tag");
+    const keyword = params.get("search");
+
+    let html = `
+        <a href="index.html">ホーム</a>
+    `;
+
+    if(category){
+
+        html += `
+            ＞
+            <a href="library.html?category=${encodeURIComponent(category)}">
+                ${category}
+            </a>
+        `;
+
+    }
+
+    if(tag){
+
+        const url = category
+            ? `library.html?category=${encodeURIComponent(category)}&tag=${encodeURIComponent(tag)}`
+            : `library.html?tag=${encodeURIComponent(tag)}`;
+
+        html += `
+            ＞
+            <a href="${url}">
+                ${tag}
+            </a>
+        `;
+
+    }
+
+    if(keyword){
+
+        html += `
+            ＞
+            <span>
+                「${keyword}」検索結果
+            </span>
+        `;
+
+    }
+
+    if(!category && !tag && !keyword){
+
+        html += `
+            ＞
+            <span>作品一覧</span>
+        `;
+
+    }
+
+    breadcrumbArea.innerHTML = html;
+
+}
+
+// --------------------------
 // 一覧表示
 // --------------------------
 
 function loadWorks(){
+
+    createBreadcrumb();
 
     const params = new URLSearchParams(location.search);
 
@@ -62,8 +133,7 @@ function loadWorks(){
     const tag = params.get("tag");
 
     let result = [...works];
-
-    // --------------------------
+        // --------------------------
     // カテゴリ検索
     // --------------------------
 
@@ -113,9 +183,9 @@ function loadWorks(){
 
                 ||
 
-                work.freeTags.some(tag=>
+                work.freeTags.some(item=>
 
-                    tag.toLowerCase().includes(word)
+                    item.toLowerCase().includes(word)
 
                 )
 
@@ -192,7 +262,7 @@ function loadWorks(){
     }
 
     // --------------------------
-    // 0件表示
+    // 検索結果0件
     // --------------------------
 
     if(result.length === 0){
@@ -217,7 +287,7 @@ function loadWorks(){
 
     }
 
-    // --------------------------
+        // --------------------------
     // カード表示
     // --------------------------
 
@@ -252,3 +322,4 @@ if(sortSelect){
     });
 
 }
+    
