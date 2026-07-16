@@ -112,3 +112,116 @@ placeholder="消防車・夏・恐竜">
 type="text"
 id="series"
 placeholder="働く車シリーズ">
+<label>難易度</label>
+
+<select id="difficulty">
+
+<option value="1">★☆☆ 初級</option>
+<option value="2">★★☆ 中級</option>
+<option value="3">★★★ 上級</option>
+
+</select>
+
+<label>対象年齢</label>
+
+<input
+type="text"
+id="age"
+placeholder="3〜6歳">
+
+<label>印刷サイズ</label>
+
+<select id="size">
+
+<option>A4</option>
+<option>A3</option>
+
+</select>
+
+<label>必要な道具</label>
+
+<input
+type="text"
+id="tools"
+placeholder="色えんぴつ・はさみ">
+
+<label>説明</label>
+
+<textarea
+id="description"
+rows="6"
+placeholder="作品説明を入力"></textarea>
+
+</form>
+
+<!-- ======================
+操作ボタン
+====================== -->
+
+<div class="admin-bottom-bar">
+
+<button
+type="button"
+class="draft">
+
+下書き保存
+
+</button>
+
+<button
+type="button"
+class="publish">
+
+公開する
+
+</button>
+
+</div>
+
+<!-- ======================
+登録済み作品
+====================== -->
+
+<section class="admin-list">
+
+<h2>
+
+登録済み作品
+
+</h2>
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>No</th>
+<th>タイトル</th>
+<th>カテゴリ</th>
+<th>操作</th>
+
+</tr>
+
+</thead>
+
+<tbody id="workList">
+
+</tbody>
+
+</table>
+
+</section>
+</main>
+
+<footer id="footer"></footer>
+
+<script src="assets/js/common.js"></script>
+
+<script src="assets/data/works.js"></script>
+
+<script src="assets/js/admin.js"></script>
+
+</body>
+
+</html>
