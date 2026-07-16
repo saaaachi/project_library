@@ -1,13 +1,24 @@
 // ==========================
 // あたまのストレッチ プリント館
 // library.js
-// Version 2.6
+// Version 2.7
 // ==========================
 
 const cardArea = document.getElementById("cardArea");
 const countArea = document.getElementById("countArea");
 const sortSelect = document.getElementById("sortSelect");
 const breadcrumbArea = document.getElementById("breadcrumbArea");
+
+// --------------------------
+// URLパラメータ取得
+// --------------------------
+
+const params = new URLSearchParams(location.search);
+
+const category = params.get("category");
+const tag = params.get("tag");
+const keyword = params.get("search");
+const level = params.get("level");
 
 // --------------------------
 // ★表示
@@ -49,7 +60,6 @@ function createCard(work){
     `;
 
 }
-
 // --------------------------
 // パンくず生成
 // --------------------------
@@ -58,43 +68,39 @@ function createBreadcrumb(){
 
     if(!breadcrumbArea) return;
 
-    const params = new URLSearchParams(location.search);
-
-    const category = params.get("category");
-    const tag = params.get("tag");
-    const keyword = params.get("search");
-
     let html = `
         <a href="index.html">ホーム</a>
     `;
 
+    let query = "";
+
     if(category){
+
+        query = `category=${encodeURIComponent(category)}`;
 
         html += `
             ＞
-            <a href="library.html?category=${encodeURIComponent(category)}">
+            <a href="library.html?${query}">
                 ${category}
             </a>
         `;
-
     }
 
     if(tag){
 
-        const url = category
-            ? `library.html?category=${encodeURIComponent(category)}&tag=${encodeURIComponent(tag)}`
-            : `library.html?tag=${encodeURIComponent(tag)}`;
+        query += `${query ? "&" : ""}tag=${encodeURIComponent(tag)}`;
 
         html += `
             ＞
-            <a href="${url}">
+            <a href="library.html?${query}">
                 ${tag}
             </a>
         `;
-
     }
 
     if(keyword){
+
+        query += `${query ? "&" : ""}search=${encodeURIComponent(keyword)}`;
 
         html += `
             ＞
@@ -102,38 +108,36 @@ function createBreadcrumb(){
                 「${keyword}」検索結果
             </span>
         `;
-
     }
 
-    if(!category && !tag && !keyword){
+    if(level){
+
+        html += `
+            ＞
+            <span>
+                難易度 ${createStars(Number(level))}
+            </span>
+        `;
+    }
+
+    if(!category && !tag && !keyword && !level){
 
         html += `
             ＞
             <span>作品一覧</span>
         `;
-
     }
 
     breadcrumbArea.innerHTML = html;
 
 }
-
-// --------------------------
-// 一覧表示
-// --------------------------
-
 function loadWorks(){
 
     createBreadcrumb();
 
-    const params = new URLSearchParams(location.search);
-
-    const category = params.get("category");
-    const keyword = params.get("search");
-    const tag = params.get("tag");
-
     let result = [...works];
-        // --------------------------
+
+    // --------------------------
     // カテゴリ検索
     // --------------------------
 
@@ -183,6 +187,14 @@ function loadWorks(){
 
                 ||
 
+                work.fixedTags.some(item=>
+
+                    item.toLowerCase().includes(word)
+
+                )
+
+                ||
+
                 work.freeTags.some(item=>
 
                     item.toLowerCase().includes(word)
@@ -196,6 +208,19 @@ function loadWorks(){
     }
 
     // --------------------------
+    // 難易度検索（将来用）
+    // --------------------------
+
+    if(level){
+
+        result = result.filter(work=>
+
+            work.level === Number(level)
+
+        );
+
+    }
+        // --------------------------
     // 並び替え
     // --------------------------
 
@@ -208,7 +233,6 @@ function loadWorks(){
                 result.sort((a,b)=>
 
                     new Date(a.publishDate) -
-
                     new Date(b.publishDate)
 
                 );
@@ -240,7 +264,6 @@ function loadWorks(){
                 result.sort((a,b)=>
 
                     new Date(b.publishDate) -
-
                     new Date(a.publishDate)
 
                 );
@@ -287,19 +310,13 @@ function loadWorks(){
 
     }
 
-        // --------------------------
+    // --------------------------
     // カード表示
     // --------------------------
 
-    let html = "";
-
-    result.forEach(work=>{
-
-        html += createCard(work);
-
-    });
-
-    cardArea.innerHTML = html;
+    cardArea.innerHTML = result
+        .map(work=>createCard(work))
+        .join("");
 
 }
 
@@ -315,11 +332,6 @@ loadWorks();
 
 if(sortSelect){
 
-    sortSelect.addEventListener("change",()=>{
-
-        loadWorks();
-
-    });
+    sortSelect.addEventListener("change",loadWorks);
 
 }
-    
