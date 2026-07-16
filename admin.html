@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>管理画面 | Project Library</title>
 
 <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
 <body>
@@ -15,23 +17,32 @@
 
 <main class="admin-container">
 
-<h2>作品登録</h2>
+<h2>作品管理</h2>
+
+<!-- ======================
+登録フォーム
+====================== -->
 
 <form id="workForm">
 
+<input type="hidden" id="editId">
+
 <label>タイトル</label>
+
 <input
 type="text"
 id="title"
 placeholder="作品タイトル">
 
 <label>PDFファイル</label>
+
 <input
 type="file"
 id="pdf"
 accept=".pdf">
 
 <label>サムネイル画像</label>
+
 <input
 type="file"
 id="thumbnail"
@@ -51,10 +62,33 @@ accept="image/*">
 
 <div class="check-group">
 
-<label><input type="checkbox"> 幼児向け</label>
-<label><input type="checkbox"> 子ども向け</label>
-<label><input type="checkbox"> 大人向け</label>
-<label><input type="checkbox"> シニア・リハビリ</label>
+<label>
+<input
+type="checkbox"
+value="幼児向け">
+幼児向け
+</label>
+
+<label>
+<input
+type="checkbox"
+value="子ども向け">
+子ども向け
+</label>
+
+<label>
+<input
+type="checkbox"
+value="大人向け">
+大人向け
+</label>
+
+<label>
+<input
+type="checkbox"
+value="シニア・リハビリ">
+シニア・リハビリ
+</label>
 
 </div>
 
@@ -62,89 +96,19 @@ accept="image/*">
 
 <input
 type="text"
-placeholder="ぬりえ・迷路・計算など">
+id="fixedTags"
+placeholder="ぬりえ・迷路・計算">
 
 <label>自由タグ</label>
 
 <input
 type="text"
-placeholder="消防車・夏・恐竜など">
-
-<div class="tag-history">
-
-<small>
-
-入力済みタグ候補がここに表示されます（Version1.1予定）
-
-</small>
-
-</div>
+id="freeTags"
+placeholder="消防車・夏・恐竜">
 
 <label>シリーズ名</label>
 
 <input
 type="text"
+id="series"
 placeholder="働く車シリーズ">
-
-<label>難易度</label>
-
-<select id="difficulty">
-
-<option value="1">★☆☆ 初級</option>
-<option value="2">★★☆ 中級</option>
-<option value="3">★★★ 上級</option>
-
-</select>
-
-<label>対象年齢</label>
-
-<input
-type="text"
-placeholder="3〜6歳">
-
-<label>印刷サイズ</label>
-
-<select>
-
-<option>A4</option>
-<option>A3</option>
-
-</select>
-
-<label>必要な道具</label>
-
-<input
-type="text"
-placeholder="色えんぴつ">
-
-<label>説明</label>
-
-<textarea
-rows="6"
-placeholder="作品説明を入力"></textarea>
-
-</form>
-
-</main>
-
-<div class="admin-bottom-bar">
-
-<button class="draft">
-
-下書き保存
-
-</button>
-
-<button class="publish">
-
-公開する
-
-</button>
-
-</div>
-
-<script src="assets/js/common.js"></script>
-<script src="assets/js/admin.js"></script>
-
-</body>
-</html>
