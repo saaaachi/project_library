@@ -1,8 +1,12 @@
 // ==========================
 // Project Library
 // admin.js
-// Version 3.0
+// Version 4.0
 // ==========================
+
+// --------------------------
+// フォーム
+// --------------------------
 
 const form = document.getElementById("workForm");
 
@@ -10,15 +14,70 @@ const draftButton = document.querySelector(".draft");
 const publishButton = document.querySelector(".publish");
 
 const thumbnailInput = document.getElementById("thumbnail");
+const pdfInput = document.getElementById("pdf");
+
 const preview = document.querySelector(".thumbnail-preview");
 
 const workList = document.getElementById("workList");
-const searchWork = document.getElementById("searchWork");
+
+// --------------------------
+// 編集ID
+// --------------------------
 
 let editId = null;
 
 // --------------------------
+// 投稿データ
+// Version4からここへまとめる
+// --------------------------
+
+let workData = {
+
+    id: null,
+
+    workNo: "",
+
+    title: "",
+
+    category: [],
+
+    fixedTags: [],
+
+    freeTags: [],
+
+    series: "",
+
+    level: 1,
+
+    age: "",
+
+    size: "A4",
+
+    tools: [],
+
+    description: "",
+
+    thumbnail: "",
+
+    pdf: "",
+
+    isNew: true,
+
+    recommend: false,
+
+    publishDate: "",
+
+    updateDate: "",
+
+    etsy: "",
+
+    related: []
+
+};
+
+// --------------------------
 // サムネイルプレビュー
+// （Version4では後でPDF自動生成へ変更）
 // --------------------------
 
 thumbnailInput.addEventListener("change", function(){
@@ -28,6 +87,7 @@ thumbnailInput.addEventListener("change", function(){
     if(!file){
 
         preview.innerHTML = "サムネイルプレビュー";
+
         return;
 
     }
@@ -56,6 +116,24 @@ border-radius:10px;
 });
 
 // --------------------------
+// PDF選択
+// Version4では次回ここを強化
+// --------------------------
+
+pdfInput.addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(!file){
+
+        return;
+
+    }
+
+    console.log("PDF選択:", file.name);
+
+});
+// --------------------------
 // 一覧表示
 // --------------------------
 
@@ -63,21 +141,9 @@ function renderList(){
 
     if(!workList) return;
 
-    const keyword = searchWork
-        ? searchWork.value.toLowerCase()
-        : "";
-
     let html = "";
 
-    works
-    .filter(work=>{
-
-        return work.title
-            .toLowerCase()
-            .includes(keyword);
-
-    })
-    .forEach(work=>{
+    works.forEach(work=>{
 
         html += `
 
@@ -103,19 +169,7 @@ ${work.category.join("・")}
 
 <td>
 
-${work.publishDate}
-
-</td>
-
-<td>
-
-${work.updateDate}
-
-</td>
-
-<td>
-
-${work.isNew ? "🟢公開" : "⚪公開"}
+${createStars(work.level)}
 
 </td>
 
@@ -150,67 +204,77 @@ onclick="deleteWork(${work.id})">
 }
 
 // --------------------------
+// ★表示
+// --------------------------
+
+function createStars(level){
+
+    if(level === 1) return "★☆☆";
+
+    if(level === 2) return "★★☆";
+
+    if(level === 3) return "★★★";
+
+    return "";
+
+}
+
+// --------------------------
 // 編集
 // --------------------------
 
 function editWork(id){
 
-    const work = works.find(item => item.id === id);
+    const work = works.find(item=>item.id===id);
 
     if(!work) return;
 
     editId = id;
 
+    // Version4では
+    // 編集中のデータを丸ごとコピーして保持
+
+    workData = structuredClone(work);
+
     document.getElementById("title").value =
-        work.title;
+        workData.title;
 
     document.getElementById("fixedTags").value =
-        work.fixedTags.join(",");
+        workData.fixedTags.join(",");
 
     document.getElementById("freeTags").value =
-        work.freeTags.join(",");
+        workData.freeTags.join(",");
 
     document.getElementById("series").value =
-        work.series;
+        workData.series;
 
     document.getElementById("difficulty").value =
-        work.level;
+        workData.level;
 
     document.getElementById("age").value =
-        work.age;
+        workData.age;
 
     document.getElementById("size").value =
-        work.size;
+        workData.size;
 
     document.getElementById("tools").value =
-        work.tools.join(",");
+        workData.tools.join(",");
 
     document.getElementById("description").value =
-        work.description;
-
-    // --------------------------
-    // カテゴリ復元
-    // --------------------------
+        workData.description;
 
     document
-        .querySelectorAll(
-            '.check-group input[type="checkbox"]'
-        )
+        .querySelectorAll('.check-group input[type="checkbox"]')
         .forEach(box=>{
 
-            box.checked =
-                work.category.includes(box.value);
+            box.checked = workData.category.includes(box.value);
 
         });
-
-    // --------------------------
-    // サムネイル表示
-    // --------------------------
 
     preview.innerHTML = `
 
 <img
-src="${work.thumbnail}"
+src="${workData.thumbnail}"
 style="
 width:100%;
 height:100%;
@@ -249,11 +313,7 @@ function deleteWork(id){
 
     if(!ok) return;
 
-    const index = works.findIndex(item=>
-
-        item.id===id
-
-    );
+    const index = works.findIndex(item=>item.id===id);
 
     if(index !== -1){
 
@@ -261,9 +321,7 @@ function deleteWork(id){
 
     }
 
-    renderList();
-
-    // 編集中なら解除
+    // 編集中だったら解除
 
     if(editId === id){
 
@@ -277,20 +335,77 @@ function deleteWork(id){
 
     }
 
+    renderList();
+
 }
 
+// --------------------------
+// フォーム内容取得
+// Version4新機能
+// --------------------------
+
+function collectFormData(){
+
+    workData.title =
+        document.getElementById("title").value.trim();
+
+    workData.fixedTags =
+        document.getElementById("fixedTags")
+        .value
+        .split(",")
+        .map(tag=>tag.trim())
+        .filter(tag=>tag);
+
+    workData.freeTags =
+        document.getElementById("freeTags")
+        .value
+        .split(",")
+        .map(tag=>tag.trim())
+        .filter(tag=>tag);
+
+    workData.series =
+        document.getElementById("series").value.trim();
+
+    workData.level =
+        Number(document.getElementById("difficulty").value);
+
+    workData.age =
+        document.getElementById("age").value.trim();
+
+    workData.size =
+        document.getElementById("size").value;
+
+    workData.tools =
+        document.getElementById("tools")
+        .value
+        .split(",")
+        .map(tool=>tool.trim())
+        .filter(tool=>tool);
+
+    workData.description =
+        document.getElementById("description").value.trim();
+
+    workData.category = [];
+
+    document
+        .querySelectorAll('.check-group input[type="checkbox"]:checked')
+        .forEach(box=>{
+
+            workData.category.push(box.value);
+
+        });
+
+}
 // --------------------------
 // 公開・更新
 // --------------------------
 
 publishButton.addEventListener("click", function(){
 
-    const title =
-        document.getElementById("title")
-        .value
-        .trim();
+    // フォーム内容を取得
+    collectFormData();
 
-    if(title === ""){
+    if(workData.title === ""){
 
         alert("タイトルを入力してください。");
 
@@ -298,72 +413,37 @@ publishButton.addEventListener("click", function(){
 
     }
 
+    const today = new Date().toISOString().slice(0,10);
+
     if(editId){
 
         // --------------------------
         // 更新
         // --------------------------
 
-        const work = works.find(item=>
+        const index = works.findIndex(item=>item.id===editId);
 
-            item.id === editId
+        workData.id = editId;
 
-        );
+        workData.workNo = works[index].workNo;
 
-        work.title = title;
+        workData.thumbnail = works[index].thumbnail;
 
-        work.fixedTags =
-            document.getElementById("fixedTags")
-            .value
-            .split(",")
-            .map(tag=>tag.trim())
-            .filter(tag=>tag);
+        workData.pdf = works[index].pdf;
 
-        work.freeTags =
-            document.getElementById("freeTags")
-            .value
-            .split(",")
-            .map(tag=>tag.trim())
-            .filter(tag=>tag);
+        workData.publishDate = works[index].publishDate;
 
-        work.series =
-            document.getElementById("series").value;
+        workData.updateDate = today;
 
-        work.level =
-            Number(
-                document.getElementById("difficulty").value
-            );
+        workData.isNew = works[index].isNew;
 
-        work.age =
-            document.getElementById("age").value;
+        workData.recommend = works[index].recommend;
 
-        work.size =
-            document.getElementById("size").value;
+        workData.etsy = works[index].etsy;
 
-        work.tools =
-            document.getElementById("tools")
-            .value
-            .split(",")
-            .map(tool=>tool.trim())
-            .filter(tool=>tool);
+        workData.related = works[index].related;
 
-        work.description =
-            document.getElementById("description").value;
-
-        work.category = [];
-
-        document
-            .querySelectorAll(
-                '.check-group input[type="checkbox"]:checked'
-            )
-            .forEach(box=>{
-
-                work.category.push(box.value);
-
-            });
-
-        work.updateDate =
-            new Date().toISOString().slice(0,10);
+        works[index] = structuredClone(workData);
 
         alert("作品を更新しました😊");
 
@@ -373,91 +453,42 @@ publishButton.addEventListener("click", function(){
         // 新規追加
         // --------------------------
 
-        const newWork = {
+        workData.id = Date.now();
 
-            id: Date.now(),
+        workData.workNo =
+            "PL-" +
+            String(works.length + 1).padStart(6,"0");
 
-            workNo: "PL-" + Date.now(),
+        workData.thumbnail =
+            "assets/images/sample.jpg";
 
-            title: title,
+        workData.pdf = "";
 
-            category: [],
+        workData.publishDate = today;
 
-            fixedTags:
-                document.getElementById("fixedTags")
-                .value
-                .split(",")
-                .map(tag=>tag.trim())
-                .filter(tag=>tag),
+        workData.updateDate = today;
 
-            freeTags:
-                document.getElementById("freeTags")
-                .value
-                .split(",")
-                .map(tag=>tag.trim())
-                .filter(tag=>tag),
+        workData.isNew = true;
 
-            series:
-                document.getElementById("series").value,
+        workData.recommend = false;
 
-            level:
-                Number(
-                    document.getElementById("difficulty").value
-                ),
+        workData.etsy = "";
 
-            age:
-                document.getElementById("age").value,
+        workData.related = [];
 
-            size:
-                document.getElementById("size").value,
+        works.unshift(
 
-            tools:
-                document.getElementById("tools")
-                .value
-                .split(",")
-                .map(tool=>tool.trim())
-                .filter(tool=>tool),
+            structuredClone(workData)
 
-            description:
-                document.getElementById("description").value,
-
-            thumbnail:
-                "assets/images/sample.jpg",
-
-            pdf:
-                "",
-
-            isNew: true,
-
-            recommend: false,
-
-            publishDate:
-                new Date().toISOString().slice(0,10),
-
-            updateDate:
-                new Date().toISOString().slice(0,10),
-
-            etsy: "",
-
-            related: []
-
-        };
-
-        document
-            .querySelectorAll(
-                '.check-group input[type="checkbox"]:checked'
-            )
-            .forEach(box=>{
-
-                newWork.category.push(box.value);
-
-            });
-
-        works.unshift(newWork);
+        );
 
         alert("作品を追加しました😊");
 
     }
+
+    // --------------------------
+    // 初期化
+    // --------------------------
 
     editId = null;
 
@@ -467,37 +498,53 @@ publishButton.addEventListener("click", function(){
 
     publishButton.textContent = "公開する";
 
+    workData = {
+
+        id:null,
+
+        workNo:"",
+
+        title:"",
+
+        category:[],
+
+        fixedTags:[],
+
+        freeTags:[],
+
+        series:"",
+
+        level:1,
+
+        age:"",
+
+        size:"A4",
+
+        tools:[],
+
+        description:"",
+
+        thumbnail:"",
+
+        pdf:"",
+
+        isNew:true,
+
+        recommend:false,
+
+        publishDate:"",
+
+        updateDate:"",
+
+        etsy:"",
+
+        related:[]
+
+    };
+
     renderList();
 
 });
-
-// --------------------------
-// 下書き保存
-// --------------------------
-
-draftButton.addEventListener("click", function(){
-
-    alert(
-
-        "Version3.0では下書き保存は準備中です😊"
-
-    );
-
-});
-
-// --------------------------
-// 一覧検索
-// --------------------------
-
-if(searchWork){
-
-    searchWork.addEventListener("input", function(){
-
-        renderList();
-
-    });
-
-}
 
 // --------------------------
 // 初回表示
@@ -505,12 +552,8 @@ if(searchWork){
 
 renderList();
 
-// --------------------------
-// Version情報
-// --------------------------
-
 console.log(
 
-    "Project Library admin.js Version 3.0"
+    "Project Library admin.js Version4.0"
 
 );
