@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // admin.js
-// Version 2.0
+// Version 3.0
 // ==========================
 
 const form = document.getElementById("workForm");
@@ -13,6 +13,7 @@ const thumbnailInput = document.getElementById("thumbnail");
 const preview = document.querySelector(".thumbnail-preview");
 
 const workList = document.getElementById("workList");
+const searchWork = document.getElementById("searchWork");
 
 let editId = null;
 
@@ -62,19 +63,61 @@ function renderList(){
 
     if(!workList) return;
 
+    const keyword = searchWork
+        ? searchWork.value.toLowerCase()
+        : "";
+
     let html = "";
 
-    works.forEach(work=>{
+    works
+    .filter(work=>{
+
+        return work.title
+            .toLowerCase()
+            .includes(keyword);
+
+    })
+    .forEach(work=>{
 
         html += `
 
 <tr>
 
-<td>${work.workNo}</td>
+<td>
 
-<td>${work.title}</td>
+${work.workNo}
 
-<td>${work.category.join("・")}</td>
+</td>
+
+<td>
+
+${work.title}
+
+</td>
+
+<td>
+
+${work.category.join("・")}
+
+</td>
+
+<td>
+
+${work.publishDate}
+
+</td>
+
+<td>
+
+${work.updateDate}
+
+</td>
+
+<td>
+
+${work.isNew ? "🟢公開" : "⚪公開"}
+
+</td>
 
 <td>
 
@@ -105,6 +148,7 @@ onclick="deleteWork(${work.id})">
     workList.innerHTML = html;
 
 }
+
 // --------------------------
 // 編集
 // --------------------------
@@ -117,7 +161,8 @@ function editWork(id){
 
     editId = id;
 
-    document.getElementById("title").value = work.title;
+    document.getElementById("title").value =
+        work.title;
 
     document.getElementById("fixedTags").value =
         work.fixedTags.join(",");
@@ -144,14 +189,17 @@ function editWork(id){
         work.description;
 
     // --------------------------
-    // カテゴリ
+    // カテゴリ復元
     // --------------------------
 
     document
-        .querySelectorAll('.check-group input[type="checkbox"]')
+        .querySelectorAll(
+            '.check-group input[type="checkbox"]'
+        )
         .forEach(box=>{
 
-            box.checked = work.category.includes(box.value);
+            box.checked =
+                work.category.includes(box.value);
 
         });
 
@@ -189,7 +237,7 @@ border-radius:10px;
 
 function deleteWork(id){
 
-    const work = works.find(item => item.id === id);
+    const work = works.find(item=>item.id===id);
 
     if(!work) return;
 
@@ -203,7 +251,7 @@ function deleteWork(id){
 
     const index = works.findIndex(item=>
 
-        item.id === id
+        item.id===id
 
     );
 
@@ -215,7 +263,7 @@ function deleteWork(id){
 
     renderList();
 
-    // 編集中だった場合は解除
+    // 編集中なら解除
 
     if(editId === id){
 
@@ -230,13 +278,17 @@ function deleteWork(id){
     }
 
 }
+
 // --------------------------
 // 公開・更新
 // --------------------------
 
 publishButton.addEventListener("click", function(){
 
-    const title = document.getElementById("title").value.trim();
+    const title =
+        document.getElementById("title")
+        .value
+        .trim();
 
     if(title === ""){
 
@@ -252,7 +304,11 @@ publishButton.addEventListener("click", function(){
         // 更新
         // --------------------------
 
-        const work = works.find(item=>item.id===editId);
+        const work = works.find(item=>
+
+            item.id === editId
+
+        );
 
         work.title = title;
 
@@ -274,7 +330,9 @@ publishButton.addEventListener("click", function(){
             document.getElementById("series").value;
 
         work.level =
-            Number(document.getElementById("difficulty").value);
+            Number(
+                document.getElementById("difficulty").value
+            );
 
         work.age =
             document.getElementById("age").value;
@@ -295,12 +353,17 @@ publishButton.addEventListener("click", function(){
         work.category = [];
 
         document
-            .querySelectorAll('.check-group input[type="checkbox"]:checked')
+            .querySelectorAll(
+                '.check-group input[type="checkbox"]:checked'
+            )
             .forEach(box=>{
 
                 work.category.push(box.value);
 
             });
+
+        work.updateDate =
+            new Date().toISOString().slice(0,10);
 
         alert("作品を更新しました😊");
 
@@ -338,7 +401,9 @@ publishButton.addEventListener("click", function(){
                 document.getElementById("series").value,
 
             level:
-                Number(document.getElementById("difficulty").value),
+                Number(
+                    document.getElementById("difficulty").value
+                ),
 
             age:
                 document.getElementById("age").value,
@@ -362,9 +427,9 @@ publishButton.addEventListener("click", function(){
             pdf:
                 "",
 
-            isNew:true,
+            isNew: true,
 
-            recommend:false,
+            recommend: false,
 
             publishDate:
                 new Date().toISOString().slice(0,10),
@@ -372,14 +437,16 @@ publishButton.addEventListener("click", function(){
             updateDate:
                 new Date().toISOString().slice(0,10),
 
-            etsy:"",
+            etsy: "",
 
-            related:[]
+            related: []
 
         };
 
         document
-            .querySelectorAll('.check-group input[type="checkbox"]:checked')
+            .querySelectorAll(
+                '.check-group input[type="checkbox"]:checked'
+            )
             .forEach(box=>{
 
                 newWork.category.push(box.value);
@@ -405,7 +472,45 @@ publishButton.addEventListener("click", function(){
 });
 
 // --------------------------
+// 下書き保存
+// --------------------------
+
+draftButton.addEventListener("click", function(){
+
+    alert(
+
+        "Version3.0では下書き保存は準備中です😊"
+
+    );
+
+});
+
+// --------------------------
+// 一覧検索
+// --------------------------
+
+if(searchWork){
+
+    searchWork.addEventListener("input", function(){
+
+        renderList();
+
+    });
+
+}
+
+// --------------------------
 // 初回表示
 // --------------------------
 
 renderList();
+
+// --------------------------
+// Version情報
+// --------------------------
+
+console.log(
+
+    "Project Library admin.js Version 3.0"
+
+);
