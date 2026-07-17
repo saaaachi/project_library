@@ -80,6 +80,10 @@ let workData = {
 // （Version4では後でPDF自動生成へ変更）
 // --------------------------
 
+// --------------------------
+// サムネイル画像選択
+// --------------------------
+
 thumbnailInput.addEventListener("change", function(){
 
     const file = this.files[0];
@@ -87,6 +91,8 @@ thumbnailInput.addEventListener("change", function(){
     if(!file){
 
         preview.innerHTML = "サムネイルプレビュー";
+
+        workData.thumbnail = "";
 
         return;
 
@@ -96,10 +102,12 @@ thumbnailInput.addEventListener("change", function(){
 
     reader.onload = function(e){
 
+        workData.thumbnail = e.target.result;
+
         preview.innerHTML = `
 
 <img
-src="${e.target.result}"
+src="${workData.thumbnail}"
 style="
 width:100%;
 height:100%;
