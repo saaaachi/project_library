@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // admin.js
-// Version 4.1
+// Version 4.3
 // ==========================
 
 // --------------------------
@@ -33,52 +33,57 @@ let editId = null;
 
 // --------------------------
 // 投稿データ
-// Version4から一元管理
 // --------------------------
 
-let workData = {
+function createEmptyWorkData(){
 
-    id: null,
+    return {
 
-    workNo: "",
+        id: null,
 
-    title: "",
+        workNo: "",
 
-    category: [],
+        title: "",
 
-    fixedTags: [],
+        category: [],
 
-    freeTags: [],
+        fixedTags: [],
 
-    series: "",
+        freeTags: [],
 
-    level: 1,
+        series: "",
 
-    age: "",
+        level: 1,
 
-    size: "A4",
+        age: "",
 
-    tools: [],
+        size: "A4",
 
-    description: "",
+        tools: [],
 
-    thumbnail: "",
+        description: "",
 
-    pdf: "",
+        thumbnail: "",
 
-    isNew: true,
+        pdf: "",
 
-    recommend: false,
+        isNew: true,
 
-    publishDate: "",
+        recommend: false,
 
-    updateDate: "",
+        publishDate: "",
 
-    etsy: "",
+        updateDate: "",
 
-    related: []
+        etsy: "",
 
-};
+        related: []
+
+    };
+
+}
+
+let workData = createEmptyWorkData();
 
 // --------------------------
 // ★表示
@@ -86,13 +91,21 @@ let workData = {
 
 function createStars(level){
 
-    if(level === 1) return "★☆☆";
+    switch(level){
 
-    if(level === 2) return "★★☆";
+        case 1:
+            return "★☆☆";
 
-    if(level === 3) return "★★★";
+        case 2:
+            return "★★☆";
 
-    return "";
+        case 3:
+            return "★★★";
+
+        default:
+            return "";
+
+    }
 
 }
 
@@ -124,12 +137,13 @@ border-radius:10px;
 function resetThumbnail(){
 
     preview.innerHTML =
+
         "サムネイルプレビュー";
 
 }
 
 // --------------------------
-// 画像選択
+// サムネイル画像選択
 // --------------------------
 
 thumbnailInput.addEventListener(
@@ -198,10 +212,9 @@ pdfInput.addEventListener(
 
         );
 
-        // Version4.1
-        // PDFからサムネイル生成
+        const thumbnail =
 
-        const thumbnail = await createThumbnail(file);
+            await createThumbnail(file);
 
         if(thumbnail){
 
@@ -214,7 +227,6 @@ pdfInput.addEventListener(
     }
 
 );
-
 // --------------------------
 // 一覧表示
 // --------------------------
@@ -295,7 +307,11 @@ onclick="deleteWork(${work.id})">
 
 function editWork(id){
 
-    const work = works.find(item=>item.id===id);
+    const work = works.find(
+
+        item => item.id === id
+
+    );
 
     if(!work){
 
@@ -305,7 +321,7 @@ function editWork(id){
 
     editId = id;
 
-    // 編集用データコピー
+    // 編集データをコピー
 
     workData = structuredClone(work);
 
@@ -343,6 +359,7 @@ function editWork(id){
         .forEach(box=>{
 
             box.checked =
+
                 workData.category.includes(box.value);
 
         });
@@ -377,7 +394,11 @@ function editWork(id){
 
 function deleteWork(id){
 
-    const work = works.find(item=>item.id===id);
+    const work = works.find(
+
+        item => item.id === id
+
+    );
 
     if(!work){
 
@@ -399,7 +420,7 @@ function deleteWork(id){
 
     const index = works.findIndex(
 
-        item=>item.id===id
+        item => item.id === id
 
     );
 
@@ -409,26 +430,15 @@ function deleteWork(id){
 
     }
 
-    // 編集中なら解除
-
     if(editId === id){
 
-        editId = null;
-
-        form.reset();
-
-        resetThumbnail();
-
-        publishButton.textContent =
-
-            "公開する";
+        resetForm();
 
     }
 
     renderList();
 
 }
-
 // --------------------------
 // フォーム内容取得
 // --------------------------
@@ -444,15 +454,15 @@ function collectFormData(){
         document.getElementById("fixedTags")
         .value
         .split(",")
-        .map(tag=>tag.trim())
-        .filter(tag=>tag);
+        .map(tag => tag.trim())
+        .filter(tag => tag);
 
     workData.freeTags =
         document.getElementById("freeTags")
         .value
         .split(",")
-        .map(tag=>tag.trim())
-        .filter(tag=>tag);
+        .map(tag => tag.trim())
+        .filter(tag => tag);
 
     workData.series =
         document.getElementById("series")
@@ -478,17 +488,13 @@ function collectFormData(){
         document.getElementById("tools")
         .value
         .split(",")
-        .map(tool=>tool.trim())
-        .filter(tool=>tool);
+        .map(tool => tool.trim())
+        .filter(tool => tool);
 
     workData.description =
         document.getElementById("description")
         .value
         .trim();
-
-    // --------------------------
-    // カテゴリ取得
-    // --------------------------
 
     workData.category = [];
 
@@ -539,10 +545,125 @@ function validateForm(){
 }
 
 // --------------------------
-// 投稿データ初期化
+// 作品データ生成
 // --------------------------
 
-function resetWorkData(){
+function generateWorkData(){
+
+    collectFormData();
+
+    const today =
+        new Date().toISOString().slice(0,10);
+
+    if(editId){
+
+        const oldWork = works.find(
+
+            item => item.id === editId
+
+        );
+
+        workData.id = oldWork.id;
+
+        workData.workNo = oldWork.workNo;
+
+        workData.thumbnail =
+            workData.thumbnail || oldWork.thumbnail;
+
+        workData.pdf =
+            workData.pdf || oldWork.pdf;
+
+        workData.publishDate =
+            oldWork.publishDate;
+
+        workData.updateDate =
+            today;
+
+        workData.isNew =
+            oldWork.isNew;
+
+        workData.recommend =
+            oldWork.recommend;
+
+        workData.etsy =
+            oldWork.etsy;
+
+        workData.related =
+            oldWork.related;
+
+    }else{
+
+        workData.id = Date.now();
+
+        workData.workNo =
+            "PL-" +
+            String(works.length + 1)
+            .padStart(6,"0");
+
+        workData.publishDate =
+            today;
+
+        workData.updateDate =
+            today;
+
+        workData.isNew = true;
+
+        workData.recommend = false;
+
+        workData.etsy = "";
+
+        workData.related = [];
+
+    }
+
+    return structuredClone(workData);
+
+}
+// --------------------------
+// 作品保存
+// Version4.3
+// --------------------------
+
+function saveWork(newWork){
+
+    if(editId){
+
+        const index = works.findIndex(
+
+            item => item.id === editId
+
+        );
+
+        works[index] = newWork;
+
+        alert("作品を更新しました😊");
+
+    }else{
+
+        works.unshift(newWork);
+
+        alert("作品を追加しました😊");
+
+    }
+
+}
+
+// --------------------------
+// フォーム初期化
+// Version4.3
+// --------------------------
+
+function resetForm(){
+
+    editId = null;
+
+    form.reset();
+
+    resetThumbnail();
+
+    publishButton.textContent =
+
+        "公開する";
 
     workData = {
 
@@ -591,173 +712,125 @@ function resetWorkData(){
 }
 
 // --------------------------
-// 公開・更新
+// works.js形式へ変換
+// Version4.3
 // --------------------------
 
-publishButton.addEventListener("click", function(){
+function exportWorkData(work){
 
-    // フォーム内容取得
+    return JSON.stringify(
 
-    collectFormData();
+        work,
 
-    // 入力チェック
+        null,
 
-    if(!validateForm()){
-
-        return;
-
-    }
-
-    const today =
-
-        new Date().toISOString().slice(0,10);
-
-    // --------------------------
-    // 更新
-    // --------------------------
-
-    if(editId){
-
-        const index = works.findIndex(
-
-            item=>item.id===editId
-
-        );
-
-        workData.id = editId;
-
-        workData.workNo =
-            works[index].workNo;
-
-        workData.publishDate =
-            works[index].publishDate;
-
-        workData.updateDate =
-            today;
-
-        workData.isNew =
-            works[index].isNew;
-
-        workData.recommend =
-            works[index].recommend;
-
-        workData.etsy =
-            works[index].etsy;
-
-        workData.related =
-            works[index].related;
-
-        // サムネイル・PDFは
-        // 新しく選択されていなければ保持
-
-        if(!workData.thumbnail){
-
-            workData.thumbnail =
-                works[index].thumbnail;
-
-        }
-
-        if(!workData.pdf){
-
-            workData.pdf =
-                works[index].pdf;
-
-        }
-
-        works[index] =
-
-            structuredClone(workData);
-
-        alert("作品を更新しました😊");
-
-    }
-
-    // --------------------------
-    // 新規追加
-    // --------------------------
-
-    else{
-
-        workData.id = Date.now();
-
-        workData.workNo =
-
-            "PL-" +
-
-            String(
-
-                works.length + 1
-
-            ).padStart(6,"0");
-
-        workData.publishDate =
-
-            today;
-
-        workData.updateDate =
-
-            today;
-
-        workData.isNew = true;
-
-        workData.recommend = false;
-
-        workData.etsy = "";
-
-        workData.related = [];
-
-        works.unshift(
-
-            structuredClone(workData)
-
-        );
-
-        alert("作品を追加しました😊");
-
-    }
-
-    // --------------------------
-    // 初期化
-    // --------------------------
-
-    editId = null;
-
-    form.reset();
-
-    resetThumbnail();
-
-    resetWorkData();
-
-    publishButton.textContent =
-
-        "公開する";
-
-    renderList();
-
-});
-
-// --------------------------
-// 下書き保存
-// （Version5で実装予定）
-// --------------------------
-
-draftButton.addEventListener("click", function(){
-
-    alert(
-
-        "下書き保存はVersion5で実装予定です😊"
+        4
 
     );
 
-});
+}
+// --------------------------
+// 公開・更新
+// Version4.3
+// --------------------------
 
+publishButton.addEventListener(
+
+    "click",
+
+    function(){
+
+        // --------------------------
+        // データ生成
+        // --------------------------
+
+        const newWork = generateWorkData();
+
+        // --------------------------
+        // 入力チェック
+        // --------------------------
+
+        if(newWork.title === ""){
+
+            alert("タイトルを入力してください。");
+
+            return;
+
+        }
+
+        if(newWork.category.length === 0){
+
+            alert("カテゴリを選択してください。");
+
+            return;
+
+        }
+
+        if(newWork.description === ""){
+
+            alert("説明を入力してください。");
+
+            return;
+
+        }
+
+        // --------------------------
+        // 保存
+        // --------------------------
+
+        saveWork(newWork);
+
+        // --------------------------
+        // 完成データ表示
+        // --------------------------
+
+        console.log(
+
+            exportWorkData(newWork)
+
+        );
+
+        // --------------------------
+        // 初期化
+        // --------------------------
+
+        resetForm();
+
+        // --------------------------
+        // 一覧更新
+        // --------------------------
+
+        renderList();
+
+    }
+
+);
+
+// --------------------------
+// 下書き保存
+// （Version5予定）
+// --------------------------
+
+draftButton.addEventListener(
+
+    "click",
+
+    function(){
+
+        alert(
+
+            "下書き保存はVersion5で実装予定です😊"
+
+        );
+
+    }
+
+);
 // --------------------------
 // 初回表示
 // --------------------------
 
-resetWorkData();
-
-resetThumbnail();
+resetForm();
 
 renderList();
 
@@ -767,6 +840,6 @@ renderList();
 
 console.log(
 
-    "Project Library admin.js Version4.1"
+    "Project Library admin.js Version4.3"
 
 );
