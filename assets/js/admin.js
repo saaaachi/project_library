@@ -1,17 +1,22 @@
-// ==========================
+// ======================================
 // Project Library
 // admin.js
-// Version 4.3
-// ==========================
+// Version 5.0
+// 更新日：2026-07-18
+// ======================================
 
 // --------------------------
-// フォーム
+// フォーム取得
 // --------------------------
 
-const form = document.getElementById("workForm");
+const form =
+    document.getElementById("workForm");
 
-const draftButton = document.querySelector(".draft");
-const publishButton = document.querySelector(".publish");
+const draftButton =
+    document.querySelector(".draft");
+
+const publishButton =
+    document.querySelector(".publish");
 
 const thumbnailInput =
     document.getElementById("thumbnail");
@@ -26,6 +31,17 @@ const workList =
     document.getElementById("workList");
 
 // --------------------------
+// Version5追加
+// works.js出力欄
+// --------------------------
+
+const exportArea =
+    document.getElementById("exportData");
+
+const copyButton =
+    document.getElementById("copyButton");
+
+// --------------------------
 // 編集中ID
 // --------------------------
 
@@ -37,56 +53,57 @@ let editId = null;
 
 function createEmptyWorkData(){
 
-    return {
+    return{
 
-        id: null,
+        id:null,
 
-        workNo: "",
+        workNo:"",
 
-        title: "",
+        title:"",
 
-        category: [],
+        category:[],
 
-        fixedTags: [],
+        fixedTags:[],
 
-        freeTags: [],
+        freeTags:[],
 
-        series: "",
+        series:"",
 
-        level: 1,
+        level:1,
 
-        age: "",
+        age:"",
 
-        size: "A4",
+        size:"A4",
 
-        tools: [],
+        tools:[],
 
-        description: "",
+        description:"",
 
-        thumbnail: "",
+        thumbnail:"",
 
-        pdf: "",
+        pdf:"",
 
-        isNew: true,
+        isNew:true,
 
-        recommend: false,
+        recommend:false,
 
-        publishDate: "",
+        publishDate:"",
 
-        updateDate: "",
+        updateDate:"",
 
-        etsy: "",
+        etsy:"",
 
-        related: []
+        related:[]
 
     };
 
 }
 
-let workData = createEmptyWorkData();
+let workData =
+    createEmptyWorkData();
 
 // --------------------------
-// ★表示
+// 難易度表示
 // --------------------------
 
 function createStars(level){
@@ -137,11 +154,9 @@ border-radius:10px;
 function resetThumbnail(){
 
     preview.innerHTML =
-
         "サムネイルプレビュー";
 
 }
-
 // --------------------------
 // サムネイル画像選択
 // --------------------------
@@ -168,12 +183,11 @@ thumbnailInput.addEventListener(
 
         reader.onload = function(e){
 
-            workData.thumbnail = e.target.result;
+            workData.thumbnail =
+                e.target.result;
 
             showThumbnail(
-
                 workData.thumbnail
-
             );
 
         };
@@ -205,20 +219,18 @@ pdfInput.addEventListener(
         workData.pdf = file;
 
         console.log(
-
             "PDF選択：",
-
             file.name
-
         );
 
+        // PDFからサムネイル生成
         const thumbnail =
-
             await createThumbnail(file);
 
         if(thumbnail){
 
-            workData.thumbnail = thumbnail;
+            workData.thumbnail =
+                thumbnail;
 
             showThumbnail(thumbnail);
 
@@ -227,6 +239,62 @@ pdfInput.addEventListener(
     }
 
 );
+
+// --------------------------
+// PDFサムネイル生成
+// Version5
+// --------------------------
+
+async function createThumbnail(file){
+
+    if(typeof pdfjsLib === "undefined"){
+
+        console.warn("pdf.js が読み込まれていません");
+
+        return null;
+
+    }
+
+    const arrayBuffer =
+        await file.arrayBuffer();
+
+    const pdf =
+        await pdfjsLib.getDocument({
+            data:arrayBuffer
+        }).promise;
+
+    const page =
+        await pdf.getPage(1);
+
+    const viewport =
+        page.getViewport({
+            scale:1.5
+        });
+
+    const canvas =
+        document.createElement("canvas");
+
+    const context =
+        canvas.getContext("2d");
+
+    canvas.width =
+        viewport.width;
+
+    canvas.height =
+        viewport.height;
+
+    await page.render({
+
+        canvasContext:context,
+
+        viewport:viewport
+
+    }).promise;
+
+    return canvas.toDataURL("image/jpeg");
+
+}
+
 // --------------------------
 // 一覧表示
 // --------------------------
@@ -247,17 +315,9 @@ function renderList(){
 
 <tr>
 
-<td>
+<td>${work.workNo}</td>
 
-${work.workNo}
-
-</td>
-
-<td>
-
-${work.title}
-
-</td>
+<td>${work.title}</td>
 
 <td>
 
@@ -300,7 +360,6 @@ onclick="deleteWork(${work.id})">
     workList.innerHTML = html;
 
 }
-
 // --------------------------
 // 編集
 // --------------------------
@@ -308,9 +367,7 @@ onclick="deleteWork(${work.id})">
 function editWork(id){
 
     const work = works.find(
-
         item => item.id === id
-
     );
 
     if(!work){
@@ -320,8 +377,6 @@ function editWork(id){
     }
 
     editId = id;
-
-    // 編集データをコピー
 
     workData = structuredClone(work);
 
@@ -359,7 +414,6 @@ function editWork(id){
         .forEach(box=>{
 
             box.checked =
-
                 workData.category.includes(box.value);
 
         });
@@ -375,7 +429,6 @@ function editWork(id){
     }
 
     publishButton.textContent =
-
         "更新する";
 
     window.scrollTo({
@@ -395,9 +448,7 @@ function editWork(id){
 function deleteWork(id){
 
     const work = works.find(
-
         item => item.id === id
-
     );
 
     if(!work){
@@ -407,9 +458,7 @@ function deleteWork(id){
     }
 
     const ok = confirm(
-
         `「${work.title}」を削除しますか？`
-
     );
 
     if(!ok){
@@ -418,11 +467,10 @@ function deleteWork(id){
 
     }
 
-    const index = works.findIndex(
-
-        item => item.id === id
-
-    );
+    const index =
+        works.findIndex(
+            item => item.id === id
+        );
 
     if(index !== -1){
 
@@ -439,6 +487,7 @@ function deleteWork(id){
     renderList();
 
 }
+
 // --------------------------
 // フォーム内容取得
 // --------------------------
@@ -500,6 +549,11 @@ function collectFormData(){
 
     document
         .querySelectorAll(
+            '.check-group input[type="checkbox"]:checked"
+        );
+
+    document
+        .querySelectorAll(
             '.check-group input[type="checkbox"]:checked'
         )
         .forEach(box=>{
@@ -509,323 +563,59 @@ function collectFormData(){
         });
 
 }
-
-// --------------------------
-// 入力チェック
-// --------------------------
-
-function validateForm(){
-
-    if(workData.title === ""){
-
-        alert("タイトルを入力してください。");
-
-        return false;
-
-    }
-
-    if(workData.category.length === 0){
-
-        alert("カテゴリを選択してください。");
-
-        return false;
-
-    }
-
-    if(workData.description === ""){
-
-        alert("説明を入力してください。");
-
-        return false;
-
-    }
-
-    return true;
-
-}
-
-// --------------------------
-// 作品データ生成
-// --------------------------
-
-function generateWorkData(){
-
-    collectFormData();
-
-    const today =
-        new Date().toISOString().slice(0,10);
-
-    if(editId){
-
-        const oldWork = works.find(
-
-            item => item.id === editId
-
-        );
-
-        workData.id = oldWork.id;
-
-        workData.workNo = oldWork.workNo;
-
-        workData.thumbnail =
-            workData.thumbnail || oldWork.thumbnail;
-
-        workData.pdf =
-            workData.pdf || oldWork.pdf;
-
-        workData.publishDate =
-            oldWork.publishDate;
-
-        workData.updateDate =
-            today;
-
-        workData.isNew =
-            oldWork.isNew;
-
-        workData.recommend =
-            oldWork.recommend;
-
-        workData.etsy =
-            oldWork.etsy;
-
-        workData.related =
-            oldWork.related;
-
-    }else{
-
-        workData.id = Date.now();
-
-        workData.workNo =
-            "PL-" +
-            String(works.length + 1)
-            .padStart(6,"0");
-
-        workData.publishDate =
-            today;
-
-        workData.updateDate =
-            today;
-
-        workData.isNew = true;
-
-        workData.recommend = false;
-
-        workData.etsy = "";
-
-        workData.related = [];
-
-    }
-
-    return structuredClone(workData);
-
-}
-// --------------------------
-// 作品保存
-// Version4.3
-// --------------------------
-
-function saveWork(newWork){
-
-    if(editId){
-
-        const index = works.findIndex(
-
-            item => item.id === editId
-
-        );
-
-        works[index] = newWork;
-
-        alert("作品を更新しました😊");
-
-    }else{
-
-        works.unshift(newWork);
-
-        alert("作品を追加しました😊");
-
-    }
-
-}
-
-// --------------------------
-// フォーム初期化
-// Version4.3
-// --------------------------
-
-function resetForm(){
-
-    editId = null;
-
-    form.reset();
-
-    resetThumbnail();
-
-    publishButton.textContent =
-
-        "公開する";
-
-    workData = {
-
-        id:null,
-
-        workNo:"",
-
-        title:"",
-
-        category:[],
-
-        fixedTags:[],
-
-        freeTags:[],
-
-        series:"",
-
-        level:1,
-
-        age:"",
-
-        size:"A4",
-
-        tools:[],
-
-        description:"",
-
-        thumbnail:"",
-
-        pdf:"",
-
-        isNew:true,
-
-        recommend:false,
-
-        publishDate:"",
-
-        updateDate:"",
-
-        etsy:"",
-
-        related:[]
-
-    };
-
-}
-
-// --------------------------
-// works.js形式へ変換
-// Version4.3
-// --------------------------
-
-function exportWorkData(work){
-
-    return JSON.stringify(
-
-        work,
-
-        null,
-
-        4
-
-    );
-
-}
 // --------------------------
 // 公開・更新
-// Version4.3
+// Version5.0
 // --------------------------
 
 publishButton.addEventListener(
-
     "click",
-
     function(){
 
-        // --------------------------
         // データ生成
-        // --------------------------
-
         const newWork = generateWorkData();
 
-        // --------------------------
         // 入力チェック
-        // --------------------------
-
-        if(newWork.title === ""){
-
-            alert("タイトルを入力してください。");
-
+        if(!validateForm(newWork)){
             return;
-
         }
 
-        if(newWork.category.length === 0){
-
-            alert("カテゴリを選択してください。");
-
-            return;
-
-        }
-
-        if(newWork.description === ""){
-
-            alert("説明を入力してください。");
-
-            return;
-
-        }
-
-        // --------------------------
         // 保存
-        // --------------------------
-
         saveWork(newWork);
 
-        // --------------------------
-        // 完成データ表示
-        // --------------------------
+        // works.js形式を画面へ表示
+        updateExportArea();
 
+        // コンソールにも表示
         console.log(
-
-            exportWorkData(newWork)
-
+            exportWorkData()
         );
 
-        // --------------------------
         // 初期化
-        // --------------------------
-
         resetForm();
 
-        // --------------------------
         // 一覧更新
-        // --------------------------
-
         renderList();
 
     }
-
 );
 
 // --------------------------
 // 下書き保存
-// （Version5予定）
+// Version5.0
 // --------------------------
 
 draftButton.addEventListener(
-
     "click",
-
     function(){
 
         alert(
-
-            "下書き保存はVersion5で実装予定です😊"
-
+            "Version5.1で実装予定です😊"
         );
 
     }
-
 );
+
 // --------------------------
 // 初回表示
 // --------------------------
@@ -834,12 +624,12 @@ resetForm();
 
 renderList();
 
+updateExportArea();
+
 // --------------------------
 // Version表示
 // --------------------------
 
 console.log(
-
-    "Project Library admin.js Version4.3"
-
+    "Project Library admin.js Version5.0"
 );
