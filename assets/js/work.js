@@ -1,27 +1,32 @@
 // ==========================
-// あたまのストレッチ プリント館
+// Project Library
 // work.js
-// Version 2.5
+// Version 5.0
 // ==========================
 
 // --------------------------
-// URLからID取得
+// URL取得
 // --------------------------
 
-const params = new URLSearchParams(location.search);
-const id = Number(params.get("id"));
+const params =
+    new URLSearchParams(location.search);
 
-// --------------------------
-// 作品取得
-// --------------------------
-
-const work = works.find(item => item.id === id);
+const id =
+    Number(params.get("id"));
 
 // --------------------------
 // 表示エリア
 // --------------------------
 
-const area = document.getElementById("workArea");
+const area =
+    document.getElementById("workArea");
+
+// --------------------------
+// データ取得
+// --------------------------
+
+const work =
+    works.find(item=>item.id===id);
 
 // --------------------------
 // ★表示
@@ -29,11 +34,69 @@ const area = document.getElementById("workArea");
 
 function createStars(level){
 
-    if(level===1) return "★☆☆";
-    if(level===2) return "★★☆";
-    if(level===3) return "★★★";
+    switch(level){
 
-    return "";
+        case 1:
+            return "★☆☆";
+
+        case 2:
+            return "★★☆";
+
+        case 3:
+            return "★★★";
+
+        default:
+            return "";
+
+    }
+
+}
+
+// --------------------------
+// NEW表示
+// --------------------------
+
+function createNewBadge(work){
+
+    if(!work.isNew){
+
+        return "";
+
+    }
+
+    return `
+
+<span class="badge badge-new">
+
+NEW
+
+</span>
+
+`;
+
+}
+
+// --------------------------
+// おすすめ表示
+// --------------------------
+
+function createRecommendBadge(work){
+
+    if(!work.recommend){
+
+        return "";
+
+    }
+
+    return `
+
+<span class="badge badge-recommend">
+
+おすすめ
+
+</span>
+
+`;
 
 }
 
@@ -79,43 +142,11 @@ ${category}
 
     });
 
-    work.fixedTags.forEach(tag=>{
-
-        html += `
-
-＞
-
-<a href="library.html?category=${encodeURIComponent(work.category[0])}&tag=${encodeURIComponent(tag)}">
-
-${tag}
-
-</a>
-
-`;
-
-    });
-
-    work.freeTags.forEach(tag=>{
-
-        html += `
-
-＞
-
-<a href="library.html?category=${encodeURIComponent(work.category[0])}&tag=${encodeURIComponent(tag)}">
-
-${tag}
-
-</a>
-
-`;
-
-    });
-
     html += `
 
 ＞
 
-<span>
+<span class="current">
 
 ${work.title}
 
@@ -128,14 +159,15 @@ ${work.title}
     return html;
 
 }
-
 // --------------------------
-// 見つからない
+// 見つからない場合
 // --------------------------
 
 if(!work){
 
     area.innerHTML = `
+
+<section class="container">
 
 <h2>
 
@@ -143,25 +175,45 @@ if(!work){
 
 </h2>
 
+<p>
+
+URLをご確認ください。
+
+</p>
+
+<a
+class="button"
+href="library.html">
+
+作品一覧へ戻る
+
+</a>
+
+</section>
+
 `;
 
 }else{
 
-    area.innerHTML = `
+// --------------------------
+// メイン表示
+// --------------------------
+
+area.innerHTML = `
+
+<section class="container">
 
 ${createBreadcrumb(work)}
 
-<h1>
+${createNewBadge(work)}
+${createRecommendBadge(work)}
+
+<h1 class="section-title">
 
 ${work.title}
 
 </h1>
 
-<p class="level">
-
-${createStars(work.level)}
-
-</p>
 <p class="level">
 
 ${createStars(work.level)}
@@ -184,18 +236,19 @@ ${category}
 
 </div>
 
-<br>
+<div class="work-image">
 
 <img
 src="${work.thumbnail}"
-class="work-image"
 alt="${work.title}">
+
+</div>
 
 <div class="info-box">
 
 <div class="info-item">
 
-<b>対象</b>
+<b>対象年齢</b>
 
 <br>
 
@@ -205,7 +258,7 @@ ${work.age}
 
 <div class="info-item">
 
-<b>サイズ</b>
+<b>印刷サイズ</b>
 
 <br>
 
@@ -215,7 +268,7 @@ ${work.size}
 
 <div class="info-item">
 
-<b>道具</b>
+<b>必要な道具</b>
 
 <br>
 
@@ -225,13 +278,13 @@ ${work.tools.join("・")}
 
 </div>
 
-<p class="work-description">
+<div class="work-description">
 
 ${work.description}
 
-</p>
+</div>
 
-<h3 style="margin-top:30px;">
+<h3>
 
 タグ
 
@@ -243,7 +296,7 @@ ${work.fixedTags.map(tag=>`
 
 <a
 class="tag"
-href="library.html?category=${encodeURIComponent(work.category[0])}&tag=${encodeURIComponent(tag)}">
+href="library.html?tag=${encodeURIComponent(tag)}">
 
 ${tag}
 
@@ -255,7 +308,7 @@ ${work.freeTags.map(tag=>`
 
 <a
 class="tag"
-href="library.html?category=${encodeURIComponent(work.category[0])}&tag=${encodeURIComponent(tag)}">
+href="library.html?tag=${encodeURIComponent(tag)}">
 
 ${tag}
 
@@ -267,7 +320,7 @@ ${tag}
 
 <div class="ad-box">
 
-広告
+広告エリア
 
 </div>
 
@@ -280,13 +333,30 @@ PDFをダウンロード
 
 </a>
 
-<hr style="margin:40px 0;">
+<div class="section">
+
+<h3>
+
+ご利用について
+
+</h3>
+
+<p>
+
+個人・教育・施設利用は無料です。<br>
+再配布・販売・データの転載は禁止しています。
+
+</p>
+
+</div>
 
 <div id="seriesArea"></div>
 
 <div id="relatedArea"></div>
 
 <div id="moveArea"></div>
+
+</section>
 
 `;
 
@@ -297,20 +367,23 @@ PDFをダウンロード
 
 if(work){
 
-    const seriesArea = document.getElementById("seriesArea");
+    const seriesArea =
+        document.getElementById("seriesArea");
 
-    const seriesWorks = works.filter(item=>
+    const seriesWorks =
+        works.filter(item=>
 
-        item.series === work.series &&
-        item.id !== work.id
+            item.series === work.series &&
 
-    );
+            item.id !== work.id
+
+        );
 
     if(seriesWorks.length){
 
         seriesArea.innerHTML = `
 
-<h2>
+<h2 class="section-title">
 
 📚 同じシリーズ
 
@@ -329,6 +402,10 @@ src="${item.thumbnail}"
 alt="${item.title}">
 
 <div class="card-body">
+
+${createNewBadge(item)}
+
+${createRecommendBadge(item)}
 
 <h3>
 
@@ -362,47 +439,56 @@ ${createStars(item.level)}
 
 if(work){
 
-    const relatedArea = document.getElementById("relatedArea");
+    const relatedArea =
+        document.getElementById("relatedArea");
 
-    const relatedWorks = works.filter(item=>{
+    const relatedWorks =
+        works.filter(item=>{
 
-        if(item.id === work.id){
+            if(item.id === work.id){
 
-            return false;
+                return false;
 
-        }
+            }
 
-        const sameCategory = item.category.some(category=>
+            const sameCategory =
+                item.category.some(category=>
 
-            work.category.includes(category)
+                    work.category.includes(category)
 
-        );
+                );
 
-        const sameFixedTag = item.fixedTags.some(tag=>
+            const sameFixedTag =
+                item.fixedTags.some(tag=>
 
-            work.fixedTags.includes(tag)
+                    work.fixedTags.includes(tag)
 
-        );
+                );
 
-        const sameFreeTag = item.freeTags.some(tag=>
+            const sameFreeTag =
+                item.freeTags.some(tag=>
 
-            work.freeTags.includes(tag)
+                    work.freeTags.includes(tag)
 
-        );
+                );
 
-        return sameCategory ||
+            return (
 
-               sameFixedTag ||
+                sameCategory ||
 
-               sameFreeTag;
+                sameFixedTag ||
 
-    }).slice(0,4);
+                sameFreeTag
+
+            );
+
+        }).slice(0,4);
 
     if(relatedWorks.length){
 
         relatedArea.innerHTML = `
 
-<h2 style="margin-top:50px;">
+<h2 class="section-title">
 
 💡 関連作品
 
@@ -421,6 +507,10 @@ src="${item.thumbnail}"
 alt="${item.title}">
 
 <div class="card-body">
+
+${createNewBadge(item)}
+
+${createRecommendBadge(item)}
 
 <h3>
 
@@ -453,28 +543,28 @@ ${createStars(item.level)}
 
 if(work){
 
-    const moveArea = document.getElementById("moveArea");
+    const moveArea =
+        document.getElementById("moveArea");
 
-    const index = works.findIndex(item=>
+    const index =
+        works.findIndex(item=>item.id===work.id);
 
-        item.id === work.id
+    const prev =
+        works[index-1];
 
-    );
-
-    const prev = works[index-1];
-
-    const next = works[index+1];
+    const next =
+        works[index+1];
 
     moveArea.innerHTML = `
 
 <div
+class="section"
 style="
 display:flex;
 justify-content:space-between;
 align-items:center;
-gap:15px;
-margin-top:50px;
 flex-wrap:wrap;
+gap:15px;
 ">
 
 ${prev ? `
@@ -495,7 +585,7 @@ ${next ? `
 class="button"
 href="work.html?id=${next.id}">
 
-次の作品 ➡
+次の作品 ➜
 
 </a>
 
@@ -514,21 +604,24 @@ href="work.html?id=${next.id}">
 if(work){
 
     document.title =
-        `${work.title} | あたまのストレッチ プリント館`;
+
+`${work.title} | Project Library`;
 
 }
 
 // --------------------------
-// meta description変更
+// meta description
 // --------------------------
 
 if(work){
 
-    const description = document.querySelector(
+    const description =
 
-        'meta[name="description"]'
+        document.querySelector(
 
-    );
+            'meta[name="description"]'
+
+        );
 
     if(description){
 
@@ -536,10 +629,40 @@ if(work){
 
             "content",
 
-            `${work.title}｜${work.description}`
+`${work.title}｜${work.description}`
 
         );
 
     }
 
 }
+
+// --------------------------
+// 公開日表示（将来用）
+// --------------------------
+
+if(work){
+
+    console.log(
+
+        "公開日 :", work.publishDate
+
+    );
+
+    console.log(
+
+        "更新日 :", work.updateDate
+
+    );
+
+}
+
+// --------------------------
+// Version表示
+// --------------------------
+
+console.log(
+
+"Project Library work.js Version5.0"
+
+);
