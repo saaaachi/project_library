@@ -1,64 +1,112 @@
 // ==========================
 // Project Library
 // common.js
-// Version 1.1
+// Version 5.0
 // ==========================
 
 // --------------------------
-// 共通パーツ読込
+// 共通パーツ読み込み
 // --------------------------
 
 async function loadComponent(id, file){
 
     const target = document.getElementById(id);
 
-    if(!target) return;
+    if(!target){
+
+        return;
+
+    }
 
     try{
 
         const response = await fetch(file);
 
-        target.innerHTML = await response.text();
+        if(!response.ok){
+
+            throw new Error(file);
+
+        }
+
+        target.innerHTML =
+
+            await response.text();
 
     }catch(error){
 
-        console.error(file + " の読み込みに失敗しました");
+        console.error(
+
+            file + " の読み込みに失敗しました"
+
+        );
 
     }
 
 }
 
-window.addEventListener("DOMContentLoaded", async ()=>{
+// --------------------------
+// 初期読み込み
+// --------------------------
 
-    await loadComponent("header","components/header.html");
+window.addEventListener(
 
-    await loadComponent("sidebar","components/sidebar.html");
+    "DOMContentLoaded",
 
-    await loadComponent("footer","components/footer.html");
+    async()=>{
 
-    setupMenu();
+        await loadComponent(
 
-    setupSearch();
+            "header",
 
-});
+            "components/header.html"
+
+        );
+
+        await loadComponent(
+
+            "sidebar",
+
+            "components/sidebar.html"
+
+        );
+
+        await loadComponent(
+
+            "footer",
+
+            "components/footer.html"
+
+        );
+
+        setupMenu();
+
+        setupSearch();
+
+        setupCurrentYear();
+
+    }
+
+);
 
 // --------------------------
-// メニュー開閉
+// ハンバーガーメニュー
 // --------------------------
 
 function setupMenu(){
 
-    const menuButton = document.getElementById("menuButton");
+    const menuButton =
 
-    const sidebar = document.querySelector(".sidebar");
+        document.getElementById("menuButton");
 
-    const closeMenu = document.getElementById("closeMenu");
+    const sidebar =
 
-    console.log(menuButton);
-    console.log(sidebar);
-    console.log(closeMenu);
+        document.querySelector(".sidebar");
 
-    if(menuButton){
+    const closeMenu =
+
+        document.getElementById("closeMenu");
+
+    if(menuButton && sidebar){
 
         menuButton.onclick = ()=>{
 
@@ -68,7 +116,7 @@ function setupMenu(){
 
     }
 
-    if(closeMenu){
+    if(closeMenu && sidebar){
 
         closeMenu.onclick = ()=>{
 
@@ -79,36 +127,162 @@ function setupMenu(){
     }
 
 }
-
 // --------------------------
 // 共通検索
 // --------------------------
 
 function setupSearch(){
 
-    const searchInput = document.getElementById("searchInput");
+    const searchInput =
 
-    if(!searchInput) return;
+        document.getElementById("searchInput");
 
-    // Enterキーで検索
+    if(!searchInput){
 
-    searchInput.addEventListener("keydown",(event)=>{
+        return;
 
-        if(event.key !== "Enter") return;
+    }
 
-        const keyword = searchInput.value.trim();
+    searchInput.addEventListener(
 
-        if(keyword===""){
+        "keydown",
 
-            location.href="library.html";
+        event=>{
+
+            if(event.key !== "Enter"){
+
+                return;
+
+            }
+
+            const keyword =
+
+                searchInput.value.trim();
+
+            if(keyword === ""){
+
+                location.href =
+
+                    "library.html";
+
+                return;
+
+            }
+
+            location.href =
+
+`library.html?search=${encodeURIComponent(keyword)}`;
+
+        }
+
+    );
+
+}
+
+// --------------------------
+// Escキーで閉じる
+// --------------------------
+
+document.addEventListener(
+
+    "keydown",
+
+    event=>{
+
+        if(event.key !== "Escape"){
 
             return;
 
         }
 
-        location.href =
-            `library.html?search=${encodeURIComponent(keyword)}`;
+        const sidebar =
 
-    });
+            document.querySelector(".sidebar");
+
+        if(sidebar){
+
+            sidebar.classList.remove("open");
+
+        }
+
+    }
+
+);
+
+// --------------------------
+// 背景クリックで閉じる
+// --------------------------
+
+document.addEventListener(
+
+    "click",
+
+    event=>{
+
+        const sidebar =
+
+            document.querySelector(".sidebar");
+
+        const menuButton =
+
+            document.getElementById("menuButton");
+
+        if(
+
+            !sidebar ||
+
+            !sidebar.classList.contains("open")
+
+        ){
+
+            return;
+
+        }
+
+        if(
+
+            sidebar.contains(event.target) ||
+
+            menuButton?.contains(event.target)
+
+        ){
+
+            return;
+
+        }
+
+        sidebar.classList.remove("open");
+
+    }
+
+);
+
+// --------------------------
+// 年号自動更新
+// --------------------------
+
+function setupCurrentYear(){
+
+    const year =
+
+        document.getElementById("currentYear");
+
+    if(year){
+
+        year.textContent =
+
+            new Date().getFullYear();
+
+    }
 
 }
+
+// --------------------------
+// Version表示
+// --------------------------
+
+console.log(
+
+"Project Library common.js Version5.0"
+
+);
