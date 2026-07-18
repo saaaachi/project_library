@@ -1,7 +1,7 @@
 /* =====================================================
    Project Library
    Common Style
-   Version 0.6
+   Version 1.0
 ===================================================== */
 
 /* ---------- リセット ---------- */
@@ -26,18 +26,23 @@ body{
     background:#ffffff;
     color:#333333;
     line-height:1.7;
+
 }
 
 /* ---------- リンク ---------- */
 
 a{
+
     color:inherit;
     text-decoration:none;
+
 }
 
 img{
+
     width:100%;
     display:block;
+
 }
 
 /* ---------- 共通 ---------- */
@@ -71,7 +76,7 @@ img{
     display:inline-block;
 
     background:#4CAF50;
-    color:white;
+    color:#fff;
 
     padding:12px 22px;
 
@@ -89,17 +94,17 @@ img{
 
 }
 
-/* ダウンロードボタン */
+/* ---------- ダウンロード ---------- */
 
 .download-button{
 
     display:block;
 
-    text-align:center;
-
     width:100%;
 
     padding:16px;
+
+    text-align:center;
 
     font-size:18px;
 
@@ -109,7 +114,7 @@ img{
 
 .card{
 
-    background:white;
+    background:#fff;
 
     border:1px solid #E5E5E5;
 
@@ -179,10 +184,9 @@ img{
 
     background:#4CAF50;
 
-    color:white;
+    color:#fff;
 
 }
-
 /* ---------- カテゴリ ---------- */
 
 .category{
@@ -291,24 +295,25 @@ footer{
 
 @media(max-width:768px){
 
-.container{
+    .container{
 
-    padding:15px;
+        padding:15px;
 
-}
+    }
 
-.section-title{
+    .section-title{
 
-    font-size:20px;
+        font-size:20px;
 
-}
+    }
 
-.button{
+    .button{
 
-    width:100%;
-    text-align:center;
+        width:100%;
 
-}
+        text-align:center;
+
+    }
 
 }
 /* ==========================
@@ -320,7 +325,9 @@ footer{
     position:sticky;
     top:0;
     z-index:1000;
-    background:#ffffff;
+
+    background:#FFFFFF;
+
     border-bottom:1px solid #E5E5E5;
 
 }
@@ -328,11 +335,15 @@ footer{
 .header-inner{
 
     max-width:1200px;
+
     margin:auto;
+
     padding:14px 18px;
 
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
 
 }
@@ -340,6 +351,7 @@ footer{
 .site-title{
 
     flex:1;
+
     text-align:center;
 
 }
@@ -347,8 +359,11 @@ footer{
 .site-title h1{
 
     font-size:20px;
+
     white-space:nowrap;
+
     overflow:hidden;
+
     text-overflow:ellipsis;
 
 }
@@ -356,7 +371,9 @@ footer{
 .site-title p{
 
     font-size:13px;
+
     color:#777;
+
     margin-top:3px;
 
 }
@@ -364,8 +381,11 @@ footer{
 .menu-button{
 
     background:none;
+
     border:none;
+
     font-size:28px;
+
     cursor:pointer;
 
 }
@@ -373,6 +393,7 @@ footer{
 .admin-button{
 
     font-size:22px;
+
     padding:8px;
 
 }
@@ -385,21 +406,22 @@ footer{
 
 @media(max-width:768px){
 
-.site-title h1{
+    .site-title h1{
 
-    font-size:17px;
+        font-size:17px;
+
+    }
+
+    .site-title p{
+
+        display:none;
+
+    }
 
 }
 
-.site-title p{
-
-    display:none;
-
-}
-
-}
 /* ==========================
-Sidebar
+   Sidebar
 ========================== */
 
 .sidebar{
@@ -414,7 +436,7 @@ Sidebar
 
     height:100%;
 
-    background:white;
+    background:#FFFFFF;
 
     box-shadow:3px 0 15px rgba(0,0,0,.15);
 
@@ -505,13 +527,14 @@ Sidebar
     color:#4CAF50;
 
 }
+
 /* ==========================
    Work Card
 ========================== */
 
 .card{
 
-    background:#fff;
+    background:#FFFFFF;
 
     border:1px solid #E5E5E5;
 
@@ -634,8 +657,8 @@ Sidebar
 
     font-weight:bold;
 
-
 }
+
 /* ==========================
    Footer
 ========================== */
@@ -707,35 +730,36 @@ Sidebar
     color:#999;
 
 }
+
 /* ==========================
    Admin
 ========================== */
 
 .admin-container{
 
-max-width:900px;
+    max-width:900px;
 
-margin:auto;
+    margin:auto;
 
-padding:30px 20px 120px;
+    padding:30px 20px 120px;
 
 }
 
 .admin-container h2{
 
-margin-bottom:25px;
+    margin-bottom:25px;
 
 }
 
 .admin-container label{
 
-display:block;
+    display:block;
 
-font-weight:bold;
+    font-weight:bold;
 
-margin-top:18px;
+    margin-top:18px;
 
-margin-bottom:8px;
+    margin-bottom:8px;
 
 }
 
@@ -743,350 +767,523 @@ margin-bottom:8px;
 .admin-container textarea,
 .admin-container select{
 
-width:100%;
+    width:100%;
 
-padding:12px;
-
-border:1px solid #DDD;
-
-border-radius:10px;
-
-box-sizing:border-box;
-
-}
-
-.preview-box{
-
-margin-top:15px;
-
-}
-
-.thumbnail-preview{
-
-height:180px;
-
-border:2px dashed #CCC;
-
-border-radius:12px;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-background:#FAFAFA;
-
-margin-top:10px;
-
-}
-
-.check-group{
-
-display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:10px;
-
-}
-
-.level-select{
-
-display:flex;
-
-flex-direction:column;
-
-gap:10px;
-
-}
-
-.tag-history{
-
-margin-top:12px;
-
-}
-
-.admin-bottom-bar{
-
-position:fixed;
-
-bottom:0;
-
-left:0;
-
-width:100%;
-
-background:white;
-
-padding:15px;
-
-display:flex;
-
-gap:12px;
-
-box-shadow:0 -5px 15px rgba(0,0,0,.08);
-
-box-sizing:border-box;
-
-}
-
-.admin-bottom-bar button{
-
-flex:1;
-
-padding:16px;
-
-border:none;
-
-border-radius:12px;
-
-font-size:16px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-.draft{
-
-background:#E0E0E0;
-
-}
-
-.publish{
-
-background:#4CAF50;
-
-color:white;
-
-}
-/* ==========================
-   Library Layout
-========================== */
-
-.grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(auto-fill,minmax(220px,1fr));
-
-    gap:20px;
-
-}
-
-.pageTitle{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.count{
-
-    color:#777;
-
-    font-size:14px;
-
-}
-
-.sort{
-
-    margin-bottom:25px;
-
-}
-
-.sort select{
-
-    padding:10px 15px;
+    padding:12px;
 
     border:1px solid #DDD;
 
     border-radius:10px;
 
-    background:white;
+    background:#FFFFFF;
+
+    font-size:15px;
+
+}
+
+.admin-container textarea{
+
+    resize:vertical;
+
+}
+
+.preview-box{
+
+    margin-top:15px;
+
+}
+
+.thumbnail-preview{
+
+    height:180px;
+
+    border:2px dashed #CCCCCC;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#FAFAFA;
+
+    overflow:hidden;
+
+    margin-top:10px;
+
+}
+
+.check-group{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:10px;
+
+}
+
+.level-select{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.tag-history{
+
+    margin-top:12px;
 
 }
 
 /* ==========================
-   NEW Badge
+   下部固定ボタン
 ========================== */
 
-.badge{
+.admin-bottom-bar{
 
-    display:inline-block;
+    position:fixed;
 
-    padding:4px 8px;
+    bottom:0;
 
-    border-radius:999px;
+    left:0;
 
-    font-size:11px;
+    width:100%;
+
+    background:#FFFFFF;
+
+    padding:15px;
+
+    display:flex;
+
+    gap:12px;
+
+    box-shadow:0 -5px 15px rgba(0,0,0,.08);
+
+    z-index:999;
+
+}
+
+.admin-bottom-bar button{
+
+    flex:1;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:16px;
 
     font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.admin-bottom-bar button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.draft{
+
+    background:#E0E0E0;
+
+}
+
+.publish{
+
+    background:#4CAF50;
+
+    color:#FFFFFF;
+
+}
+
+/* ==========================
+   登録済み作品一覧
+========================== */
+
+.admin-list{
+
+    margin-top:60px;
+
+}
+
+.admin-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#FFFFFF;
+
+}
+
+.admin-table th{
+
+    background:#F7F7F7;
+
+    padding:14px;
+
+    border:1px solid #E5E5E5;
+
+}
+
+.admin-table td{
+
+    padding:14px;
+
+    border:1px solid #E5E5E5;
+
+    text-align:center;
+
+}
+
+.edit-button{
+
+    background:#4CAF50;
+
+    color:#FFFFFF;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
 
     margin-right:6px;
 
 }
 
-.badge-new{
+.delete-button{
 
-    background:#FF5252;
+    background:#F44336;
 
-    color:white;
+    color:#FFFFFF;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+/* ==========================
+   works.js 出力エリア
+========================== */
+
+.export-area{
+
+    margin-top:60px;
+
+    padding:25px;
+
+    background:#FFFFFF;
+
+    border:1px solid #E5E5E5;
+
+    border-radius:16px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.05);
 
 }
 
-.badge-recommend{
+.export-area h2{
 
-    background:#4CAF50;
+    margin-bottom:12px;
 
-    color:white;
+}
+
+.export-description{
+
+    color:#666;
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    margin-bottom:18px;
 
 }
 
 /* ==========================
-   Work Detail
+   出力テキストエリア
 ========================== */
 
-.work-image{
+#exportData{
 
-    max-width:600px;
+    width:100%;
 
-    margin:25px auto;
+    min-height:260px;
+
+    padding:16px;
+
+    border:1px solid #DDDDDD;
+
+    border-radius:12px;
+
+    background:#F8F8F8;
+
+    font-family:
+
+        Consolas,
+
+        Monaco,
+
+        monospace;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+    resize:vertical;
+
+    white-space:pre;
+
+    overflow:auto;
 
 }
 
-.work-description{
+/* ==========================
+   コピーエリア
+========================== */
 
-    margin:25px 0;
+.export-buttons{
 
-    line-height:1.9;
+    margin-top:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
 
 }
 
-.related-area{
+/* ==========================
+   コピーボタン
+========================== */
 
-    margin-top:50px;
+.copy-button{
+
+    background:#4CAF50;
+
+    color:#FFFFFF;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:14px 28px;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
 
 }
 
+.copy-button:hover{
+
+    background:#43A047;
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+   コピー完了メッセージ
+========================== */
+
+.copy-message{
+
+    color:#4CAF50;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+    min-height:22px;
+
+    display:flex;
+
+    align-items:center;
+
+}
 /* ==========================
    Responsive
 ========================== */
 
 @media(max-width:768px){
 
-.grid{
+    .grid{
 
-grid-template-columns:
-repeat(2,1fr);
+        grid-template-columns:repeat(2,1fr);
 
-gap:14px;
+        gap:14px;
+
+    }
+
+    .pageTitle{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:10px;
+
+    }
+
+    .info-box{
+
+        flex-direction:column;
+
+    }
+
+    .check-group{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .admin-container{
+
+        padding:20px 15px 120px;
+
+    }
+
+    .admin-table{
+
+        display:block;
+
+        overflow-x:auto;
+
+        white-space:nowrap;
+
+    }
+
+    .admin-bottom-bar{
+
+        padding:12px;
+
+        gap:10px;
+
+    }
+
+    .admin-bottom-bar button{
+
+        padding:14px;
+
+        font-size:15px;
+
+    }
+
+    .export-area{
+
+        padding:18px;
+
+    }
+
+    #exportData{
+
+        min-height:220px;
+
+        font-size:12px;
+
+    }
+
+    .export-buttons{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+    .copy-button{
+
+        width:100%;
+
+    }
+
+    .copy-message{
+
+        justify-content:center;
+
+        text-align:center;
+
+    }
 
 }
 
-.pageTitle{
-
-flex-direction:column;
-
-align-items:flex-start;
-
-gap:10px;
-
-}
-
-.info-box{
-
-flex-direction:column;
-
-}
-
-}
 /* ==========================
-   Card Grid
+   Scrollbar
 ========================== */
 
-.card-grid{
+::-webkit-scrollbar{
 
-    display:grid;
+    width:10px;
 
-    grid-template-columns:repeat(2,1fr);
-
-    gap:16px;
-
-    margin-top:20px;
+    height:10px;
 
 }
 
-@media(min-width:768px){
+::-webkit-scrollbar-track{
 
-.card-grid{
-
-    grid-template-columns:repeat(4,1fr);
+    background:#F5F5F5;
 
 }
+
+::-webkit-scrollbar-thumb{
+
+    background:#C8C8C8;
+
+    border-radius:999px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#AFAFAF;
 
 }
 
 /* ==========================
-   Card
+   Version
 ========================== */
 
-.card{
+/*
 
-    display:flex;
+Project Library
 
-    flex-direction:column;
+Style Version 1.0
 
-    height:100%;
+2026
 
-}
+・管理画面完成
+・works.js出力追加
+・コピー機能対応
+・レスポンシブ改善
+・カードデザイン統一
+・管理画面デザイン統一
 
-.card img{
-
-    width:100%;
-
-    aspect-ratio:1/1;
-
-    object-fit:cover;
-
-}
-
-.card-body{
-
-    padding:12px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    flex:1;
-
-}
-
-.card-body h3{
-
-    font-size:15px;
-
-    line-height:1.5;
-
-    min-height:48px;
-
-}
-
-.card-body p{
-
-    margin-top:auto;
-
-    color:#FF9800;
-
-    font-weight:bold;
-
-}
+*/
