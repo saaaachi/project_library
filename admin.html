@@ -1,47 +1,107 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>管理画面 | Project Library</title>
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="assets/css/style.css">
+<title>
+
+管理画面 |
+Project Library
+
+</title>
+
+<meta
+name="description"
+content="Project Library 管理画面">
+
+<link
+rel="stylesheet"
+href="assets/css/style.css">
 
 </head>
 
 <body>
 
+<!-- ==========================
+Header
+========================== -->
+
 <header id="header"></header>
+
+<!-- ==========================
+Sidebar
+========================== -->
+
+<div id="sidebar"></div>
+
+<!-- ==========================
+Main
+========================== -->
 
 <main class="admin-container">
 
-<h2>作品管理</h2>
+<h1>
 
-<!-- ======================
-登録フォーム
-====================== -->
+📚 Project Library
+管理画面
+
+</h1>
+
+<p class="admin-subtitle">
+
+作品登録・編集・管理を行います
+
+</p>
+
+<!-- ==========================
+作品登録フォーム
+========================== -->
 
 <form id="workForm">
 
-<input type="hidden" id="editId">
+<input
+type="hidden"
+id="editId">
 
-<label>タイトル</label>
+<!-- タイトル -->
+
+<label>
+
+タイトル
+
+</label>
 
 <input
 type="text"
 id="title"
 placeholder="作品タイトル">
 
-<label>PDFファイル</label>
+<!-- PDF -->
+
+<label>
+
+PDFファイル
+
+</label>
 
 <input
 type="file"
 id="pdf"
 accept=".pdf">
 
-<label>サムネイル画像</label>
+<!-- サムネイル -->
+
+<label>
+
+サムネイル画像
+
+</label>
 
 <input
 type="file"
@@ -58,105 +118,196 @@ accept="image/*">
 
 </div>
 
-<label>カテゴリ</label>
+<!-- カテゴリ -->
+
+<label>
+
+カテゴリ
+
+</label>
 
 <div class="check-group">
 
 <label>
+
 <input
 type="checkbox"
 value="幼児向け">
+
 幼児向け
+
 </label>
 
 <label>
+
 <input
 type="checkbox"
 value="子ども向け">
+
 子ども向け
+
 </label>
 
 <label>
+
 <input
 type="checkbox"
 value="大人向け">
+
 大人向け
+
 </label>
 
 <label>
+
 <input
 type="checkbox"
 value="シニア・リハビリ">
+
 シニア・リハビリ
+
 </label>
 
 </div>
 
-<label>固定タグ</label>
+<!-- 固定タグ -->
+
+<label>
+
+固定タグ
+
+</label>
 
 <input
 type="text"
 id="fixedTags"
 placeholder="ぬりえ・迷路・計算">
 
-<label>自由タグ</label>
+<!-- 自由タグ -->
+
+<label>
+
+自由タグ
+
+</label>
 
 <input
 type="text"
 id="freeTags"
 placeholder="消防車・夏・恐竜">
+<!-- シリーズ -->
 
-<label>シリーズ名</label>
+<label>
+
+シリーズ名
+
+</label>
 
 <input
 type="text"
 id="series"
 placeholder="働く車シリーズ">
-<label>難易度</label>
+
+<!-- 難易度 -->
+
+<label>
+
+難易度
+
+</label>
 
 <select id="difficulty">
 
-<option value="1">★☆☆ 初級</option>
-<option value="2">★★☆ 中級</option>
-<option value="3">★★★ 上級</option>
+<option value="1">
+
+★☆☆ 初級
+
+</option>
+
+<option value="2">
+
+★★☆ 中級
+
+</option>
+
+<option value="3">
+
+★★★ 上級
+
+</option>
 
 </select>
 
-<label>対象年齢</label>
+<!-- 対象年齢 -->
+
+<label>
+
+対象年齢
+
+</label>
 
 <input
 type="text"
 id="age"
 placeholder="3〜6歳">
 
-<label>印刷サイズ</label>
+<!-- 印刷サイズ -->
+
+<label>
+
+印刷サイズ
+
+</label>
 
 <select id="size">
 
-<option>A4</option>
-<option>A3</option>
+<option value="A4">
+
+A4
+
+</option>
+
+<option value="A3">
+
+A3
+
+</option>
 
 </select>
 
-<label>必要な道具</label>
+<!-- 必要な道具 -->
+
+<label>
+
+必要な道具
+
+</label>
 
 <input
 type="text"
 id="tools"
 placeholder="色えんぴつ・はさみ">
 
-<label>説明</label>
+<!-- 説明 -->
+
+<label>
+
+説明
+
+</label>
 
 <textarea
 id="description"
 rows="6"
-placeholder="作品説明を入力"></textarea>
+placeholder="作品説明を入力">
+
+</textarea>
 
 </form>
 
-<!-- ======================
+<!-- ==========================
 操作ボタン
-====================== -->
+========================== -->
 
 <div class="admin-bottom-bar">
 
@@ -177,10 +328,9 @@ class="publish">
 </button>
 
 </div>
-<!-- ======================
-works.js出力
-Version4.3
-====================== -->
+<!-- ==========================
+works.js 出力
+========================== -->
 
 <section class="export-area">
 
@@ -189,13 +339,16 @@ Version4.3
 works.js 出力
 
 </h2>
+
 <p class="export-description">
 
 公開すると作品データがここへ表示されます。<br>
 
-「📋 コピー」を押すだけで works.js に貼り付けられます。
+「📋 コピー」を押すだけで
+works.js に貼り付けできます。
 
 </p>
+
 <textarea
 id="exportData"
 rows="12"
@@ -215,15 +368,20 @@ class="copy-button">
 📋 コピー
 
 </button>
-<p id="copyMessage" class="copy-message">
+
+<p
+id="copyMessage"
+class="copy-message">
 
 </p>
+
 </div>
 
 </section>
-<!-- ======================
+
+<!-- ==========================
 登録済み作品
-====================== -->
+========================== -->
 
 <section class="admin-list">
 
@@ -239,10 +397,35 @@ class="copy-button">
 
 <tr>
 
-<th>No</th>
-<th>タイトル</th>
-<th>カテゴリ</th>
-<th>操作</th>
+<th>
+
+No
+
+</th>
+
+<th>
+
+タイトル
+
+</th>
+
+<th>
+
+カテゴリ
+
+</th>
+
+<th>
+
+難易度
+
+</th>
+
+<th>
+
+操作
+
+</th>
 
 </tr>
 
@@ -255,18 +438,29 @@ class="copy-button">
 </table>
 
 </section>
-</main>
 
+</main>
 <footer id="footer"></footer>
+
+<!-- 共通 -->
 
 <script src="assets/js/common.js"></script>
 
+<!-- 作品データ -->
+
 <script src="assets/data/works.js"></script>
 
-<!-- PDF読み込みライブラリ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.54/pdf.min.mjs" type="module"></script>
+<!-- PDF.js -->
+
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.54/pdf.min.mjs"
+type="module">
+</script>
+
+<!-- 管理画面 -->
 
 <script src="assets/js/admin.js"></script>
+
 </body>
 
 </html>
