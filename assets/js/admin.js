@@ -1,8 +1,8 @@
 // ======================================
 // Project Library
 // admin.js
-// Version 5.0
-// 更新日：2026-07-18
+// Version 6.0
+// 更新日：2026-07-22
 // ======================================
 
 // --------------------------
@@ -31,7 +31,7 @@ const workList =
     document.getElementById("workList");
 
 // --------------------------
-// Version5追加
+// Version6追加
 // works.js出力欄
 // --------------------------
 
@@ -40,6 +40,9 @@ const exportArea =
 
 const copyButton =
     document.getElementById("copyButton");
+
+const copyMessage =
+    document.getElementById("copyMessage");
 
 // --------------------------
 // 編集中ID
@@ -157,6 +160,7 @@ function resetThumbnail(){
         "サムネイルプレビュー";
 
 }
+
 // --------------------------
 // サムネイル画像選択
 // --------------------------
@@ -223,7 +227,6 @@ pdfInput.addEventListener(
             file.name
         );
 
-        // PDFからサムネイル生成
         const thumbnail =
             await createThumbnail(file);
 
@@ -242,14 +245,15 @@ pdfInput.addEventListener(
 
 // --------------------------
 // PDFサムネイル生成
-// Version5
 // --------------------------
 
 async function createThumbnail(file){
 
     if(typeof pdfjsLib === "undefined"){
 
-        console.warn("pdf.js が読み込まれていません");
+        console.warn(
+            "pdf.js が読み込まれていません"
+        );
 
         return null;
 
@@ -260,7 +264,9 @@ async function createThumbnail(file){
 
     const pdf =
         await pdfjsLib.getDocument({
+
             data:arrayBuffer
+
         }).promise;
 
     const page =
@@ -268,7 +274,9 @@ async function createThumbnail(file){
 
     const viewport =
         page.getViewport({
+
             scale:1.5
+
         });
 
     const canvas =
@@ -291,10 +299,11 @@ async function createThumbnail(file){
 
     }).promise;
 
-    return canvas.toDataURL("image/jpeg");
+    return canvas.toDataURL(
+        "image/jpeg"
+    );
 
 }
-
 // --------------------------
 // 一覧表示
 // --------------------------
@@ -360,15 +369,15 @@ onclick="deleteWork(${work.id})">
     workList.innerHTML = html;
 
 }
+
 // --------------------------
 // 編集
 // --------------------------
 
 function editWork(id){
 
-    const work = works.find(
-        item => item.id === id
-    );
+    const work =
+        works.find(item => item.id === id);
 
     if(!work){
 
@@ -378,7 +387,8 @@ function editWork(id){
 
     editId = id;
 
-    workData = structuredClone(work);
+    workData =
+        structuredClone(work);
 
     document.getElementById("title").value =
         workData.title;
@@ -447,9 +457,8 @@ function editWork(id){
 
 function deleteWork(id){
 
-    const work = works.find(
-        item => item.id === id
-    );
+    const work =
+        works.find(item => item.id === id);
 
     if(!work){
 
@@ -458,7 +467,9 @@ function deleteWork(id){
     }
 
     const ok = confirm(
+
         `「${work.title}」を削除しますか？`
+
     );
 
     if(!ok){
@@ -468,9 +479,7 @@ function deleteWork(id){
     }
 
     const index =
-        works.findIndex(
-            item => item.id === id
-        );
+        works.findIndex(item => item.id === id);
 
     if(index !== -1){
 
@@ -485,6 +494,8 @@ function deleteWork(id){
     }
 
     renderList();
+
+    updateExportArea();
 
 }
 
@@ -503,15 +514,15 @@ function collectFormData(){
         document.getElementById("fixedTags")
         .value
         .split(",")
-        .map(tag => tag.trim())
-        .filter(tag => tag);
+        .map(tag=>tag.trim())
+        .filter(tag=>tag);
 
     workData.freeTags =
         document.getElementById("freeTags")
         .value
         .split(",")
-        .map(tag => tag.trim())
-        .filter(tag => tag);
+        .map(tag=>tag.trim())
+        .filter(tag=>tag);
 
     workData.series =
         document.getElementById("series")
@@ -520,8 +531,7 @@ function collectFormData(){
 
     workData.level =
         Number(
-            document.getElementById("difficulty")
-            .value
+            document.getElementById("difficulty").value
         );
 
     workData.age =
@@ -537,8 +547,8 @@ function collectFormData(){
         document.getElementById("tools")
         .value
         .split(",")
-        .map(tool => tool.trim())
-        .filter(tool => tool);
+        .map(tool=>tool.trim())
+        .filter(tool=>tool);
 
     workData.description =
         document.getElementById("description")
@@ -546,11 +556,6 @@ function collectFormData(){
         .trim();
 
     workData.category = [];
-
-    document
-        .querySelectorAll(
-            '.check-group input[type="checkbox"]:checked"
-        );
 
     document
         .querySelectorAll(
@@ -563,57 +568,304 @@ function collectFormData(){
         });
 
 }
+
+// --------------------------
+// 入力チェック
+// --------------------------
+
+function validateForm(){
+
+    collectFormData();
+
+    if(workData.title === ""){
+
+        alert("タイトルを入力してください。");
+
+        return false;
+
+    }
+
+    if(workData.category.length === 0){
+
+        alert("カテゴリを選択してください。");
+
+        return false;
+
+    }
+
+    if(workData.description === ""){
+
+        alert("説明を入力してください。");
+
+        return false;
+
+    }
+
+    return true;
+
+}
+// --------------------------
+// 作品データ生成
+// --------------------------
+
+function generateWorkData(){
+
+    collectFormData();
+
+    const today =
+        new Date().toISOString().slice(0,10);
+
+    if(editId){
+
+        const oldWork =
+            works.find(item => item.id === editId);
+
+        workData.id =
+            oldWork.id;
+
+        workData.workNo =
+            oldWork.workNo;
+
+        workData.thumbnail =
+            workData.thumbnail || oldWork.thumbnail;
+
+        workData.pdf =
+            workData.pdf || oldWork.pdf;
+
+        workData.publishDate =
+            oldWork.publishDate;
+
+        workData.updateDate =
+            today;
+
+        workData.isNew =
+            oldWork.isNew;
+
+        workData.recommend =
+            oldWork.recommend;
+
+        workData.etsy =
+            oldWork.etsy;
+
+        workData.related =
+            oldWork.related;
+
+    }else{
+
+        workData.id =
+            Date.now();
+
+        workData.workNo =
+            "PL-" +
+            String(works.length + 1)
+            .padStart(6,"0");
+
+        workData.publishDate =
+            today;
+
+        workData.updateDate =
+            today;
+
+        workData.isNew =
+            true;
+
+        workData.recommend =
+            false;
+
+        workData.etsy =
+            "";
+
+        workData.related =
+            [];
+
+    }
+
+    return structuredClone(workData);
+
+}
+
+// --------------------------
+// 保存
+// --------------------------
+
+function saveWork(newWork){
+
+    if(editId){
+
+        const index =
+            works.findIndex(
+                item => item.id === editId
+            );
+
+        works[index] =
+            newWork;
+
+        alert("作品を更新しました😊");
+
+    }else{
+
+        works.unshift(newWork);
+
+        alert("作品を追加しました😊");
+
+    }
+
+}
+
+// --------------------------
+// フォーム初期化
+// --------------------------
+
+function resetForm(){
+
+    editId = null;
+
+    form.reset();
+
+    resetThumbnail();
+
+    publishButton.textContent =
+        "公開する";
+
+    workData =
+        createEmptyWorkData();
+
+}
+
+// --------------------------
+// works.js形式へ変換
+// --------------------------
+
+function exportWorkData(){
+
+    return `const works = ${JSON.stringify(
+
+        works,
+
+        null,
+
+        4
+
+    )};`;
+
+}
+
+// --------------------------
+// 出力欄更新
+// --------------------------
+
+function updateExportArea(){
+
+    if(!exportArea){
+
+        return;
+
+    }
+
+    exportArea.value =
+        exportWorkData();
+
+}
+
+// --------------------------
+// コピー
+// --------------------------
+
+if(copyButton){
+
+    copyButton.addEventListener(
+
+        "click",
+
+        async function(){
+
+            try{
+
+                await navigator.clipboard.writeText(
+
+                    exportArea.value
+
+                );
+
+                copyButton.textContent =
+                    "✅ コピーしました！";
+
+                setTimeout(()=>{
+
+                    copyButton.textContent =
+                        "📋 コピー";
+
+                },2000);
+
+            }catch(error){
+
+                alert(
+                    "コピーに失敗しました🥲"
+                );
+
+            }
+
+        }
+
+    );
+
+}
 // --------------------------
 // 公開・更新
-// Version5.0
 // --------------------------
 
 publishButton.addEventListener(
+
     "click",
+
     function(){
 
-        // データ生成
-        const newWork = generateWorkData();
+        if(!validateForm()){
 
-        // 入力チェック
-        if(!validateForm(newWork)){
             return;
+
         }
 
-        // 保存
+        const newWork =
+            generateWorkData();
+
         saveWork(newWork);
 
-        // works.js形式を画面へ表示
         updateExportArea();
 
-        // コンソールにも表示
         console.log(
+
             exportWorkData()
+
         );
 
-        // 初期化
         resetForm();
 
-        // 一覧更新
         renderList();
 
     }
+
 );
 
 // --------------------------
 // 下書き保存
-// Version5.0
+// Version6.1予定
 // --------------------------
 
 draftButton.addEventListener(
+
     "click",
+
     function(){
 
         alert(
-            "Version5.1で実装予定です😊"
+
+            "Version6.1で実装予定です😊"
+
         );
 
     }
+
 );
 
 // --------------------------
@@ -631,5 +883,7 @@ updateExportArea();
 // --------------------------
 
 console.log(
-    "Project Library admin.js Version5.0"
+
+    "Project Library admin.js Version6.0"
+
 );
