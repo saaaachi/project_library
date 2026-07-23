@@ -159,6 +159,7 @@ ${work.title}
     return html;
 
 }
+
 // --------------------------
 // 見つからない場合
 // --------------------------
@@ -243,7 +244,6 @@ src="${work.thumbnail}"
 alt="${work.title}">
 
 </div>
-
 <div class="info-box">
 
 <div class="info-item">
