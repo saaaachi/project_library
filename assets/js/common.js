@@ -54,39 +54,46 @@ window.addEventListener(
 
     async()=>{
 
-        await loadComponent(
-
-            "header",
-
-            "components/header.html"
-
-        );
-
-        await loadComponent(
-
-            "sidebar",
-
-            "components/sidebar.html"
-
-        );
-
-        await loadComponent(
-
-            "footer",
-
-            "components/footer.html"
-
-        );
-        await loadComponent(
-   "adTop",
-   "components/ads/top.html"
+await loadComponent(
+    "header",
+    "components/header.html"
 );
 
-        setupMenu();
+await loadComponent(
+    "sidebar",
+    "components/sidebar.html"
+);
 
-        setupSearch();
+await loadComponent(
+    "footer",
+    "components/footer.html"
+);
 
-        setupCurrentYear();
+await loadComponent(
+    "adTop",
+    "components/ads/top.html"
+);
+
+await loadComponent(
+    "adMiddle",
+    "components/ads/middle.html"
+);
+
+await loadComponent(
+    "adBottom",
+    "components/ads/bottom.html"
+);
+
+await loadComponent(
+    "adSidebar",
+    "components/ads/sidebar.html"
+);
+
+setupMenu();
+
+setupSearch();
+
+setupCurrentYear();
 
     }
 
