@@ -77,6 +77,10 @@ window.addEventListener(
             "components/footer.html"
 
         );
+        await loadComponent(
+   "adTop",
+   "components/ads/top.html"
+);
 
         setupMenu();
 
