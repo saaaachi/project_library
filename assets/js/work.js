@@ -318,11 +318,16 @@ ${tag}
 
 </div>
 
-<div class="ad-box">
-
-広告エリア
-
-</div>
+<!-- プリント横長レスポンシブ -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1299640300068792"
+     data-ad-slot="6020574861"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
 
 <a
 class="button download-button"
