@@ -318,6 +318,8 @@ ${tag}
 
 </div>
 
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
+     crossorigin="anonymous"></script>
 <!-- プリント横長レスポンシブ -->
 <ins class="adsbygoogle"
      style="display:block"
