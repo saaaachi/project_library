@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>
+
+管理者ログイン | Project Library
+
+</title>
+<link
+rel="stylesheet"
+href="assets/css/style.css">
+</head>
+<body>
+<header id="header"></header>
+<div class="container">
+<aside id="sidebar"></aside>
+<main>
+<section class="home-section">
+<div class="breadcrumb">
+<a href="index.html">
+
+ホーム
+
+</a>
+
+＞
+
+<span class="current">
+
+管理者ログイン
+
+</span>
+</div>
+<h1 class="section-title">
+
+🔐 管理者ログイン
+
+</h1>
+<p>
+
+管理画面に入るにはパスワードを入力してください。
+
+</p>
+<br>
+<form id="loginForm">
+<label>
+
+パスワード
+
+</label>
+
+ログイン
+
+</button>
+</form>
+<p
+id="loginError"
+style="
+margin-top:20px;
+color:#F44336;
+font-weight:bold;
+display:none;
+">
+
+パスワードが違います。
+
+</p>
+</section>
+</main>
+</div>
+<footer id="footer"></footer>
+<script src="assets/js/common.js"></script>
+<script>
+const loginForm =
+    document.getElementById("loginForm");
+const passwordInput =
+    document.getElementById("password");
+const loginError =
+    document.getElementById("loginError");
+loginForm.addEventListener(
+    "submit",
+    function(event){
+        event.preventDefault();
+        const password =
+            passwordInput.value;
+        if(password === "112233"){
+            sessionStorage.setItem(
+                "adminLoggedIn",
+                "true"
+            );
+            location.href =
+                "admin.html";
+        }else{
+            loginError.style.display =
+                "block";
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
+    }
+);
+</script>
+</body>
+</html>
