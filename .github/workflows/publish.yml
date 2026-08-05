@@ -1,15 +1,33 @@
 name: Project Library Publish
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
+inputs:
+title:
+description: ‘作品タイトル’
+required: true
+category:
+description: ‘カテゴリ’
+required: true
+fixedTags:
+description: ‘固定タグ’
+required: false
+freeTags:
+description: ‘自由タグ’
+required: false
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
+publish:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Repository checkout
-        uses: actions/checkout@v4
-
-      - name: Confirm workflow
-        run: echo "Project Library publish workflow is ready."
+steps:
+  - name: Repository checkout
+    uses: actions/checkout@v4
+  - name: Confirm received data
+    run: |
+      echo "=== Project Library Publish ==="
+      echo "Title: ${{ github.event.inputs.title }}"
+      echo "Category: ${{ github.event.inputs.category }}"
+      echo "Fixed Tags: ${{ github.event.inputs.fixedTags }}"
+      echo "Free Tags: ${{ github.event.inputs.freeTags }}"
+      echo "Publish workflow is working correctly."
