@@ -1,475 +1,356 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
-
 <title>
 
 管理画面 |
 Project Library
 
 </title>
-  <script>
-
+<script>
 if(sessionStorage.getItem("adminLoggedIn") !== "true"){
-
     location.href = "admin-login.html";
-
 }
-
+function logout(){
+    sessionStorage.removeItem("adminLoggedIn");
+    location.href = "admin-login.html";
+}
 </script>
-
-<meta
-name="description"
-content="Project Library 管理画面">
-
 <link
 rel="stylesheet"
 href="assets/css/style.css">
-
 </head>
-
 <body>
-
 <!-- ==========================
 Header
 ========================== -->
-
 <header id="header"></header>
-
 <!-- ==========================
 Sidebar
 ========================== -->
-
 <div id="sidebar"></div>
-
 <!-- ==========================
 Main
 ========================== -->
-
 <main class="admin-container">
-
+<!-- ==========================
+タイトル
+========================== -->
+<div
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+">
+<div>
 <h1>
 
 📚 Project Library
 管理画面
 
 </h1>
-
 <p class="admin-subtitle">
 
 作品登録・編集・管理を行います
 
 </p>
+</div>
 
+ログアウト
+
+</button>
+</div>
+<!-- ==========================
+公開ステータス
+========================== -->
+<section
+style="
+background:#f8f9fb;
+border:1px solid #e0e0e0;
+border-radius:12px;
+padding:16px;
+margin:24px 0;
+">
+<h2
+style="
+margin:0 0 10px;
+font-size:18px;
+">
+
+🚀 公開ステータス
+
+</h2>
+<p
+style="
+margin:0;
+line-height:1.8;
+">
+
+Version6.2
+
+GitHub Actions 接続済み
+
+GitHub Secrets 設定済み
+
+ワンクリック投稿システム構築中
+
+</p>
+</section>
 <!-- ==========================
 作品登録フォーム
 ========================== -->
-
 <form id="workForm">
-
-<input
-type="hidden"
-id="editId">
-
 <!-- タイトル -->
-
 <label>
 
 タイトル
 
 </label>
-
-<input
-type="text"
-id="title"
-placeholder="作品タイトル">
-
 <!-- PDF -->
-
 <label>
 
 PDFファイル
 
 </label>
-
-<input
-type="file"
-id="pdf"
-accept=".pdf">
-
 <!-- サムネイル -->
-
 <label>
 
 サムネイル画像
 
 </label>
-
-<input
-type="file"
-id="thumbnail"
-accept="image/*">
-
 <div class="preview-box">
-
 <div class="thumbnail-preview">
 
 サムネイルプレビュー
 
 </div>
-
 </div>
-
 <!-- カテゴリ -->
-
 <label>
 
 カテゴリ
 
 </label>
-
 <div class="check-group">
-
 <label>
-
-<input
-type="checkbox"
-value="幼児向け">
 
 幼児向け
 
 </label>
-
 <label>
-
-<input
-type="checkbox"
-value="子ども向け">
 
 子ども向け
 
 </label>
-
 <label>
-
-<input
-type="checkbox"
-value="大人向け">
 
 大人向け
 
 </label>
-
 <label>
-
-<input
-type="checkbox"
-value="シニア・リハビリ">
 
 シニア・リハビリ
 
 </label>
-
 </div>
-
 <!-- 固定タグ -->
-
 <label>
 
 固定タグ
 
 </label>
-
-<input
-type="text"
-id="fixedTags"
-placeholder="ぬりえ・迷路・計算">
-
 <!-- 自由タグ -->
-
 <label>
 
 自由タグ
 
 </label>
-
-<input
-type="text"
-id="freeTags"
-placeholder="消防車・夏・恐竜">
 <!-- シリーズ -->
-
 <label>
 
 シリーズ名
 
 </label>
-
-<input
-type="text"
-id="series"
-placeholder="働く車シリーズ">
-
 <!-- 難易度 -->
-
 <label>
 
 難易度
 
 </label>
-
 <select id="difficulty">
-
 <option value="1">
 
 ★☆☆ 初級
 
 </option>
-
 <option value="2">
 
 ★★☆ 中級
 
 </option>
-
 <option value="3">
 
 ★★★ 上級
 
 </option>
-
 </select>
-
 <!-- 対象年齢 -->
-
 <label>
 
 対象年齢
 
 </label>
-
-<input
-type="text"
-id="age"
-placeholder="3〜6歳">
-
 <!-- 印刷サイズ -->
-
 <label>
 
 印刷サイズ
 
 </label>
-
 <select id="size">
-
 <option value="A4">
 
 A4
 
 </option>
-
 <option value="A3">
 
 A3
 
 </option>
-
 </select>
-
 <!-- 必要な道具 -->
-
 <label>
 
 必要な道具
 
 </label>
-
-<input
-type="text"
-id="tools"
-placeholder="色えんぴつ・はさみ">
-
 <!-- 説明 -->
-
 <label>
 
 説明
 
 </label>
-
 <textarea
 id="description"
 rows="6"
 placeholder="作品説明を入力">
-
 </textarea>
-
 </form>
-
 <!-- ==========================
 操作ボタン
 ========================== -->
-
 <div class="admin-bottom-bar">
-
-<button
-type="button"
-class="draft">
 
 下書き保存
 
 </button>
 
-<button
-type="button"
-class="publish">
-
-公開する
+🚀 公開する（GitHub）
 
 </button>
-
 </div>
 <!-- ==========================
 works.js 出力
 ========================== -->
-
 <section class="export-area">
-
 <h2>
 
 works.js 出力
 
 </h2>
-
 <p class="export-description">
 
-公開すると作品データがここへ表示されます。<br>
+現在は移行期間のため、
+作品データをここにも表示します。
 
-「📋 コピー」を押すだけで
-works.js に貼り付けできます。
+GitHub自動更新完成後は
+この欄は削除されます。
 
 </p>
-
 <textarea
 id="exportData"
 rows="12"
 readonly
 spellcheck="false"
 placeholder="公開するとここに作品データが表示されます。">
-
 </textarea>
-
 <div class="export-buttons">
-
-<button
-type="button"
-id="copyButton"
-class="copy-button">
 
 📋 コピー
 
 </button>
-
 <p
 id="copyMessage"
 class="copy-message">
-
 </p>
-
 </div>
-
 </section>
-
 <!-- ==========================
 登録済み作品
 ========================== -->
-
 <section class="admin-list">
-
 <h2>
 
 登録済み作品
 
 </h2>
-
 <table class="admin-table">
-
 <thead>
-
 <tr>
-
 <th>
 
 No
 
 </th>
-
 <th>
 
 タイトル
 
 </th>
-
 <th>
 
 カテゴリ
 
 </th>
-
 <th>
 
 難易度
 
 </th>
-
 <th>
 
 操作
 
 </th>
-
 </tr>
-
 </thead>
-
 <tbody id="workList">
-
 </tbody>
-
 </table>
-
 </section>
-
 </main>
 <footer id="footer"></footer>
-
-<!-- 共通 -->
-
+<!-- ==========================
+共通
+========================== -->
 <script src="assets/js/common.js"></script>
-
-<!-- 作品データ -->
-
+<!-- ==========================
+作品データ
+========================== -->
 <script src="assets/data/works.js"></script>
-
-<!-- PDF.js -->
-
+<!-- ==========================
+PDF.js
+========================== -->
 <script
 src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.54/pdf.min.mjs"
 type="module">
 </script>
-
-<!-- 管理画面 -->
-
+<!-- ==========================
+管理画面
+========================== -->
 <script src="assets/js/admin.js"></script>
-
 </body>
-
 </html>
