@@ -1,33 +1,45 @@
 name: Project Library Publish
 
 on:
-workflow_dispatch:
-inputs:
-title:
-description: ‘作品タイトル’
-required: true
-category:
-description: ‘カテゴリ’
-required: true
-fixedTags:
-description: ‘固定タグ’
-required: false
-freeTags:
-description: ‘自由タグ’
-required: false
+  workflow_dispatch:
+    inputs:
+      title:
+        description: '作品タイトル'
+        required: true
+        type: string
+
+      category:
+        description: 'カテゴリ'
+        required: true
+        type: string
+
+      fixedTags:
+        description: '固定タグ'
+        required: false
+        type: string
+
+      freeTags:
+        description: '自由タグ'
+        required: false
+        type: string
+
 
 jobs:
-publish:
-runs-on: ubuntu-latest
+  publish:
 
-steps:
-  - name: Repository checkout
-    uses: actions/checkout@v4
-  - name: Confirm received data
-    run: |
-      echo "=== Project Library Publish ==="
-      echo "Title: ${{ github.event.inputs.title }}"
-      echo "Category: ${{ github.event.inputs.category }}"
-      echo "Fixed Tags: ${{ github.event.inputs.fixedTags }}"
-      echo "Free Tags: ${{ github.event.inputs.freeTags }}"
-      echo "Publish workflow is working correctly."
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Repository checkout
+        uses: actions/checkout@v4
+
+
+      - name: Confirm received data
+        run: |
+          echo "=== Project Library Publish ==="
+          echo "Title: ${{ github.event.inputs.title }}"
+          echo "Category: ${{ github.event.inputs.category }}"
+          echo "Fixed Tags: ${{ github.event.inputs.fixedTags }}"
+          echo "Free Tags: ${{ github.event.inputs.freeTags }}"
+          echo "Publish workflow is working correctly."
