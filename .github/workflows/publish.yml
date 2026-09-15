@@ -24,6 +24,11 @@ on:
         type: string
 
 
+concurrency:
+  group: project-library-publish
+  cancel-in-progress: false
+
+
 jobs:
   publish:
 
