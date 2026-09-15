@@ -29,17 +29,41 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
 
       - name: Repository checkout
         uses: actions/checkout@v4
 
 
-      - name: Confirm received data
+      - name: Create publish test file
         run: |
-          echo "=== Project Library Publish ==="
-          echo "Title: ${{ github.event.inputs.title }}"
-          echo "Category: ${{ github.event.inputs.category }}"
-          echo "Fixed Tags: ${{ github.event.inputs.fixedTags }}"
-          echo "Free Tags: ${{ github.event.inputs.freeTags }}"
-          echo "Publish workflow is working correctly."
+          mkdir -p .project-library-test
+
+          cat > .project-library-test/latest.txt << EOF
+          Project Library Publish Test
+
+          Title: ${{ github.event.inputs.title }}
+          Category: ${{ github.event.inputs.category }}
+          Fixed Tags: ${{ github.event.inputs.fixedTags }}
+          Free Tags: ${{ github.event.inputs.freeTags }}
+
+          Published at:
+          $(date '+%Y-%m-%d %H:%M:%S')
+
+          GitHub Actions automatic commit is working.
+          EOF
+
+
+      - name: Commit test file
+        run: |
+          git config user.name "Project Library Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .project-library-test/latest.txt
+
+          git diff --cached --quiet || git commit -m "test: Project Library automatic publish"
+
+          git push
