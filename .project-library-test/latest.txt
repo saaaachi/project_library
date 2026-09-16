@@ -1,11 +1,29 @@
+
 Project Library Publish Test
 
-Title: テスト
-Category: 幼児向け
-Fixed Tags: テスト
-Free Tags: 
+Title:
+テスト
+
+Category:
+幼児向け
+
+Fixed Tags:
+テスト
+
+Free Tags:
+
+
+Upload ID:
+1789530390895
+
+PDF Path:
+.project-library-upload/pdf/テスト_1789530390895.pdf
+
+Thumbnail Path:
+.project-library-upload/thumbnail/テスト_1789530390895.jpg
 
 Published at:
-2026-09-15 09:38:31
+2026-09-16 03:47:15
 
-GitHub Actions automatic commit is working.
+GitHub Actions automatic publish is working.
+
