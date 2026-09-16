@@ -1,8 +1,8 @@
 // ======================================
 // Project Library
 // admin.js
-// Version 7.3
-// 統合完成版
+// Version 7.4
+// PDF・サムネイル送信対応版
 // ======================================
 
 
@@ -12,18 +12,29 @@
 
 const form = document.getElementById("workForm");
 
-const draftButton = document.querySelector(".draft");
-const publishButton = document.querySelector(".publish");
+const draftButton =
+    document.querySelector(".draft");
 
-const pdfInput = document.getElementById("pdfFile");
+const publishButton =
+    document.querySelector(".publish");
 
-const preview = document.getElementById("thumbnailPreview");
+const pdfInput =
+    document.getElementById("pdfFile");
 
-const workList = document.getElementById("workList");
+const preview =
+    document.getElementById("thumbnailPreview");
 
-const exportArea = document.getElementById("exportData");
-const copyButton = document.getElementById("copyButton");
-const copyMessage = document.getElementById("copyMessage");
+const workList =
+    document.getElementById("workList");
+
+const exportArea =
+    document.getElementById("exportData");
+
+const copyButton =
+    document.getElementById("copyButton");
+
+const copyMessage =
+    document.getElementById("copyMessage");
 
 
 // --------------------------------------
@@ -42,7 +53,8 @@ let editId = null;
 
 let selectedPdfFile = null;
 
-let workData = createEmptyWorkData();
+let workData =
+    createEmptyWorkData();
 
 
 // --------------------------------------
@@ -136,20 +148,28 @@ function createStars(level){
 function toArray(value){
 
     if(Array.isArray(value)){
+
         return value;
+
     }
+
 
     if(
         typeof value !== "string" ||
         value.trim() === ""
     ){
+
         return [];
+
     }
+
 
     return value
         .split(",")
         .map(function(item){
+
             return item.trim();
+
         })
         .filter(Boolean);
 
@@ -163,8 +183,11 @@ function toArray(value){
 function showThumbnail(image){
 
     if(!preview){
+
         return;
+
     }
+
 
     if(!image){
 
@@ -174,7 +197,9 @@ function showThumbnail(image){
 
     }
 
+
     preview.innerHTML = `
+
         <img
             src="${image}"
             alt="サムネイルプレビュー"
@@ -185,6 +210,7 @@ function showThumbnail(image){
                 margin:auto;
             "
         >
+
     `;
 
 }
@@ -197,8 +223,11 @@ function showThumbnail(image){
 function resetThumbnail(){
 
     if(!preview){
+
         return;
+
     }
+
 
     preview.innerHTML =
         "サムネイルプレビュー";
@@ -216,8 +245,11 @@ let pdfjsReady = null;
 async function loadPdfJs(){
 
     if(pdfjsReady){
+
         return pdfjsReady;
+
     }
+
 
     pdfjsReady =
         import(
@@ -225,16 +257,20 @@ async function loadPdfJs(){
         )
         .then(function(pdfjs){
 
-            if(pdfjs.GlobalWorkerOptions){
+            if(
+                pdfjs.GlobalWorkerOptions
+            ){
 
                 pdfjs.GlobalWorkerOptions.workerSrc =
                     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 
             }
 
+
             return pdfjs;
 
         });
+
 
     return pdfjsReady;
 
@@ -251,8 +287,10 @@ async function createPdfThumbnailWithWatermark(file){
     const pdfjs =
         await loadPdfJs();
 
+
     const arrayBuffer =
         await file.arrayBuffer();
+
 
     const pdf =
         await pdfjs
@@ -260,6 +298,7 @@ async function createPdfThumbnailWithWatermark(file){
                 data: arrayBuffer
             })
             .promise;
+
 
     const page =
         await pdf.getPage(1);
@@ -278,12 +317,14 @@ async function createPdfThumbnailWithWatermark(file){
     const canvas =
         document.createElement("canvas");
 
+
     const context =
         canvas.getContext("2d");
 
 
     canvas.width =
         viewport.width;
+
 
     canvas.height =
         viewport.height;
@@ -295,9 +336,11 @@ async function createPdfThumbnailWithWatermark(file){
 
     await page.render({
 
-        canvasContext: context,
+        canvasContext:
+            context,
 
-        viewport: viewport
+        viewport:
+            viewport
 
     }).promise;
 
@@ -308,20 +351,35 @@ async function createPdfThumbnailWithWatermark(file){
 
     context.save();
 
-    context.globalAlpha = 0.20;
 
-    context.fillStyle = "#666666";
+    context.globalAlpha =
+        0.20;
 
-    context.textAlign = "center";
 
-    context.textBaseline = "middle";
+    context.fillStyle =
+        "#666666";
+
+
+    context.textAlign =
+        "center";
+
+
+    context.textBaseline =
+        "middle";
+
 
     context.translate(
+
         canvas.width / 2,
+
         canvas.height / 2
+
     );
 
-    context.rotate(-Math.PI / 6);
+
+    context.rotate(
+        -Math.PI / 6
+    );
 
 
     // ----------------------------------
@@ -330,6 +388,7 @@ async function createPdfThumbnailWithWatermark(file){
 
     context.font =
         "bold 34px sans-serif";
+
 
     context.fillText(
         "Project Library",
@@ -340,6 +399,7 @@ async function createPdfThumbnailWithWatermark(file){
 
     context.font =
         "bold 28px sans-serif";
+
 
     context.fillText(
         "無料プリント",
@@ -355,6 +415,7 @@ async function createPdfThumbnailWithWatermark(file){
     context.font =
         "bold 34px sans-serif";
 
+
     context.fillText(
         "Project Library",
         0,
@@ -364,6 +425,7 @@ async function createPdfThumbnailWithWatermark(file){
 
     context.font =
         "bold 28px sans-serif";
+
 
     context.fillText(
         "無料プリント",
@@ -379,6 +441,7 @@ async function createPdfThumbnailWithWatermark(file){
     context.font =
         "bold 34px sans-serif";
 
+
     context.fillText(
         "Project Library",
         0,
@@ -388,6 +451,7 @@ async function createPdfThumbnailWithWatermark(file){
 
     context.font =
         "bold 28px sans-serif";
+
 
     context.fillText(
         "無料プリント",
@@ -427,30 +491,46 @@ if(pdfInput){
 
             if(!file){
 
-                selectedPdfFile = null;
+                selectedPdfFile =
+                    null;
 
-                workData.pdf = "";
+
+                workData.pdf =
+                    "";
+
+
+                workData.thumbnail =
+                    "";
+
 
                 resetThumbnail();
+
 
                 return;
 
             }
 
 
-            selectedPdfFile = file;
+            // ----------------------------------
+            // PDFを保持
+            // ----------------------------------
+
+            selectedPdfFile =
+                file;
 
 
-            workData.pdf = file;
+            workData.pdf =
+                file;
 
 
             // ----------------------------------
-            // 読み込み中表示
+            // 読み込み中
             // ----------------------------------
 
             if(preview){
 
                 preview.innerHTML = `
+
                     <p
                         style="
                             text-align:center;
@@ -458,9 +538,13 @@ if(pdfInput){
                             line-height:1.8;
                         "
                     >
+
                         📄 PDFを読み込み中…<br>
+
                         サムネイルを作成しています😊
+
                     </p>
+
                 `;
 
             }
@@ -479,9 +563,11 @@ if(pdfInput){
                     workData.thumbnail =
                         thumbnail;
 
+
                     showThumbnail(
                         thumbnail
                     );
+
 
                     console.log(
                         "透かし付きサムネイル生成完了✨"
@@ -497,7 +583,13 @@ if(pdfInput){
                     error
                 );
 
+
+                workData.thumbnail =
+                    "";
+
+
                 resetThumbnail();
+
 
                 alert(
                     "PDFのサムネイル生成に失敗しました🥲"
@@ -518,7 +610,9 @@ if(pdfInput){
 function getSelectedCategories(){
 
     if(!form){
+
         return [];
+
     }
 
 
@@ -686,6 +780,32 @@ function validateForm(data){
     }
 
 
+    if(
+        !selectedPdfFile &&
+        !workData.pdf
+    ){
+
+        alert(
+            "PDFを選択してください🥹"
+        );
+
+        return false;
+
+    }
+
+
+    if(!workData.thumbnail){
+
+        alert(
+            "サムネイルがまだ生成されていません🥹\n" +
+            "PDFをもう一度選択してください。"
+        );
+
+        return false;
+
+    }
+
+
     return true;
 
 }
@@ -797,6 +917,7 @@ function generateWorkData(){
     const existingWork =
         editId !== null &&
         typeof works !== "undefined"
+
             ? works.find(
                 function(work){
 
@@ -807,6 +928,7 @@ function generateWorkData(){
 
                 }
             )
+
             : null;
 
 
@@ -1072,7 +1194,8 @@ function updateExportArea(){
 
     if(!workData){
 
-        exportArea.value = "";
+        exportArea.value =
+            "";
 
         return;
 
@@ -1166,11 +1289,15 @@ function renderList(){
     ){
 
         workList.innerHTML = `
+
             <tr>
+
                 <td colspan="5">
                     作品データがありません
                 </td>
+
             </tr>
+
         `;
 
         return;
@@ -1181,11 +1308,15 @@ function renderList(){
     if(works.length === 0){
 
         workList.innerHTML = `
+
             <tr>
+
                 <td colspan="5">
                     登録済み作品はありません
                 </td>
+
             </tr>
+
         `;
 
         return;
@@ -1199,27 +1330,48 @@ function renderList(){
                 function(work){
 
                     return `
+
                         <tr>
 
                             <td>
-                                ${work.workNo || work.id || ""}
+                                ${
+                                    work.workNo ||
+                                    work.id ||
+                                    ""
+                                }
                             </td>
 
-                            <td>
-                                ${work.title || ""}
-                            </td>
 
                             <td>
                                 ${
-                                    Array.isArray(work.category)
-                                        ? work.category.join(" / ")
-                                        : ""
+                                    work.title ||
+                                    ""
                                 }
                             </td>
+
+
+                            <td>
+
+                                ${
+                                    Array.isArray(
+                                        work.category
+                                    )
+
+                                        ? work.category.join(
+                                            " / "
+                                        )
+
+                                        : ""
+
+                                }
+
+                            </td>
+
 
                             <td>
                                 ${createStars(work.level)}
                             </td>
+
 
                             <td>
 
@@ -1229,6 +1381,7 @@ function renderList(){
                                 >
                                     編集
                                 </button>
+
 
                                 <button
                                     type="button"
@@ -1240,6 +1393,7 @@ function renderList(){
                             </td>
 
                         </tr>
+
                     `;
 
                 }
@@ -1292,43 +1446,61 @@ function editWork(id){
         work.id;
 
 
-    document.getElementById("title").value =
+    document
+        .getElementById("title")
+        .value =
         work.title || "";
 
 
-    document.getElementById("description").value =
+    document
+        .getElementById("description")
+        .value =
         work.description || "";
 
 
-    document.getElementById("fixedTags").value =
+    document
+        .getElementById("fixedTags")
+        .value =
         Array.isArray(work.fixedTags)
             ? work.fixedTags.join(", ")
             : "";
 
 
-    document.getElementById("freeTags").value =
+    document
+        .getElementById("freeTags")
+        .value =
         Array.isArray(work.freeTags)
             ? work.freeTags.join(", ")
             : "";
 
 
-    document.getElementById("series").value =
+    document
+        .getElementById("series")
+        .value =
         work.series || "";
 
 
-    document.getElementById("difficulty").value =
+    document
+        .getElementById("difficulty")
+        .value =
         work.level || 1;
 
 
-    document.getElementById("age").value =
+    document
+        .getElementById("age")
+        .value =
         work.age || "";
 
 
-    document.getElementById("size").value =
+    document
+        .getElementById("size")
+        .value =
         work.size || "A4";
 
 
-    document.getElementById("tools").value =
+    document
+        .getElementById("tools")
+        .value =
         Array.isArray(work.tools)
             ? work.tools.join(", ")
             : "";
@@ -1456,6 +1628,10 @@ function resetForm(){
 
 async function triggerGitHubPublish(){
 
+    // ----------------------------------
+    // 作品データ生成
+    // ----------------------------------
+
     const data =
         saveWork();
 
@@ -1467,52 +1643,192 @@ async function triggerGitHubPublish(){
     }
 
 
-    const payload = {
+    // ----------------------------------
+    // PDFチェック
+    // ----------------------------------
 
-        title:
-            data.title,
+    if(
+        !selectedPdfFile
+    ){
 
+        alert(
+            "公開するPDFを選択してください🥹"
+        );
 
-        category:
-            data.category.join(","),
+        return;
 
-
-        fixedTags:
-            data.fixedTags.join(","),
-
-
-        freeTags:
-            data.freeTags.join(",")
-
-    };
+    }
 
 
-    console.log(
-        "Cloudflare Workerへ公開リクエスト送信：",
-        payload
+    // ----------------------------------
+    // FormData作成
+    // ----------------------------------
+
+    const formData =
+        new FormData();
+
+
+    // ----------------------------------
+    // 作品情報
+    // ----------------------------------
+
+    formData.append(
+        "title",
+        data.title
     );
+
+
+    formData.append(
+        "description",
+        data.description
+    );
+
+
+    formData.append(
+        "category",
+        data.category.join(",")
+    );
+
+
+    formData.append(
+        "fixedTags",
+        data.fixedTags.join(",")
+    );
+
+
+    formData.append(
+        "freeTags",
+        data.freeTags.join(",")
+    );
+
+
+    formData.append(
+        "series",
+        data.series
+    );
+
+
+    formData.append(
+        "level",
+        String(data.level)
+    );
+
+
+    formData.append(
+        "age",
+        data.age
+    );
+
+
+    formData.append(
+        "size",
+        data.size
+    );
+
+
+    formData.append(
+        "tools",
+        data.tools.join(",")
+    );
+
+
+    formData.append(
+        "workNo",
+        data.workNo
+    );
+
+
+    formData.append(
+        "workId",
+        String(data.id)
+    );
+
+
+    // ----------------------------------
+    // PDF
+    // ----------------------------------
+
+    formData.append(
+        "pdf",
+        selectedPdfFile,
+        selectedPdfFile.name
+    );
+
+
+    // ----------------------------------
+    // サムネイル
+    // ----------------------------------
+
+    try{
+
+        const thumbnailBlob =
+            await dataUrlToBlob(
+                data.thumbnail
+            );
+
+
+        formData.append(
+            "thumbnail",
+            thumbnailBlob,
+            `${data.workNo}.jpg`
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "サムネイル変換エラー:",
+            error
+        );
+
+
+        alert(
+            "サムネイルの準備に失敗しました🥲"
+        );
+
+        return;
+
+    }
+
+
+    // ----------------------------------
+    // 公開中表示
+    // ----------------------------------
+
+    if(publishButton){
+
+        publishButton.disabled =
+            true;
+
+
+        publishButton.textContent =
+            "🚀 公開処理中…";
+
+    }
 
 
     try{
 
+        console.log(
+            "Cloudflare WorkerへPDF＋サムネイル＋作品情報を送信します📦"
+        );
+
+
         const response =
             await fetch(
+
                 WORKER_URL,
+
                 {
 
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                    method:
+                        "POST",
 
                     body:
-                        JSON.stringify(
-                            payload
-                        )
+                        formData
 
                 }
+
             );
 
 
@@ -1529,8 +1845,10 @@ async function triggerGitHubPublish(){
         if(!response.ok){
 
             throw new Error(
+
                 result.error ||
                 "公開処理に失敗しました"
+
             );
 
         }
@@ -1539,17 +1857,41 @@ async function triggerGitHubPublish(){
         if(!result.success){
 
             throw new Error(
+
                 result.error ||
-                "GitHub Actionsの起動に失敗しました"
+                "GitHubへの保存に失敗しました"
+
             );
 
         }
 
 
+        // ----------------------------------
+        // 成功
+        // ----------------------------------
+
         alert(
+
             "🚀 公開リクエストを送信しました！\n\n" +
-            "GitHub Actionsが実行されます😊"
+
+            "📄 PDF\n" +
+
+            "🖼️ サムネイル\n" +
+
+            "📝 作品情報\n\n" +
+
+            "をGitHubへ送信しました😊\n\n" +
+
+            "このあとGitHub Actionsが実行されます✨"
+
         );
+
+
+        console.log(
+            "公開成功✨",
+            result
+        );
+
 
     }
     catch(error){
@@ -1561,11 +1903,57 @@ async function triggerGitHubPublish(){
 
 
         alert(
+
             "公開処理でエラーが発生しました🥲\n\n" +
+
             error.message
+
         );
 
     }
+    finally{
+
+        if(publishButton){
+
+            publishButton.disabled =
+                false;
+
+
+            publishButton.textContent =
+                "🚀 公開";
+
+        }
+
+    }
+
+}
+
+
+// --------------------------------------
+// Data URL → Blob
+// --------------------------------------
+
+async function dataUrlToBlob(dataUrl){
+
+    if(
+        typeof dataUrl !== "string" ||
+        !dataUrl.startsWith("data:")
+    ){
+
+        throw new Error(
+            "サムネイルデータが正しくありません。"
+        );
+
+    }
+
+
+    const response =
+        await fetch(
+            dataUrl
+        );
+
+
+    return await response.blob();
 
 }
 
@@ -1594,5 +1982,5 @@ updateExportArea();
 
 
 console.log(
-    "Project Library admin.js Version 7.3 統合完成版"
+    "Project Library admin.js Version 7.4 統合完成版"
 );
