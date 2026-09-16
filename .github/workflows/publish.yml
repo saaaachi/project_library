@@ -3,6 +3,7 @@ name: Project Library Publish
 on:
   workflow_dispatch:
     inputs:
+
       title:
         description: '作品タイトル'
         required: true
@@ -23,6 +24,21 @@ on:
         required: false
         type: string
 
+      uploadId:
+        description: 'アップロードID'
+        required: false
+        type: string
+
+      pdfPath:
+        description: '一時PDFパス'
+        required: false
+        type: string
+
+      thumbnailPath:
+        description: '一時サムネイルパス'
+        required: false
+        type: string
+
 
 concurrency:
   group: project-library-publish
@@ -30,6 +46,7 @@ concurrency:
 
 
 jobs:
+
   publish:
 
     runs-on: ubuntu-latest
@@ -37,38 +54,184 @@ jobs:
     permissions:
       contents: write
 
+
     steps:
 
+      # --------------------------------------
+      # GitHubリポジトリ取得
+      # --------------------------------------
+
       - name: Repository checkout
+
         uses: actions/checkout@v4
 
 
-      - name: Create publish test file
+      # --------------------------------------
+      # 公開情報確認
+      # --------------------------------------
+
+      - name: Show publish information
+
         run: |
+
+          echo "======================================"
+          echo "Project Library Publish"
+          echo "======================================"
+
+          echo "Title:"
+          echo "${{ github.event.inputs.title }}"
+
+          echo ""
+
+          echo "Category:"
+          echo "${{ github.event.inputs.category }}"
+
+          echo ""
+
+          echo "Fixed Tags:"
+          echo "${{ github.event.inputs.fixedTags }}"
+
+          echo ""
+
+          echo "Free Tags:"
+          echo "${{ github.event.inputs.freeTags }}"
+
+          echo ""
+
+          echo "Upload ID:"
+          echo "${{ github.event.inputs.uploadId }}"
+
+          echo ""
+
+          echo "PDF Path:"
+          echo "${{ github.event.inputs.pdfPath }}"
+
+          echo ""
+
+          echo "Thumbnail Path:"
+          echo "${{ github.event.inputs.thumbnailPath }}"
+
+          echo "======================================"
+
+
+      # --------------------------------------
+      # テスト用ファイル
+      # --------------------------------------
+
+      - name: Create publish test file
+
+        run: |
+
           mkdir -p .project-library-test
 
+
           cat > .project-library-test/latest.txt << EOF
+
           Project Library Publish Test
 
-          Title: ${{ github.event.inputs.title }}
-          Category: ${{ github.event.inputs.category }}
-          Fixed Tags: ${{ github.event.inputs.fixedTags }}
-          Free Tags: ${{ github.event.inputs.freeTags }}
+          Title:
+          ${{ github.event.inputs.title }}
+
+          Category:
+          ${{ github.event.inputs.category }}
+
+          Fixed Tags:
+          ${{ github.event.inputs.fixedTags }}
+
+          Free Tags:
+          ${{ github.event.inputs.freeTags }}
+
+          Upload ID:
+          ${{ github.event.inputs.uploadId }}
+
+          PDF Path:
+          ${{ github.event.inputs.pdfPath }}
+
+          Thumbnail Path:
+          ${{ github.event.inputs.thumbnailPath }}
 
           Published at:
           $(date '+%Y-%m-%d %H:%M:%S')
 
-          GitHub Actions automatic commit is working.
+          GitHub Actions automatic publish is working.
+
           EOF
 
 
-      - name: Commit test file
+      # --------------------------------------
+      # 一時アップロードファイル確認
+      # --------------------------------------
+
+      - name: Check uploaded files
+
         run: |
+
+          echo "アップロードファイル確認"
+
+          if [ -n "${{ github.event.inputs.pdfPath }}" ]; then
+
+            echo "PDFパスが指定されています："
+            echo "${{ github.event.inputs.pdfPath }}"
+
+            if [ -f "${{ github.event.inputs.pdfPath }}" ]; then
+
+              echo "PDFファイルを確認しました😊"
+
+            else
+
+              echo "PDFファイルはまだ存在しません。"
+              echo "次のVersionでWorkerからアップロードします。"
+
+            fi
+
+          else
+
+            echo "PDFパスは未指定です。"
+
+          fi
+
+
+          if [ -n "${{ github.event.inputs.thumbnailPath }}" ]; then
+
+            echo "サムネイルパスが指定されています："
+            echo "${{ github.event.inputs.thumbnailPath }}"
+
+            if [ -f "${{ github.event.inputs.thumbnailPath }}" ]; then
+
+              echo "サムネイルを確認しました😊"
+
+            else
+
+              echo "サムネイルはまだ存在しません。"
+              echo "次のVersionでWorkerからアップロードします。"
+
+            fi
+
+          else
+
+            echo "サムネイルパスは未指定です。"
+
+          fi
+
+
+      # --------------------------------------
+      # Git設定・テストファイル保存
+      # --------------------------------------
+
+      - name: Commit test file
+
+        run: |
+
           git config user.name "Project Library Bot"
+
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
 
           git add .project-library-test/latest.txt
 
-          git diff --cached --quiet || git commit -m "test: Project Library automatic publish"
+
+          git diff --cached --quiet || \
+            git commit -m "test: Project Library automatic publish"
+
 
           git push
