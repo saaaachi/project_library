@@ -76,6 +76,7 @@ jobs:
 
           echo "======================================"
           echo "Project Library Publish"
+          echo "Version 9.0"
           echo "======================================"
 
           echo "Title:"
@@ -115,50 +116,6 @@ jobs:
 
 
       # --------------------------------------
-      # テスト用ファイル
-      # --------------------------------------
-
-      - name: Create publish test file
-
-        run: |
-
-          mkdir -p .project-library-test
-
-
-          cat > .project-library-test/latest.txt << EOF
-
-          Project Library Publish Test
-
-          Title:
-          ${{ github.event.inputs.title }}
-
-          Category:
-          ${{ github.event.inputs.category }}
-
-          Fixed Tags:
-          ${{ github.event.inputs.fixedTags }}
-
-          Free Tags:
-          ${{ github.event.inputs.freeTags }}
-
-          Upload ID:
-          ${{ github.event.inputs.uploadId }}
-
-          PDF Path:
-          ${{ github.event.inputs.pdfPath }}
-
-          Thumbnail Path:
-          ${{ github.event.inputs.thumbnailPath }}
-
-          Published at:
-          $(date '+%Y-%m-%d %H:%M:%S')
-
-          GitHub Actions automatic publish is working.
-
-          EOF
-
-
-      # --------------------------------------
       # 一時アップロードファイル確認
       # --------------------------------------
 
@@ -166,59 +123,235 @@ jobs:
 
         run: |
 
-          echo "アップロードファイル確認"
+          echo "アップロードファイル確認を開始します。"
 
-          if [ -n "${{ github.event.inputs.pdfPath }}" ]; then
+          if [ -z "${{ github.event.inputs.pdfPath }}" ]; then
+            echo "❌ PDFパスが指定されていません。"
+            exit 1
+          fi
 
-            echo "PDFパスが指定されています："
-            echo "${{ github.event.inputs.pdfPath }}"
-
-            if [ -f "${{ github.event.inputs.pdfPath }}" ]; then
-
-              echo "PDFファイルを確認しました😊"
-
-            else
-
-              echo "PDFファイルはまだ存在しません。"
-              echo "次のVersionでWorkerからアップロードします。"
-
-            fi
-
-          else
-
-            echo "PDFパスは未指定です。"
-
+          if [ -z "${{ github.event.inputs.thumbnailPath }}" ]; then
+            echo "❌ サムネイルパスが指定されていません。"
+            exit 1
           fi
 
 
-          if [ -n "${{ github.event.inputs.thumbnailPath }}" ]; then
+          echo ""
+          echo "PDF："
+          echo "${{ github.event.inputs.pdfPath }}"
 
-            echo "サムネイルパスが指定されています："
-            echo "${{ github.event.inputs.thumbnailPath }}"
+          if [ ! -f "${{ github.event.inputs.pdfPath }}" ]; then
 
-            if [ -f "${{ github.event.inputs.thumbnailPath }}" ]; then
+            echo "❌ PDFファイルが見つかりません。"
+            exit 1
 
-              echo "サムネイルを確認しました😊"
+          fi
 
-            else
+          echo "✅ PDFファイルを確認しました😊"
 
-              echo "サムネイルはまだ存在しません。"
-              echo "次のVersionでWorkerからアップロードします。"
 
-            fi
+          echo ""
+          echo "サムネイル："
+          echo "${{ github.event.inputs.thumbnailPath }}"
+
+          if [ ! -f "${{ github.event.inputs.thumbnailPath }}" ]; then
+
+            echo "❌ サムネイルファイルが見つかりません。"
+            exit 1
+
+          fi
+
+          echo "✅ サムネイルを確認しました😊"
+
+
+      # --------------------------------------
+      # 正式フォルダ作成
+      # --------------------------------------
+
+      - name: Create final directories
+
+        run: |
+
+          echo "正式フォルダを確認します。"
+
+          mkdir -p assets/pdf
+          mkdir -p assets/images/thumbnail
+
+          echo "✅ 正式フォルダを準備しました😊"
+
+
+      # --------------------------------------
+      # PDFを正式フォルダへ移動
+      # --------------------------------------
+
+      - name: Move PDF to final location
+
+        run: |
+
+          PDF_PATH="${{ github.event.inputs.pdfPath }}"
+
+          PDF_FILENAME=$(basename "$PDF_PATH")
+
+          FINAL_PDF_PATH="assets/pdf/$PDF_FILENAME"
+
+
+          echo "PDFを正式フォルダへ移動します。"
+
+          echo "元："
+          echo "$PDF_PATH"
+
+          echo ""
+
+          echo "先："
+          echo "$FINAL_PDF_PATH"
+
+
+          cp "$PDF_PATH" "$FINAL_PDF_PATH"
+
+
+          if [ -f "$FINAL_PDF_PATH" ]; then
+
+            echo ""
+            echo "✅ PDFの正式配置に成功しました😊"
 
           else
 
-            echo "サムネイルパスは未指定です。"
+            echo ""
+            echo "❌ PDFの配置に失敗しました。"
+            exit 1
 
           fi
 
 
       # --------------------------------------
-      # Git設定・テストファイル保存
+      # サムネイルを正式フォルダへ移動
       # --------------------------------------
 
-      - name: Commit test file
+      - name: Move thumbnail to final location
+
+        run: |
+
+          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
+
+          THUMBNAIL_FILENAME=$(basename "$THUMBNAIL_PATH")
+
+          FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$THUMBNAIL_FILENAME"
+
+
+          echo "サムネイルを正式フォルダへ移動します。"
+
+          echo "元："
+          echo "$THUMBNAIL_PATH"
+
+          echo ""
+
+          echo "先："
+          echo "$FINAL_THUMBNAIL_PATH"
+
+
+          cp "$THUMBNAIL_PATH" "$FINAL_THUMBNAIL_PATH"
+
+
+          if [ -f "$FINAL_THUMBNAIL_PATH" ]; then
+
+            echo ""
+            echo "✅ サムネイルの正式配置に成功しました😊"
+
+          else
+
+            echo ""
+            echo "❌ サムネイルの配置に失敗しました。"
+            exit 1
+
+          fi
+
+
+      # --------------------------------------
+      # 正式配置されたファイル確認
+      # --------------------------------------
+
+      - name: Verify final files
+
+        run: |
+
+          PDF_PATH="${{ github.event.inputs.pdfPath }}"
+          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
+
+          PDF_FILENAME=$(basename "$PDF_PATH")
+          THUMBNAIL_FILENAME=$(basename "$THUMBNAIL_PATH")
+
+          FINAL_PDF_PATH="assets/pdf/$PDF_FILENAME"
+          FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$THUMBNAIL_FILENAME"
+
+
+          echo "======================================"
+          echo "正式配置ファイル確認"
+          echo "======================================"
+
+          echo ""
+          echo "PDF："
+          echo "$FINAL_PDF_PATH"
+
+          ls -lh "$FINAL_PDF_PATH"
+
+
+          echo ""
+          echo "サムネイル："
+          echo "$FINAL_THUMBNAIL_PATH"
+
+          ls -lh "$FINAL_THUMBNAIL_PATH"
+
+
+          echo ""
+          echo "======================================"
+          echo "✅ 正式配置ファイルを確認しました😊"
+          echo "======================================"
+
+
+      # --------------------------------------
+      # 一時ファイル削除
+      # --------------------------------------
+
+      - name: Remove temporary upload files
+
+        run: |
+
+          PDF_PATH="${{ github.event.inputs.pdfPath }}"
+          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
+
+
+          echo "一時ファイルを削除します。"
+
+          rm -f "$PDF_PATH"
+          rm -f "$THUMBNAIL_PATH"
+
+
+          echo "一時ファイル削除後："
+
+          if [ -e "$PDF_PATH" ]; then
+
+            echo "❌ PDF一時ファイルが残っています。"
+            exit 1
+
+          fi
+
+
+          if [ -e "$THUMBNAIL_PATH" ]; then
+
+            echo "❌ サムネイル一時ファイルが残っています。"
+            exit 1
+
+          fi
+
+
+          echo "✅ 一時ファイルを削除しました😊"
+
+
+      # --------------------------------------
+      # Git設定
+      # --------------------------------------
+
+      - name: Configure Git
 
         run: |
 
@@ -227,11 +360,52 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 
-          git add .project-library-test/latest.txt
+      # --------------------------------------
+      # 変更内容確認
+      # --------------------------------------
+
+      - name: Show changed files
+
+        run: |
+
+          echo "======================================"
+          echo "Git変更内容"
+          echo "======================================"
+
+          git status --short
+
+          echo "======================================"
 
 
-          git diff --cached --quiet || \
-            git commit -m "test: Project Library automatic publish"
+      # --------------------------------------
+      # 正式ファイル保存
+      # --------------------------------------
+
+      - name: Commit and push published files
+
+        run: |
+
+          git add assets/pdf
+          git add assets/images/thumbnail
+          git add .project-library-upload
+
+
+          if git diff --cached --quiet; then
+
+            echo "❌ 保存する変更がありません。"
+            exit 1
+
+          fi
+
+
+          git commit -m "publish: ${{ github.event.inputs.title }}"
 
 
           git push
+
+
+          echo ""
+          echo "======================================"
+          echo "🎉 Project Library Version 9.0"
+          echo "正式公開ファイルの保存に成功しました！"
+          echo "======================================"
