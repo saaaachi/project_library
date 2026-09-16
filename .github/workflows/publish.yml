@@ -76,7 +76,7 @@ jobs:
 
           echo "======================================"
           echo "Project Library Publish"
-          echo "Version 9.0"
+          echo "Version 10.0"
           echo "======================================"
 
           echo "Title:"
@@ -135,6 +135,11 @@ jobs:
             exit 1
           fi
 
+          if [ -z "${{ github.event.inputs.uploadId }}" ]; then
+            echo "❌ アップロードIDが指定されていません。"
+            exit 1
+          fi
+
 
           echo ""
           echo "PDF："
@@ -161,7 +166,43 @@ jobs:
 
           fi
 
-          echo "✅ サムネイルを確認しました😊"
+          echo "✅ サムネイルファイルを確認しました😊"
+
+
+      # --------------------------------------
+      # metadata確認
+      # --------------------------------------
+
+      - name: Check metadata
+
+        run: |
+
+          METADATA_PATH=".project-library-upload/metadata/${{ github.event.inputs.uploadId }}.json"
+
+          echo "作品情報を確認します。"
+
+          echo ""
+          echo "Metadata："
+          echo "$METADATA_PATH"
+
+
+          if [ ! -f "$METADATA_PATH" ]; then
+
+            echo "❌ metadataファイルが見つかりません。"
+            exit 1
+
+          fi
+
+
+          echo ""
+          echo "metadata内容："
+          cat "$METADATA_PATH"
+
+
+          echo ""
+          echo "======================================"
+          echo "✅ metadataを確認しました😊"
+          echo "======================================"
 
 
       # --------------------------------------
@@ -309,7 +350,575 @@ jobs:
 
 
       # --------------------------------------
-      # 一時ファイル削除
+      # works.js更新
+      # --------------------------------------
+
+      - name: Update works.js
+
+        env:
+          UPLOAD_ID: ${{ github.event.inputs.uploadId }}
+
+        run: |
+
+          echo "======================================"
+          echo "works.js自動更新"
+          echo "Version 10.0"
+          echo "======================================"
+
+
+          node <<'NODE'
+
+          const fs = require("fs");
+
+          const metadataPath =
+            `.project-library-upload/metadata/${process.env.UPLOAD_ID}.json`;
+
+          const worksPath =
+            "assets/data/works.js";
+
+
+          console.log("Metadata：");
+          console.log(metadataPath);
+
+          console.log("");
+
+          console.log("works.js：");
+          console.log(worksPath);
+
+
+          // ----------------------------------
+          // metadata読み込み
+          // ----------------------------------
+
+          if (!fs.existsSync(metadataPath)) {
+
+            console.error(
+              "❌ metadataファイルが見つかりません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          const metadata =
+            JSON.parse(
+              fs.readFileSync(
+                metadataPath,
+                "utf8"
+              )
+            );
+
+
+          console.log("");
+          console.log("作品情報を読み込みました😊");
+
+          console.log(
+            `タイトル：${metadata.title}`
+          );
+
+
+          // ----------------------------------
+          // works.js読み込み
+          // ----------------------------------
+
+          if (!fs.existsSync(worksPath)) {
+
+            console.error(
+              "❌ works.jsが見つかりません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          const worksText =
+            fs.readFileSync(
+              worksPath,
+              "utf8"
+            );
+
+
+          // ----------------------------------
+          // works配列部分を取得
+          // ----------------------------------
+
+          const startMarker =
+            "const works = [";
+
+          const endMarker =
+            "// --------------------------\n// 共通関数";
+
+
+          const startIndex =
+            worksText.indexOf(startMarker);
+
+
+          const endIndex =
+            worksText.indexOf(endMarker);
+
+
+          if (
+            startIndex === -1 ||
+            endIndex === -1
+          ) {
+
+            console.error(
+              "❌ works.jsの構造を確認できません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          const arrayStart =
+            startIndex +
+            startMarker.length;
+
+
+          const arrayText =
+            worksText
+              .slice(
+                arrayStart,
+                endIndex
+              )
+              .trim();
+
+
+          // ----------------------------------
+          // 既存works配列をJavaScriptとして取得
+          // ----------------------------------
+
+          let works;
+
+
+          try {
+
+            works =
+              Function(
+                `"use strict"; return [${arrayText}]`
+              )();
+
+          } catch (error) {
+
+            console.error(
+              "❌ works.jsの既存データを読み込めませんでした。"
+            );
+
+            console.error(error);
+
+            process.exit(1);
+
+          }
+
+
+          if (!Array.isArray(works)) {
+
+            console.error(
+              "❌ worksデータが配列ではありません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          console.log(
+            `現在の作品数：${works.length}件`
+          );
+
+
+          // ----------------------------------
+          // データ変換用関数
+          // ----------------------------------
+
+          function toArray(value) {
+
+            if (Array.isArray(value)) {
+              return value;
+            }
+
+            if (
+              value === undefined ||
+              value === null ||
+              value === ""
+            ) {
+              return [];
+            }
+
+            return String(value)
+              .split(/[、,]/)
+              .map(item => item.trim())
+              .filter(Boolean);
+
+          }
+
+
+          function toNumber(value, defaultValue = 0) {
+
+            const number =
+              Number(value);
+
+            if (
+              Number.isFinite(number)
+            ) {
+              return number;
+            }
+
+            return defaultValue;
+
+          }
+
+
+          // ----------------------------------
+          // ID決定
+          // ----------------------------------
+
+          const id =
+            toNumber(
+              metadata.workId
+            );
+
+
+          if (!id) {
+
+            console.error(
+              "❌ workIdが正しくありません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          // ----------------------------------
+          // workNo決定
+          // ----------------------------------
+
+          let workNo =
+            String(
+              metadata.workNo || ""
+            ).trim();
+
+
+          if (
+            !/^PL-\d{6}$/.test(workNo)
+          ) {
+
+            workNo =
+              `PL-${String(id).padStart(6, "0")}`;
+
+          }
+
+
+          // ----------------------------------
+          // 正式ファイルパス
+          // ----------------------------------
+
+          const pdfFilename =
+            require("path")
+              .basename(
+                metadata.pdfPath
+              );
+
+
+          const thumbnailFilename =
+            require("path")
+              .basename(
+                metadata.thumbnailPath
+              );
+
+
+          const pdfPath =
+            `assets/pdf/${pdfFilename}`;
+
+
+          const thumbnailPath =
+            `assets/images/thumbnail/${thumbnailFilename}`;
+
+
+          // ----------------------------------
+          // works.js用データ作成
+          // ----------------------------------
+
+          const newWork = {
+
+            id: id,
+
+            workNo: workNo,
+
+            title:
+              metadata.title || "",
+
+            category:
+              toArray(
+                metadata.category
+              ),
+
+            fixedTags:
+              toArray(
+                metadata.fixedTags
+              ),
+
+            freeTags:
+              toArray(
+                metadata.freeTags
+              ),
+
+            series:
+              metadata.series || "",
+
+            level:
+              toNumber(
+                metadata.level,
+                1
+              ),
+
+            age:
+              metadata.age || "",
+
+            size:
+              metadata.size || "",
+
+            tools:
+              toArray(
+                metadata.tools
+              ),
+
+            description:
+              metadata.description || "",
+
+            thumbnail:
+              thumbnailPath,
+
+            pdf:
+              pdfPath,
+
+            isNew:
+              metadata.isNew !== false,
+
+            recommend:
+              metadata.recommend === true,
+
+            publishDate:
+              metadata.publishDate || "",
+
+            updateDate:
+              metadata.updateDate || "",
+
+            etsy:
+              metadata.etsy || "",
+
+            related:
+              Array.isArray(
+                metadata.related
+              )
+                ? metadata.related
+                : [],
+
+            viewCount:
+              0,
+
+            downloadCount:
+              0,
+
+            favorite:
+              false
+
+          };
+
+
+          // ----------------------------------
+          // 既存作品チェック
+          // ----------------------------------
+
+          const existingIndex =
+            works.findIndex(
+              work =>
+                Number(work.id) === id
+            );
+
+
+          if (existingIndex !== -1) {
+
+            console.log("");
+            console.log(
+              `既存作品 id:${id} を更新します。`
+            );
+
+            works[existingIndex] =
+              newWork;
+
+          } else {
+
+            console.log("");
+            console.log(
+              `新しい作品 id:${id} を追加します。`
+            );
+
+            works.push(
+              newWork
+            );
+
+          }
+
+
+          // ----------------------------------
+          // ID重複チェック
+          // ----------------------------------
+
+          const ids =
+            works.map(
+              work =>
+                Number(work.id)
+            );
+
+
+          const uniqueIds =
+            new Set(ids);
+
+
+          if (
+            ids.length !==
+            uniqueIds.size
+          ) {
+
+            console.error(
+              "❌ ID重複が発生しています。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          // ----------------------------------
+          // works.js生成
+          // ----------------------------------
+
+          const commonFunctions =
+            worksText.slice(
+              endIndex
+            );
+
+
+          const newWorksText =
+`// ==========================
+// Project Library
+// works.js
+// Version 10.0
+// ==========================
+
+const works = ${JSON.stringify(
+  works,
+  null,
+  4
+)};
+
+${commonFunctions}`;
+
+
+          fs.writeFileSync(
+            worksPath,
+            newWorksText,
+            "utf8"
+          );
+
+
+          console.log("");
+          console.log(
+            `🎉 works.jsを更新しました！`
+          );
+
+          console.log(
+            `作品数：${works.length}件`
+          );
+
+          console.log(
+            `追加/更新ID：${id}`
+          );
+
+          console.log(
+            `workNo：${workNo}`
+          );
+
+          console.log(
+            `タイトル：${metadata.title}`
+          );
+
+          console.log("");
+          console.log(
+            "======================================"
+          );
+
+          NODE
+
+
+      # --------------------------------------
+      # works.js更新結果確認
+      # --------------------------------------
+
+      - name: Verify works.js
+
+        run: |
+
+          echo "======================================"
+          echo "works.js確認"
+          echo "======================================"
+
+          grep -n \
+            'title' \
+            assets/data/works.js \
+            | tail -10
+
+          echo ""
+
+          grep -n \
+            'workNo' \
+            assets/data/works.js \
+            | tail -10
+
+          echo ""
+
+          echo "======================================"
+          echo "✅ works.jsの更新を確認しました😊"
+          echo "======================================"
+
+
+      # --------------------------------------
+      # metadata削除
+      # --------------------------------------
+
+      - name: Remove metadata
+
+        run: |
+
+          METADATA_PATH=".project-library-upload/metadata/${{ github.event.inputs.uploadId }}.json"
+
+
+          echo "metadataを削除します。"
+
+          echo "$METADATA_PATH"
+
+
+          rm -f "$METADATA_PATH"
+
+
+          if [ -e "$METADATA_PATH" ]; then
+
+            echo "❌ metadataが残っています。"
+            exit 1
+
+          fi
+
+
+          echo "✅ metadataを削除しました😊"
+
+
+      # --------------------------------------
+      # 一時PDF・サムネイル削除
       # --------------------------------------
 
       - name: Remove temporary upload files
@@ -322,11 +931,13 @@ jobs:
 
           echo "一時ファイルを削除します。"
 
+
           rm -f "$PDF_PATH"
           rm -f "$THUMBNAIL_PATH"
 
 
           echo "一時ファイル削除後："
+
 
           if [ -e "$PDF_PATH" ]; then
 
@@ -387,6 +998,7 @@ jobs:
 
           git add assets/pdf
           git add assets/images/thumbnail
+          git add assets/data/works.js
           git add .project-library-upload
 
 
@@ -398,7 +1010,8 @@ jobs:
           fi
 
 
-          git commit -m "publish: ${{ github.event.inputs.title }}"
+          git commit \
+            -m "publish: ${{ github.event.inputs.title }}"
 
 
           git push
@@ -406,6 +1019,12 @@ jobs:
 
           echo ""
           echo "======================================"
-          echo "🎉 Project Library Version 9.0"
+          echo "🎉 Project Library Version 10.0"
+          echo "======================================"
+          echo "PDF：保存完了"
+          echo "サムネイル：保存完了"
+          echo "works.js：更新完了"
+          echo "metadata：削除完了"
+          echo "======================================"
           echo "正式公開ファイルの保存に成功しました！"
           echo "======================================"
