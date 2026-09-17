@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // works.js
-// Version 2.0
+// Version 5.0
 // ==========================
 
 const works = [
@@ -10,10 +10,9 @@ const works = [
 
     id: 1,
 
-    title: "消防車ぬりえ①",
+    workNo: "PL-000001",
 
-    description:
-        "消防車のぬりえです。",
+    title: "消防車ぬりえ①",
 
     category: [
         "子ども向け"
@@ -29,54 +28,110 @@ const works = [
         "働く車"
     ],
 
-    series:
-        "はたらく車",
+    series: "消防車シリーズ",
 
     level: 1,
 
-    age:
-        "3〜6歳",
+    age: "3〜6歳",
 
-    size:
-        "A4",
+    size: "A4",
 
     tools: [
         "色えんぴつ"
     ],
 
+    description:
+        "消防車のぬりえです。",
+
     thumbnail:
         "assets/images/sample.jpg",
-
-    watermark:
-        "assets/images/watermark/firetruck01.jpg",
 
     pdf:
         "assets/pdf/firetruck01.pdf",
 
-    recommend: true,
-
     isNew: true,
 
-    publishDate:
-        "2026-07-13",
+    recommend: true,
 
-    updateDate:
-        "2026-07-13",
+    publishDate: "2026-07-12",
 
-    etsy:
-        "",
+    updateDate: "2026-07-12",
 
-    related: [
-        2,
-        3
-    ],
+    etsy: "",
 
-    author:
-        "あたまのストレッチ",
+    related: [],
 
-    status:
-        "public"
+    viewCount: 0,
+
+    downloadCount: 0,
+
+    favorite: false
 
 }
 
 ];
+
+// --------------------------
+// 共通関数
+// --------------------------
+
+function getWorkById(id){
+
+    return works.find(
+        work => work.id === id
+    );
+
+}
+
+function getNewWorks(limit = 5){
+
+    return works
+        .filter(work => work.isNew)
+        .slice(0, limit);
+
+}
+
+function getRecommendWorks(limit = 5){
+
+    return works
+        .filter(work => work.recommend)
+        .slice(0, limit);
+
+}
+
+function getSeriesWorks(series, excludeId = null){
+
+    return works.filter(work =>
+        work.series === series &&
+        work.id !== excludeId
+    );
+
+}
+
+function getRelatedWorks(work, limit = 4){
+
+    return works
+        .filter(item=>{
+            if(item.id === work.id){
+                return false;
+            }
+
+            return(
+                item.category.some(category=>
+                    work.category.includes(category)
+                ) ||
+                item.fixedTags.some(tag=>
+                    work.fixedTags.includes(tag)
+                ) ||
+                item.freeTags.some(tag=>
+                    work.freeTags.includes(tag)
+                )
+            );
+        })
+        .slice(0, limit);
+}
+
+console.log(
+    `Project Library works.js Version5.0
+作品数：${works.length}件`
+);
