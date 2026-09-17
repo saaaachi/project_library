@@ -369,6 +369,7 @@ jobs:
           node <<'NODE'
 
           const fs = require("fs");
+          const path = require("path");
 
           const metadataPath =
             `.project-library-upload/metadata/${process.env.UPLOAD_ID}.json`;
@@ -618,17 +619,15 @@ jobs:
           // ----------------------------------
 
           const pdfFilename =
-            require("path")
-              .basename(
-                metadata.pdfPath
-              );
+            path.basename(
+              metadata.pdfPath
+            );
 
 
           const thumbnailFilename =
-            require("path")
-              .basename(
-                metadata.thumbnailPath
-              );
+            path.basename(
+              metadata.thumbnailPath
+            );
 
 
           const pdfPath =
@@ -804,20 +803,30 @@ jobs:
             );
 
 
+          /*
+           * Version 10.0
+           *
+           * ここではテンプレートリテラルの
+           * 複数行文字列を使用しない。
+           *
+           * YAML内でのインデント崩れを防ぐため、
+           * 文字列を + で連結する。
+           */
+
           const newWorksText =
-`// ==========================
-// Project Library
-// works.js
-// Version 10.0
-// ==========================
-
-const works = ${JSON.stringify(
-  works,
-  null,
-  4
-)};
-
-${commonFunctions}`;
+            "// ==========================\n" +
+            "// Project Library\n" +
+            "// works.js\n" +
+            "// Version 10.0\n" +
+            "// ==========================\n\n" +
+            "const works = " +
+            JSON.stringify(
+              works,
+              null,
+              4
+            ) +
+            ";\n\n" +
+            commonFunctions;
 
 
           fs.writeFileSync(
@@ -829,7 +838,7 @@ ${commonFunctions}`;
 
           console.log("");
           console.log(
-            `🎉 works.jsを更新しました！`
+            "🎉 works.jsを更新しました！"
           );
 
           console.log(
