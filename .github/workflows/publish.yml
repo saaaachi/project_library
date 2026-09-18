@@ -372,12 +372,9 @@ jobs:
           const path = require("path");
 
 
-          // ----------------------------------
-          // ファイルパス
-          // ----------------------------------
-
           const metadataPath =
             `.project-library-upload/metadata/${process.env.UPLOAD_ID}.json`;
+
 
           const worksPath =
             "assets/data/works.js";
@@ -447,119 +444,70 @@ jobs:
 
 
           // ----------------------------------
-          // works配列の開始位置
+          // works配列部分を取得
           // ----------------------------------
 
           const startMarker =
             "const works = [";
 
 
-          const startIndex =
-            worksText.indexOf(
-              startMarker
-            );
-
-
-          if (startIndex === -1) {
-
-            console.error(
-              "❌ works.jsの開始位置を確認できません。"
-            );
-
-            process.exit(1);
-
-          }
-
-
-          // ----------------------------------
-          // 共通関数の開始位置
-          // ----------------------------------
-
-          const commonMarker =
+          const endMarker =
             "// --------------------------\n// 共通関数";
 
 
-          const commonIndex =
-            worksText.indexOf(
-              commonMarker,
-              startIndex
-            );
+          const startIndex =
+            worksText.indexOf(startMarker);
 
 
-          if (commonIndex === -1) {
-
-            console.error(
-              "❌ works.jsの共通関数位置を確認できません。"
-            );
-
-            process.exit(1);
-
-          }
-
-
-          // ----------------------------------
-          // works配列の閉じ括弧を取得
-          // ----------------------------------
-          //
-          // 共通関数の直前にある
-          // 「];」を探す。
-          //
-          // 空行の数に影響されない方式。
-          //
-
-          const closeIndex =
-            worksText.lastIndexOf(
-              "];",
-              commonIndex
-            );
-
-
-          if (closeIndex === -1) {
-
-            console.error(
-              "❌ works配列の終了位置を確認できません。"
-            );
-
-            process.exit(1);
-
-          }
+          const endIndex =
+            worksText.indexOf(endMarker);
 
 
           if (
-            closeIndex <=
-            startIndex
+            startIndex === -1 ||
+            endIndex === -1
           ) {
 
             console.error(
-              "❌ works配列の位置関係が不正です。"
+              "❌ works.jsの構造を確認できません。"
             );
 
             process.exit(1);
 
           }
 
-
-          // ----------------------------------
-          // works配列部分を取得
-          // ----------------------------------
 
           const arrayStart =
             startIndex +
             startMarker.length;
 
 
-          const arrayText =
+          let arrayText =
             worksText
               .slice(
                 arrayStart,
-                closeIndex
+                endIndex
+              )
+              .trim();
+
+
+          // ----------------------------------
+          // Version 10.1
+          // 末尾の ]; を除去
+          // ----------------------------------
+
+          arrayText =
+            arrayText
+              .replace(
+                /\]\s*;\s*$/,
+                ""
               )
               .trim();
 
 
           console.log("");
           console.log(
-            "works配列データを取得しました😊"
+            "works配列データを解析します。"
           );
 
 
@@ -818,9 +766,7 @@ jobs:
             );
 
 
-          if (
-            existingIndex !== -1
-          ) {
+          if (existingIndex !== -1) {
 
             console.log("");
             console.log(
@@ -877,14 +823,9 @@ jobs:
           // works.js生成
           // ----------------------------------
 
-          //
-          // 既存の共通関数は
-          // 「];」から最後までをそのまま使用。
-          //
-
           const commonFunctions =
             worksText.slice(
-              closeIndex
+              endIndex
             );
 
 
@@ -911,10 +852,6 @@ jobs:
           );
 
 
-          // ----------------------------------
-          // 完了ログ
-          // ----------------------------------
-
           console.log("");
           console.log(
             "🎉 works.jsを更新しました！"
@@ -937,19 +874,9 @@ jobs:
           );
 
           console.log("");
-
           console.log(
             "======================================"
           );
-
-          console.log(
-            "works.js Version 10.1 完了😊"
-          );
-
-          console.log(
-            "======================================"
-          );
-
 
           NODE
 
