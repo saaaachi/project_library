@@ -76,7 +76,7 @@ jobs:
 
           echo "======================================"
           echo "Project Library Publish"
-          echo "Version 10.0"
+          echo "Version 10.1"
           echo "======================================"
 
           echo "Title:"
@@ -362,7 +362,7 @@ jobs:
 
           echo "======================================"
           echo "works.js自動更新"
-          echo "Version 10.0"
+          echo "Version 10.1"
           echo "======================================"
 
 
@@ -370,6 +370,11 @@ jobs:
 
           const fs = require("fs");
           const path = require("path");
+
+
+          // ----------------------------------
+          // ファイルパス
+          // ----------------------------------
 
           const metadataPath =
             `.project-library-upload/metadata/${process.env.UPLOAD_ID}.json`;
@@ -442,37 +447,101 @@ jobs:
 
 
           // ----------------------------------
-          // works配列部分を取得
+          // works配列の開始位置
           // ----------------------------------
 
           const startMarker =
             "const works = [";
 
-          const endMarker =
-            "// --------------------------\n// 共通関数";
-
 
           const startIndex =
-            worksText.indexOf(startMarker);
+            worksText.indexOf(
+              startMarker
+            );
 
 
-          const endIndex =
-            worksText.indexOf(endMarker);
-
-
-          if (
-            startIndex === -1 ||
-            endIndex === -1
-          ) {
+          if (startIndex === -1) {
 
             console.error(
-              "❌ works.jsの構造を確認できません。"
+              "❌ works.jsの開始位置を確認できません。"
             );
 
             process.exit(1);
 
           }
 
+
+          // ----------------------------------
+          // 共通関数の開始位置
+          // ----------------------------------
+
+          const commonMarker =
+            "// --------------------------\n// 共通関数";
+
+
+          const commonIndex =
+            worksText.indexOf(
+              commonMarker,
+              startIndex
+            );
+
+
+          if (commonIndex === -1) {
+
+            console.error(
+              "❌ works.jsの共通関数位置を確認できません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          // ----------------------------------
+          // works配列の閉じ括弧を取得
+          // ----------------------------------
+          //
+          // 共通関数の直前にある
+          // 「];」を探す。
+          //
+          // 空行の数に影響されない方式。
+          //
+
+          const closeIndex =
+            worksText.lastIndexOf(
+              "];",
+              commonIndex
+            );
+
+
+          if (closeIndex === -1) {
+
+            console.error(
+              "❌ works配列の終了位置を確認できません。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          if (
+            closeIndex <=
+            startIndex
+          ) {
+
+            console.error(
+              "❌ works配列の位置関係が不正です。"
+            );
+
+            process.exit(1);
+
+          }
+
+
+          // ----------------------------------
+          // works配列部分を取得
+          // ----------------------------------
 
           const arrayStart =
             startIndex +
@@ -483,9 +552,15 @@ jobs:
             worksText
               .slice(
                 arrayStart,
-                endIndex
+                closeIndex
               )
               .trim();
+
+
+          console.log("");
+          console.log(
+            "works配列データを取得しました😊"
+          );
 
 
           // ----------------------------------
@@ -557,7 +632,10 @@ jobs:
           }
 
 
-          function toNumber(value, defaultValue = 0) {
+          function toNumber(
+            value,
+            defaultValue = 0
+          ) {
 
             const number =
               Number(value);
@@ -740,7 +818,9 @@ jobs:
             );
 
 
-          if (existingIndex !== -1) {
+          if (
+            existingIndex !== -1
+          ) {
 
             console.log("");
             console.log(
@@ -797,27 +877,22 @@ jobs:
           // works.js生成
           // ----------------------------------
 
+          //
+          // 既存の共通関数は
+          // 「];」から最後までをそのまま使用。
+          //
+
           const commonFunctions =
             worksText.slice(
-              endIndex
+              closeIndex
             );
 
-
-          /*
-           * Version 10.0
-           *
-           * ここではテンプレートリテラルの
-           * 複数行文字列を使用しない。
-           *
-           * YAML内でのインデント崩れを防ぐため、
-           * 文字列を + で連結する。
-           */
 
           const newWorksText =
             "// ==========================\n" +
             "// Project Library\n" +
             "// works.js\n" +
-            "// Version 10.0\n" +
+            "// Version 10.1\n" +
             "// ==========================\n\n" +
             "const works = " +
             JSON.stringify(
@@ -835,6 +910,10 @@ jobs:
             "utf8"
           );
 
+
+          // ----------------------------------
+          // 完了ログ
+          // ----------------------------------
 
           console.log("");
           console.log(
@@ -858,9 +937,19 @@ jobs:
           );
 
           console.log("");
+
           console.log(
             "======================================"
           );
+
+          console.log(
+            "works.js Version 10.1 完了😊"
+          );
+
+          console.log(
+            "======================================"
+          );
+
 
           NODE
 
@@ -1028,7 +1117,7 @@ jobs:
 
           echo ""
           echo "======================================"
-          echo "🎉 Project Library Version 10.0"
+          echo "🎉 Project Library Version 10.1"
           echo "======================================"
           echo "PDF：保存完了"
           echo "サムネイル：保存完了"
