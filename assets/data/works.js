@@ -1,74 +1,74 @@
 // ==========================
 // Project Library
 // works.js
-// Version 5.0
+// Version 10.1
 // ==========================
 
 const works = [
-
-{
-
-    id: 1,
-
-    workNo: "PL-000001",
-
-    title: "消防車ぬりえ①",
-
-    category: [
-        "子ども向け"
-    ],
-
-    fixedTags: [
-        "ぬりえ"
-    ],
-
-    freeTags: [
-        "車",
-        "消防車",
-        "働く車"
-    ],
-
-    series: "消防車シリーズ",
-
-    level: 1,
-
-    age: "3〜6歳",
-
-    size: "A4",
-
-    tools: [
-        "色えんぴつ"
-    ],
-
-    description:
-        "消防車のぬりえです。",
-
-    thumbnail:
-        "assets/images/sample.jpg",
-
-    pdf:
-        "assets/pdf/firetruck01.pdf",
-
-    isNew: true,
-
-    recommend: true,
-
-    publishDate: "2026-07-12",
-
-    updateDate: "2026-07-12",
-
-    etsy: "",
-
-    related: [],
-
-    viewCount: 0,
-
-    downloadCount: 0,
-
-    favorite: false
-
-}
-
+    {
+        "id": 1,
+        "workNo": "PL-000001",
+        "title": "消防車ぬりえ①",
+        "category": [
+            "子ども向け"
+        ],
+        "fixedTags": [
+            "ぬりえ"
+        ],
+        "freeTags": [
+            "車",
+            "消防車",
+            "働く車"
+        ],
+        "series": "消防車シリーズ",
+        "level": 1,
+        "age": "3〜6歳",
+        "size": "A4",
+        "tools": [
+            "色えんぴつ"
+        ],
+        "description": "消防車のぬりえです。",
+        "thumbnail": "assets/images/sample.jpg",
+        "pdf": "assets/pdf/firetruck01.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-07-12",
+        "updateDate": "2026-07-12",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
+    },
+    {
+        "id": 2,
+        "workNo": "PL-000002",
+        "title": "3",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "テスト"
+        ],
+        "freeTags": [],
+        "series": "",
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "テスト",
+        "thumbnail": "assets/images/thumbnail/3_1789777953419.jpg",
+        "pdf": "assets/pdf/3_1789777953419.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-19",
+        "updateDate": "2026-09-19",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
+    }
 ];
 
 // --------------------------
