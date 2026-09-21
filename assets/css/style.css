@@ -1,7 +1,7 @@
 /* =====================================================
    Project Library
    Common Style
-   Version 7.0
+   Version 7.1
    2026-09-21
 ===================================================== */
 
@@ -69,7 +69,8 @@ img{
 }
 
 
-/* PC
+/* =====================================================
+   PCレイアウト
    サイドバー＋メイン
 ===================================================== */
 
@@ -208,7 +209,7 @@ img{
 }
 
 
-/* PCではハンバーガー不要
+/* PCではハンバーガー非表示
 ===================================================== */
 
 @media(min-width:769px){
@@ -274,8 +275,7 @@ img{
 }
 
 
-/* PCでは上に残る
-   スクロールしても見やすい
+/* PCではsticky
 ===================================================== */
 
 @media(min-width:769px){
@@ -346,7 +346,7 @@ img{
 }
 
 
-/* PCでは閉じるボタン不要
+/* PCでは閉じるボタン非表示
 ===================================================== */
 
 @media(min-width:769px){
@@ -437,7 +437,7 @@ img{
 
 
 /* =====================================================
-   スマホ：サイドバーをハンバーガー化
+   スマホ：サイドバー
 ===================================================== */
 
 @media(max-width:768px){
@@ -497,11 +497,11 @@ img{
 
 .section-title{
 
-    font-size:24px;
+    font-size:21px;
 
     font-weight:bold;
 
-    margin-bottom:20px;
+    margin-bottom:15px;
 
 }
 
@@ -518,9 +518,9 @@ img{
 
     color:#ffffff;
 
-    padding:11px 20px;
+    padding:10px 20px;
 
-    border-radius:10px;
+    border-radius:9px;
 
     transition:.25s;
 
@@ -533,6 +533,41 @@ img{
 .button:hover{
 
     background:#43A047;
+
+}
+
+
+/* =====================================================
+   Hero
+===================================================== */
+
+.hero{
+
+    background:#F8FFF8;
+
+    border:1px solid #E5F3E5;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    text-align:center;
+
+    margin-bottom:28px;
+
+}
+
+.hero-button{
+
+    width:auto !important;
+
+    min-width:170px;
+
+    padding:9px 22px;
+
+    font-size:15px;
+
+    border-radius:9px;
 
 }
 
@@ -670,6 +705,44 @@ img{
    広告
 ===================================================== */
 
+/*
+   AdSenseはレスポンシブのまま使用。
+   Project Library側では広告エリアの高さを
+   最大250pxに抑えて、広告の主張を小さくする。
+*/
+
+.home-ad{
+
+    width:100%;
+
+    max-height:250px;
+
+    overflow:hidden;
+
+    margin:18px 0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-start;
+
+}
+
+
+/* AdSense本体 */
+
+.home-ad .adsbygoogle{
+
+    width:100%;
+
+    max-height:250px;
+
+}
+
+
+/* 既存の広告ボックス */
+
 .ad-box{
 
     background:#F8F8F8;
@@ -682,7 +755,7 @@ img{
 
     border-radius:12px;
 
-    margin:30px 0;
+    margin:25px 0;
 
 }
 
@@ -763,87 +836,42 @@ footer{
 
 
 /* =====================================================
-   Hero
-===================================================== */
-
-.hero{
-
-    background:#F8FFF8;
-
-    border:1px solid #E5F3E5;
-
-    border-radius:16px;
-
-    padding:30px 25px;
-
-    text-align:center;
-
-    margin-bottom:30px;
-
-}
-
-.hero h1{
-
-    font-size:30px;
-
-    margin-bottom:8px;
-
-    color:#2E7D32;
-
-}
-
-.hero-subtitle{
-
-    font-size:16px;
-
-    color:#666666;
-
-    line-height:1.7;
-
-}
-
-
-/* =====================================================
    Home
 ===================================================== */
 
 .home-section{
 
-    margin-bottom:45px;
+    margin-bottom:38px;
 
 }
 
-.section-title{
 
-    display:flex;
+/* トップページの見出し
+   「新着」「おすすめ」を控えめにする
+===================================================== */
 
-    justify-content:space-between;
+.home-section .section-title{
 
-    align-items:center;
+    font-size:18px;
 
-    gap:15px;
-
-    margin-bottom:15px;
+    margin-bottom:12px;
 
 }
 
-.section-title a{
+.home-section .section-title h2{
 
-    color:#4CAF50;
+    font-size:18px;
+
+    line-height:1.4;
 
     font-weight:bold;
 
-    font-size:14px;
-
-    white-space:nowrap;
-
 }
 
-.section-title a:hover{
 
-    text-decoration:underline;
-
-}
+/* =====================================================
+   Home message
+===================================================== */
 
 .home-message{
 
@@ -851,11 +879,11 @@ footer{
 
     color:#777777;
 
-    margin-top:20px;
+    margin-top:18px;
 
-    line-height:1.8;
+    line-height:1.7;
 
-    font-size:14px;
+    font-size:13px;
 
 }
 
@@ -876,9 +904,7 @@ footer{
 }
 
 
-/* =====================================================
-   トップページのカード
-===================================================== */
+/* トップページ */
 
 .home-section .card-grid{
 
@@ -941,9 +967,9 @@ footer{
     grid-template-columns:
     1fr 1fr;
 
-    gap:18px;
+    gap:15px;
 
-    margin:40px 0;
+    margin:32px 0;
 
 }
 
@@ -955,13 +981,13 @@ footer{
 
     justify-content:center;
 
-    min-height:90px;
+    min-height:75px;
 
     background:#FFF8E1;
 
     border-radius:14px;
 
-    font-size:18px;
+    font-size:16px;
 
     font-weight:bold;
 
@@ -1266,7 +1292,8 @@ footer{
 
     }
 
-    /* メインコンテンツ */
+
+    /* メイン */
 
     body > .container{
 
@@ -1274,7 +1301,8 @@ footer{
 
     }
 
-    /* 通常カードは2列 */
+
+    /* 通常カード */
 
     .card-grid{
 
@@ -1285,7 +1313,10 @@ footer{
 
     }
 
-    /* トップの新着・おすすめは3列 */
+
+    /* トップページ
+       新着・おすすめは3列
+    */
 
     .home-section .card-grid{
 
@@ -1295,6 +1326,7 @@ footer{
         gap:9px;
 
     }
+
 
     .home-section .card{
 
@@ -1318,64 +1350,78 @@ footer{
 
     }
 
+
     /* Hero */
 
     .hero{
 
-        padding:22px 15px;
+        padding:18px 15px;
 
         margin-bottom:22px;
 
-        border-radius:14px;
+        border-radius:12px;
 
     }
 
-    .hero h1{
+    .hero-button{
 
-        font-size:24px;
+        min-width:150px;
 
-        margin-bottom:5px;
+        padding:8px 18px;
 
-    }
-
-    .hero-subtitle{
-
-        font-size:13px;
-
-        line-height:1.6;
+        font-size:14px;
 
     }
 
-    /* セクション */
+
+    /* Home見出し */
 
     .home-section{
 
-        margin-bottom:35px;
+        margin-bottom:32px;
 
     }
 
-    .section-title{
+    .home-section .section-title{
 
-        font-size:19px;
-
-        margin-bottom:12px;
+        margin-bottom:10px;
 
     }
 
-    .section-title a{
+    .home-section .section-title h2{
+
+        font-size:17px;
+
+    }
+
+
+    /* Home message */
+
+    .home-message{
 
         font-size:12px;
 
-    }
-
-    /* カテゴリ */
-
-    .category-links{
-
-        grid-template-columns:
-        1fr;
+        margin-top:15px;
 
     }
+
+
+    /* 広告 */
+
+    .home-ad{
+
+        max-height:250px;
+
+        margin:15px 0;
+
+    }
+
+    .home-ad .adsbygoogle{
+
+        max-height:250px;
+
+    }
+
 
     /* バナー */
 
@@ -1383,19 +1429,20 @@ footer{
 
         grid-template-columns:1fr;
 
-        gap:12px;
+        gap:10px;
 
-        margin:30px 0;
+        margin:25px 0;
 
     }
 
     .banner{
 
-        min-height:70px;
+        min-height:65px;
 
-        font-size:16px;
+        font-size:15px;
 
     }
+
 
     /* Library */
 
@@ -1421,6 +1468,7 @@ footer{
 
     }
 
+
     /* 詳細 */
 
     .info-box{
@@ -1445,11 +1493,18 @@ footer{
 
     }
 
+
     /* ボタン */
 
     .button{
 
         width:100%;
+
+    }
+
+    .hero-button{
+
+        width:auto !important;
 
     }
 
@@ -1464,6 +1519,7 @@ footer{
         width:100%;
 
     }
+
 
     /* フッター */
 
@@ -1603,7 +1659,8 @@ a:focus{
     .sidebar,
     .admin-bottom-bar,
     .banner-area,
-    .ad-box{
+    .ad-box,
+    .home-ad{
 
         display:none !important;
 
@@ -1633,22 +1690,20 @@ a:focus{
 /*
 
 Project Library
-Style Version 7.0
+Style Version 7.1
 2026-09-21
 
 【今回の変更】
 
-・PC用サイドバー＋メインの横並び対応
-・PCサイドバーのsticky対応
-・スマホ用ハンバーガーメニュー対応
-・スマホ用サイドバー開閉対応
-・ヘッダーのコンパクト化
-・トップページのHero縮小
-・トップページカードの4列化
-・スマホ新着／おすすめカードの3列化
-・通常ライブラリカードのスマホ2列維持
-・各種余白の圧縮
-・広告エリアとの相性を考慮したレイアウト調整
+・トップページ見出しを小型化
+・Heroボタンをコンパクト化
+・広告エリアを最大250pxに設定
+・PC／スマホとも広告最大250px
+・広告周辺の余白を縮小
+・トップページ全体の余白を圧縮
+・バナーをコンパクト化
+・既存のPCサイドバーを維持
+・スマホ用ハンバーガーメニューを維持
 ・既存ページのスタイルを維持
 ・レスポンシブ調整
 
