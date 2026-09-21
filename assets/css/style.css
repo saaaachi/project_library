@@ -1,7 +1,7 @@
 /* =====================================================
    Project Library
    Common Style
-   Version 7.1
+   Version 7.2
    2026-09-21
 ===================================================== */
 
@@ -557,6 +557,66 @@ img{
 
 }
 
+
+/* =====================================================
+   Hero案内
+   左：検索案内
+   右：作品を見る
+===================================================== */
+
+.hero-guide{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    width:100%;
+
+}
+
+.hero-guide-text{
+
+    flex:1;
+
+    min-width:0;
+
+    text-align:left;
+
+}
+
+.hero-guide-text strong{
+
+    display:block;
+
+    font-size:15px;
+
+    color:#2E7D32;
+
+    line-height:1.5;
+
+}
+
+.hero-guide-text p{
+
+    margin-top:3px;
+
+    font-size:12px;
+
+    color:#777777;
+
+    line-height:1.5;
+
+}
+
+
+/* =====================================================
+   Heroボタン
+===================================================== */
+
 .hero-button{
 
     width:auto !important;
@@ -568,6 +628,8 @@ img{
     font-size:15px;
 
     border-radius:9px;
+
+    flex-shrink:0;
 
 }
 
@@ -1351,11 +1413,14 @@ footer{
     }
 
 
-    /* Hero */
+    /* =================================================
+       Hero
+       スマホでも横並び
+    ================================================= */
 
     .hero{
 
-        padding:18px 15px;
+        padding:15px 12px;
 
         margin-bottom:22px;
 
@@ -1363,13 +1428,43 @@ footer{
 
     }
 
+    .hero-guide{
+
+        gap:10px;
+
+    }
+
+    .hero-guide-text{
+
+        text-align:left;
+
+    }
+
+    .hero-guide-text strong{
+
+        font-size:13px;
+
+        line-height:1.4;
+
+    }
+
+    .hero-guide-text p{
+
+        font-size:10px;
+
+        line-height:1.4;
+
+        margin-top:2px;
+
+    }
+
     .hero-button{
 
-        min-width:150px;
+        min-width:125px;
 
-        padding:8px 18px;
+        padding:8px 12px;
 
-        font-size:14px;
+        font-size:13px;
 
     }
 
@@ -1690,11 +1785,17 @@ a:focus{
 /*
 
 Project Library
-Style Version 7.1
+Style Version 7.2
 2026-09-21
 
 【今回の変更】
 
+・Heroに作品検索案内を追加
+・「☰ メニューから作品を探せます」を表示
+・キーワード・対象者・ジャンルの案内を追加
+・Heroを「案内＋作品を見る」の横並び構成に変更
+・PC／スマホとも横並びを維持
+・スマホでは案内文とボタンをコンパクト化
 ・トップページ見出しを小型化
 ・Heroボタンをコンパクト化
 ・広告エリアを最大250pxに設定
