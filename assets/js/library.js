@@ -1,8 +1,9 @@
 // ==========================
 // Project Library
 // library.js
-// Version 3.0
+// Version 4.0
 // ==========================
+
 
 // --------------------------
 // 要素取得
@@ -19,6 +20,7 @@ const sortSelect =
 
 const breadcrumbArea =
     document.getElementById("breadcrumbArea");
+
 
 // --------------------------
 // URLパラメータ
@@ -38,6 +40,7 @@ const keyword =
 
 const level =
     params.get("level");
+
 
 // --------------------------
 // ★表示
@@ -62,6 +65,7 @@ function createStars(level){
     }
 
 }
+
 
 // --------------------------
 // バッジ生成
@@ -94,6 +98,7 @@ function createBadge(work){
     return badge;
 
 }
+
 
 // --------------------------
 // カード生成
@@ -136,6 +141,95 @@ class="card"
 `;
 
 }
+
+
+// --------------------------
+// 広告生成
+// --------------------------
+
+function createLibraryAd(){
+
+    return `
+
+<div
+    class="library-inline-ad"
+    style="
+        width:100%;
+        max-height:100px;
+        overflow:hidden;
+        margin:18px 0;
+    "
+>
+
+    <ins
+        class="adsbygoogle"
+        style="
+            display:block;
+            width:100%;
+        "
+        data-ad-client="ca-pub-1299640300068792"
+        data-ad-slot="6020574861"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+    ></ins>
+
+</div>
+
+`;
+
+}
+
+
+// --------------------------
+// 広告間隔
+// --------------------------
+
+function getAdInterval(){
+
+    // スマートフォン
+    if(window.innerWidth <= 767){
+
+        return 6;
+
+    }
+
+    // PC・タブレット
+    return 12;
+
+}
+
+
+// --------------------------
+// 広告を表示するか
+// --------------------------
+
+function shouldInsertAd(index, total){
+
+    const interval =
+        getAdInterval();
+
+    const position =
+        index + 1;
+
+    // 作品数が広告間隔未満なら広告なし
+    if(total < interval){
+
+        return false;
+
+    }
+
+    // 一定件数ごとに広告
+    if(position % interval === 0){
+
+        return true;
+
+    }
+
+    return false;
+
+}
+
+
 // --------------------------
 // パンくず生成
 // --------------------------
@@ -157,6 +251,7 @@ function createBreadcrumb(){
 `;
 
     let query = "";
+
 
     // --------------------------
     // カテゴリ
@@ -181,6 +276,7 @@ ${category}
 
     }
 
+
     // --------------------------
     // タグ
     // --------------------------
@@ -204,6 +300,7 @@ ${tag}
 
     }
 
+
     // --------------------------
     // キーワード
     // --------------------------
@@ -224,6 +321,7 @@ ${tag}
 
     }
 
+
     // --------------------------
     // 難易度
     // --------------------------
@@ -243,6 +341,7 @@ ${tag}
 `;
 
     }
+
 
     // --------------------------
     // 通常表示
@@ -269,9 +368,52 @@ ${tag}
 
     }
 
+
     breadcrumbArea.innerHTML = html;
 
 }
+
+
+// --------------------------
+// AdSense広告を実行
+// --------------------------
+
+function pushAds(){
+
+    const ads =
+        cardArea.querySelectorAll(
+            ".library-inline-ad .adsbygoogle"
+        );
+
+    ads.forEach(ad => {
+
+        try{
+
+            if(
+                !ad.getAttribute(
+                    "data-adsbygoogle-status"
+                )
+            ){
+
+                (adsbygoogle =
+                    window.adsbygoogle || []
+                ).push({});
+
+            }
+
+        }catch(error){
+
+            console.log(
+                "AdSense広告の読み込みを待機しています。",
+                error
+            );
+
+        }
+
+    });
+
+}
+
 
 // --------------------------
 // 作品読み込み
@@ -283,13 +425,14 @@ function loadWorks(){
 
     let result = [...works];
 
+
     // --------------------------
     // カテゴリ検索
     // --------------------------
 
     if(category){
 
-        result = result.filter(work=>
+        result = result.filter(work =>
 
             work.category.includes(category)
 
@@ -297,13 +440,14 @@ function loadWorks(){
 
     }
 
+
     // --------------------------
     // タグ検索
     // --------------------------
 
     if(tag){
 
-        result = result.filter(work=>
+        result = result.filter(work =>
 
             work.fixedTags.includes(tag)
 
@@ -315,6 +459,7 @@ function loadWorks(){
 
     }
 
+
     // --------------------------
     // キーワード検索
     // --------------------------
@@ -324,7 +469,7 @@ function loadWorks(){
         const word =
             keyword.toLowerCase();
 
-        result = result.filter(work=>{
+        result = result.filter(work => {
 
             return(
 
@@ -340,7 +485,7 @@ function loadWorks(){
 
                 ||
 
-                work.fixedTags.some(item=>
+                work.fixedTags.some(item =>
 
                     item
                         .toLowerCase()
@@ -350,7 +495,7 @@ function loadWorks(){
 
                 ||
 
-                work.freeTags.some(item=>
+                work.freeTags.some(item =>
 
                     item
                         .toLowerCase()
@@ -364,20 +509,23 @@ function loadWorks(){
 
     }
 
+
     // --------------------------
     // 難易度検索
     // --------------------------
 
     if(level){
 
-        result = result.filter(work=>
+        result = result.filter(work =>
 
             work.level === Number(level)
 
         );
 
     }
-        // --------------------------
+
+
+    // --------------------------
     // 並び替え
     // --------------------------
 
@@ -387,7 +535,7 @@ function loadWorks(){
 
             case "old":
 
-                result.sort((a,b)=>
+                result.sort((a,b) =>
 
                     new Date(a.publishDate) -
                     new Date(b.publishDate)
@@ -396,9 +544,10 @@ function loadWorks(){
 
                 break;
 
+
             case "easy":
 
-                result.sort((a,b)=>
+                result.sort((a,b) =>
 
                     a.level - b.level
 
@@ -406,9 +555,10 @@ function loadWorks(){
 
                 break;
 
+
             case "hard":
 
-                result.sort((a,b)=>
+                result.sort((a,b) =>
 
                     b.level - a.level
 
@@ -416,9 +566,10 @@ function loadWorks(){
 
                 break;
 
+
             default:
 
-                result.sort((a,b)=>
+                result.sort((a,b) =>
 
                     new Date(b.publishDate) -
                     new Date(a.publishDate)
@@ -431,6 +582,7 @@ function loadWorks(){
 
     }
 
+
     // --------------------------
     // 件数表示
     // --------------------------
@@ -442,6 +594,7 @@ function loadWorks(){
             `作品 ${result.length} 件`;
 
     }
+
 
     // --------------------------
     // 検索結果なし
@@ -473,26 +626,60 @@ function loadWorks(){
 
     }
 
+
     // --------------------------
     // カード生成
     // --------------------------
 
     let html = "";
 
-    result.forEach(work=>{
 
+    result.forEach((work,index) => {
+
+        // 作品カード
         html += createCard(work);
+
+
+        // --------------------------
+        // 広告挿入
+        // --------------------------
+
+        if(
+            shouldInsertAd(
+                index,
+                result.length
+            )
+        ){
+
+            html += createLibraryAd();
+
+        }
 
     });
 
+
+    // --------------------------
+    // HTML反映
+    // --------------------------
+
     cardArea.innerHTML = html;
 
+
+    // --------------------------
+    // AdSense実行
+    // --------------------------
+
+    pushAds();
+
 }
+
+
 // --------------------------
 // 初回表示
 // --------------------------
 
 loadWorks();
+
 
 // --------------------------
 // 並び替え変更
@@ -514,12 +701,13 @@ if(sortSelect){
 
 }
 
+
 // --------------------------
 // Version表示
 // --------------------------
 
 console.log(
 
-    "Project Library library.js Version3.0"
+    "Project Library library.js Version4.0"
 
 );
