@@ -1,46 +1,70 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
 crossorigin="anonymous"></script>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>作品一覧 | Project Library</title>
 
-<link rel="stylesheet" href="assets/css/style.css">
+<link
+    rel="stylesheet"
+    href="assets/css/style.css"
+>
 
 </head>
 
+
 <body>
+
 
 <header id="header"></header>
 
+
 <div class="container">
+
 
     <aside id="sidebar"></aside>
 
+
     <main>
 
-        <!-- パンくず -->
 
-<div
-    class="breadcrumb"
-    id="breadcrumbArea">
+        <!-- ==========================
+             パンくず
+        ========================== -->
 
-</div>
+        <div
+            class="breadcrumb"
+            id="breadcrumbArea"
+        >
 
-        <!-- タイトル -->
+        </div>
 
-        <div class="pageTitle">
 
-            <h1>作品一覧</h1>
+        <!-- ==========================
+             タイトル
+        ========================== -->
+
+        <div class="page-title">
+
+            <h1>
+                作品一覧
+            </h1>
 
             <div
-                class="count"
-                id="countArea">
+                class="count-area"
+                id="countArea"
+            >
 
                 作品0件
 
@@ -48,62 +72,101 @@ crossorigin="anonymous"></script>
 
         </div>
 
-        <!-- 並び替え -->
 
-<div class="sort">
+        <!-- ==========================
+             並び替え
+        ========================== -->
 
-    <select id="sortSelect">
+        <div class="sort-select">
 
-        <option value="new">
-            🆕 新しい順
-        </option>
+            <select id="sortSelect">
 
-        <option value="old">
-            📜 古い順
-        </option>
+                <option value="new">
+                    🆕 新しい順
+                </option>
 
-        <option value="easy">
-            ⭐ 易しい順
-        </option>
+                <option value="old">
+                    📜 古い順
+                </option>
 
-        <option value="hard">
-            ⭐⭐ 難しい順
-        </option>
+                <option value="easy">
+                    ⭐ 易しい順
+                </option>
 
-    </select>
+                <option value="hard">
+                    ⭐⭐ 難しい順
+                </option>
 
-</div>
-
-        <!-- 一覧 -->
-
-        <div
-            id="cardArea"
-            class="grid">
+            </select>
 
         </div>
 
-<!-- プリント横長レスポンシブ -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-1299640300068792"
-     data-ad-slot="6020574861"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+
+        <!-- ==========================
+             作品一覧
+        ========================== -->
+
+        <div
+            id="cardArea"
+            class="grid"
+        >
+
+        </div>
+
+
+        <!-- ==========================
+             ページ下部広告
+             ※作品間広告とは別
+        ========================== -->
+
+        <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-1299640300068792"
+            data-ad-slot="6020574861"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+        ></ins>
+
+        <script>
+
+            (adsbygoogle =
+                window.adsbygoogle || []
+            ).push({});
+
+        </script>
+
 
     </main>
 
+
 </div>
+
 
 <footer id="footer"></footer>
 
+
+<!-- ==========================
+     共通
+========================== -->
+
 <script src="assets/js/common.js"></script>
+
+
+<!-- ==========================
+     作品データ
+========================== -->
 
 <script src="assets/data/works.js"></script>
 
+
+<!-- ==========================
+     一覧ページ
+========================== -->
+
 <script src="assets/js/library.js"></script>
 
+
 </body>
+
 </html>
