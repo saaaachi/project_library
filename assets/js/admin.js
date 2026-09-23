@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // admin.js
-// Version 8.0
+// Version 9.0
 // ==========================
 // --------------------------
 // API Worker
@@ -27,6 +27,18 @@ const freeTagChoices =
     document.getElementById("freeTagChoices");
 const seriesChoices =
     document.getElementById("seriesChoices");
+const fixedTagSelected =
+    document.getElementById("fixedTagSelected");
+const freeTagSelected =
+    document.getElementById("freeTagSelected");
+const seriesSelected =
+    document.getElementById("seriesSelected");
+const fixedTagSearch =
+    document.getElementById("fixedTagSearch");
+const freeTagSearch =
+    document.getElementById("freeTagSearch");
+const seriesSearch =
+    document.getElementById("seriesSearch");
 const workList =
     document.getElementById("workList");
 const editIdInput =
@@ -36,11 +48,12 @@ const editIdInput =
 // --------------------------
 let editId = null;
 let selectedPdfFile = null;
-let workData = createEmptyWorkData();
+let workData =
+    createEmptyWorkData();
 // --------------------------
 // 空データ
 // --------------------------
-function createEmptyWorkData() {
+function createEmptyWorkData(){
     return {
         id: null,
         workNo: "",
@@ -51,6 +64,7 @@ function createEmptyWorkData() {
         freeTags: [],
         series: "",
         level: 1,
+        size: "A4",
         thumbnail: "",
         watermark: true,
         pdf: "",
@@ -67,13 +81,13 @@ function createEmptyWorkData() {
 // --------------------------
 // 共通関数
 // --------------------------
-function toArray(value) {
-    if (Array.isArray(value)) {
+function toArray(value){
+    if(Array.isArray(value)){
         return value
             .map(v => String(v).trim())
             .filter(Boolean);
     }
-    if (!value) {
+    if(!value){
         return [];
     }
     return String(value)
@@ -81,14 +95,16 @@ function toArray(value) {
         .map(v => v.trim())
         .filter(Boolean);
 }
-function uniqueArray(array) {
-    return [...new Set(
-        array
-            .map(v => String(v).trim())
-            .filter(Boolean)
-    )];
+function uniqueArray(array){
+    return [
+        ...new Set(
+            array
+                .map(v => String(v).trim())
+                .filter(Boolean)
+        )
+    ];
 }
-function escapeHtml(value) {
+function escapeHtml(value){
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -97,117 +113,448 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 }
 // --------------------------
-// 既存データ取得
+// 既存タグ・シリーズ取得
 // --------------------------
-function getAllFixedTags() {
+function getAllFixedTags(){
     const tags = [];
     works.forEach(work => {
-        if (Array.isArray(work.fixedTags)) {
-            tags.push(...work.fixedTags);
+        if(Array.isArray(work.fixedTags)){
+            tags.push(
+                ...work.fixedTags
+            );
         }
     });
-    return uniqueArray(tags).sort(
-        (a, b) => a.localeCompare(b, "ja")
-    );
+    return uniqueArray(tags)
+        .sort(
+            (a,b) =>
+                a.localeCompare(
+                    b,
+                    "ja"
+                )
+        );
 }
-function getAllFreeTags() {
+function getAllFreeTags(){
     const tags = [];
     works.forEach(work => {
-        if (Array.isArray(work.freeTags)) {
-            tags.push(...work.freeTags);
+        if(Array.isArray(work.freeTags)){
+            tags.push(
+                ...work.freeTags
+            );
         }
     });
-    return uniqueArray(tags).sort(
-        (a, b) => a.localeCompare(b, "ja")
-    );
+    return uniqueArray(tags)
+        .sort(
+            (a,b) =>
+                a.localeCompare(
+                    b,
+                    "ja"
+                )
+        );
 }
-function getAllSeries() {
+function getAllSeries(){
     const series = [];
     works.forEach(work => {
-        if (work.series) {
-            series.push(work.series);
+        if(work.series){
+            series.push(
+                work.series
+            );
         }
     });
-    return uniqueArray(series).sort(
-        (a, b) => a.localeCompare(b, "ja")
-    );
+    return uniqueArray(series)
+        .sort(
+            (a,b) =>
+                a.localeCompare(
+                    b,
+                    "ja"
+                )
+        );
 }
 // --------------------------
-// タグ選択UI
+// 選択状態を管理
 // --------------------------
-function renderChoiceButtons(
+function isSelected(
+    type,
+    value
+){
+    if(type === "fixed"){
+        return workData.fixedTags
+            .includes(value);
+    }
+    if(type === "free"){
+        return workData.freeTags
+            .includes(value);
+    }
+    if(type === "series"){
+        return workData.series === value;
+    }
+    return false;
+}
+// --------------------------
+// タグを追加
+// --------------------------
+function addChoice(
+    type,
+    value
+){
+    if(!value){
+        return;
+    }
+    if(type === "fixed"){
+        workData.fixedTags =
+            uniqueArray([
+                ...workData.fixedTags,
+                value
+            ]);
+    }
+    if(type === "free"){
+        workData.freeTags =
+            uniqueArray([
+                ...workData.freeTags,
+                value
+            ]);
+    }
+    if(type === "series"){
+        workData.series =
+            value;
+    }
+}
+// --------------------------
+// タグを削除
+// --------------------------
+function removeChoice(
+    type,
+    value
+){
+    if(type === "fixed"){
+        workData.fixedTags =
+            workData.fixedTags.filter(
+                item => item !== value
+            );
+    }
+    if(type === "free"){
+        workData.freeTags =
+            workData.freeTags.filter(
+                item => item !== value
+            );
+    }
+    if(type === "series"){
+        if(
+            workData.series === value
+        ){
+            workData.series = "";
+        }
+    }
+}
+// --------------------------
+// 選択中表示
+// --------------------------
+function renderSelectedChoices(
     container,
     values,
-    selectedValues,
-    multiple = true
-) {
-    if (!container) {
+    type
+){
+    if(!container){
         return;
     }
     container.innerHTML = "";
-    if (!values.length) {
-        container.innerHTML =
-            `<p class="choice-empty">
-                まだ登録されていません
-            </p>`;
+    if(!values.length){
         return;
     }
     values.forEach(value => {
+        const item =
+            document.createElement(
+                "span"
+            );
+        item.className =
+            "selected-choice";
+        const text =
+            document.createElement(
+                "span"
+            );
+        text.textContent =
+            value;
+        const removeButton =
+            document.createElement(
+                "button"
+            );
+        removeButton.type =
+            "button";
+        removeButton.textContent =
+            "×";
+        removeButton.title =
+            "選択を解除";
+        removeButton.addEventListener(
+            "click",
+            () => {
+                removeChoice(
+                    type,
+                    value
+                );
+                renderAllChoices();
+            }
+        );
+        item.appendChild(
+            text
+        );
+        item.appendChild(
+            removeButton
+        );
+        container.appendChild(
+            item
+        );
+    });
+}
+// --------------------------
+// 候補表示
+// --------------------------
+function renderChoiceResults(
+    container,
+    values,
+    type,
+    searchText
+){
+    if(!container){
+        return;
+    }
+    container.innerHTML = "";
+    const keyword =
+        String(
+            searchText || ""
+        )
+            .trim()
+            .toLowerCase();
+    const filtered =
+        values.filter(value => {
+            if(!keyword){
+                return true;
+            }
+            return value
+                .toLowerCase()
+                .includes(keyword);
+        });
+    if(!filtered.length){
+        container.innerHTML =
+            `<p class="choice-empty">
+                該当するものがありません
+            </p>`;
+        return;
+    }
+    filtered.forEach(value => {
         const button =
-            document.createElement("button");
-        button.type = "button";
+            document.createElement(
+                "button"
+            );
+        button.type =
+            "button";
         button.className =
-            "tag-choice";
+            "choice-button";
         button.textContent =
             value;
-        button.dataset.value =
-            value;
-        if (selectedValues.includes(value)) {
-            button.classList.add("selected");
+        if(
+            isSelected(
+                type,
+                value
+            )
+        ){
+            button.classList.add(
+                "selected"
+            );
         }
         button.addEventListener(
             "click",
             () => {
-                if (multiple) {
-                    button.classList.toggle(
-                        "selected"
-                    );
-                } else {
-                    container
-                        .querySelectorAll(
-                            ".tag-choice"
+                if(type === "series"){
+                    if(
+                        workData.series === value
+                    ){
+                        removeChoice(
+                            type,
+                            value
+                        );
+                    }else{
+                        addChoice(
+                            type,
+                            value
+                        );
+                    }
+                }else{
+                    if(
+                        isSelected(
+                            type,
+                            value
                         )
-                        .forEach(other => {
-                            other.classList.remove(
-                                "selected"
-                            );
-                        });
-                    button.classList.add(
-                        "selected"
-                    );
+                    ){
+                        removeChoice(
+                            type,
+                            value
+                        );
+                    }else{
+                        addChoice(
+                            type,
+                            value
+                        );
+                    }
                 }
+                renderAllChoices();
             }
         );
-        container.appendChild(button);
+        container.appendChild(
+            button
+        );
     });
 }
 // --------------------------
-// 選択済みタグ取得
+// 全UI更新
 // --------------------------
-function getSelectedChoiceValues(container) {
-    if (!container) {
-        return [];
-    }
-    return [...container.querySelectorAll(
-        ".tag-choice.selected"
-    )]
-        .map(button => button.dataset.value)
-        .filter(Boolean);
+function renderAllChoices(){
+    const fixedTags =
+        getAllFixedTags();
+    const freeTags =
+        getAllFreeTags();
+    const series =
+        getAllSeries();
+    // --------------------------
+    // 選択中
+    // --------------------------
+    renderSelectedChoices(
+        fixedTagSelected,
+        workData.fixedTags,
+        "fixed"
+    );
+    renderSelectedChoices(
+        freeTagSelected,
+        workData.freeTags,
+        "free"
+    );
+    renderSelectedChoices(
+        seriesSelected,
+        workData.series
+            ? [workData.series]
+            : [],
+        "series"
+    );
+    // --------------------------
+    // 候補
+    // --------------------------
+    renderChoiceResults(
+        fixedTagChoices,
+        fixedTags,
+        "fixed",
+        fixedTagSearch?.value
+    );
+    renderChoiceResults(
+        freeTagChoices,
+        freeTags,
+        "free",
+        freeTagSearch?.value
+    );
+    renderChoiceResults(
+        seriesChoices,
+        series,
+        "series",
+        seriesSearch?.value
+    );
 }
 // --------------------------
-// 新規タグ入力取得
+// 検索イベント
 // --------------------------
-function getInputValue(id) {
+if(fixedTagSearch){
+    fixedTagSearch.addEventListener(
+        "input",
+        () => {
+            renderAllChoices();
+        }
+    );
+}
+if(freeTagSearch){
+    freeTagSearch.addEventListener(
+        "input",
+        () => {
+            renderAllChoices();
+        }
+    );
+}
+if(seriesSearch){
+    seriesSearch.addEventListener(
+        "input",
+        () => {
+            renderAllChoices();
+        }
+    );
+}
+// --------------------------
+// 新規作成エリア
+// --------------------------
+function setupNewChoiceToggle(
+    buttonId,
+    areaId
+){
+    const button =
+        document.getElementById(
+            buttonId
+        );
+    const area =
+        document.getElementById(
+            areaId
+        );
+    if(!button || !area){
+        return;
+    }
+    button.addEventListener(
+        "click",
+        () => {
+            area.classList.toggle(
+                "open"
+            );
+            if(
+                area.classList.contains(
+                    "open"
+                )
+            ){
+                button.textContent =
+                    "− 新しいものを閉じる";
+            }else{
+                if(
+                    buttonId ===
+                    "newFixedTagToggle"
+                ){
+                    button.textContent =
+                        "＋ 新しい固定タグを作る";
+                }
+                if(
+                    buttonId ===
+                    "newFreeTagToggle"
+                ){
+                    button.textContent =
+                        "＋ 新しい自由タグを作る";
+                }
+                if(
+                    buttonId ===
+                    "newSeriesToggle"
+                ){
+                    button.textContent =
+                        "＋ 新しいシリーズを作る";
+                }
+            }
+        }
+    );
+}
+setupNewChoiceToggle(
+    "newFixedTagToggle",
+    "newFixedTagArea"
+);
+setupNewChoiceToggle(
+    "newFreeTagToggle",
+    "newFreeTagArea"
+);
+setupNewChoiceToggle(
+    "newSeriesToggle",
+    "newSeriesArea"
+);
+// --------------------------
+// 入力値
+// --------------------------
+function getInputValue(id){
     const element =
         document.getElementById(id);
     return element
@@ -215,90 +562,73 @@ function getInputValue(id) {
         : "";
 }
 // --------------------------
-// タグ・シリーズUI初期化
-// --------------------------
-function renderTagAndSeriesChoices() {
-    renderChoiceButtons(
-        fixedTagChoices,
-        getAllFixedTags(),
-        workData.fixedTags,
-        true
-    );
-    renderChoiceButtons(
-        freeTagChoices,
-        getAllFreeTags(),
-        workData.freeTags,
-        true
-    );
-    renderChoiceButtons(
-        seriesChoices,
-        getAllSeries(),
-        workData.series
-            ? [workData.series]
-            : [],
-        false
-    );
-}
-// --------------------------
 // サムネイル表示
 // --------------------------
-function showThumbnail(src) {
-    if (!thumbnailPreview) {
+function showThumbnail(src){
+    if(!thumbnailPreview){
         return;
     }
-    if (!src) {
-        thumbnailPreview.style.display =
-            "none";
-        thumbnailPreview.src = "";
+    thumbnailPreview.innerHTML = "";
+    if(!src){
+        thumbnailPreview.innerHTML =
+            `<span>
+                PDFを選択すると表示されます
+            </span>`;
         return;
     }
-    thumbnailPreview.src = src;
-    thumbnailPreview.style.display =
-        "block";
-    thumbnailPreview.style.width =
-        "220px";
-    thumbnailPreview.style.maxWidth =
-        "100%";
-    thumbnailPreview.style.height =
-        "auto";
+    const image =
+        document.createElement(
+            "img"
+        );
+    image.src =
+        src;
+    image.alt =
+        "作品サムネイル";
+    thumbnailPreview.appendChild(
+        image
+    );
 }
-function resetThumbnail() {
-    if (!thumbnailPreview) {
-        return;
-    }
-    thumbnailPreview.src = "";
-    thumbnailPreview.style.display =
-        "none";
+function resetThumbnail(){
+    showThumbnail("");
 }
 // --------------------------
 // PDF.js
 // --------------------------
 let pdfjsLibPromise = null;
-function loadPdfJs() {
-    if (!pdfjsLibPromise) {
+function loadPdfJs(){
+    if(!pdfjsLibPromise){
         pdfjsLibPromise =
             import(
                 "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-            ).then(pdfjsLib => {
-                pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
-                return pdfjsLib;
-            });
+            )
+                .then(
+                    pdfjsLib => {
+                        pdfjsLib
+                            .GlobalWorkerOptions
+                            .workerSrc =
+                            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+                        return pdfjsLib;
+                    }
+                );
     }
     return pdfjsLibPromise;
 }
 // --------------------------
 // PDF → サムネイル生成
 // --------------------------
-async function createPdfThumbnailWithWatermark(file) {
+async function createPdfThumbnailWithWatermark(
+    file
+){
     const pdfjsLib =
         await loadPdfJs();
     const arrayBuffer =
         await file.arrayBuffer();
     const pdf =
-        await pdfjsLib.getDocument({
-            data: arrayBuffer
-        }).promise;
+        await pdfjsLib
+            .getDocument({
+                data: arrayBuffer
+            })
+            .promise;
     const page =
         await pdf.getPage(1);
     const viewport =
@@ -306,16 +636,22 @@ async function createPdfThumbnailWithWatermark(file) {
             scale: 1.2
         });
     const canvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
     const context =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
     canvas.width =
         viewport.width;
     canvas.height =
         viewport.height;
     await page.render({
-        canvasContext: context,
-        viewport: viewport
+        canvasContext:
+            context,
+        viewport:
+            viewport
     }).promise;
     // --------------------------
     // 透かし
@@ -338,16 +674,20 @@ async function createPdfThumbnailWithWatermark(file) {
     context.rotate(
         -25 * Math.PI / 180
     );
-    for (
-        let y = -canvas.height;
-        y < canvas.height * 2;
+    for(
+        let y =
+            -canvas.height;
+        y <
+            canvas.height * 2;
         y += 150
-    ) {
-        for (
-            let x = -canvas.width;
-            x < canvas.width * 2;
+    ){
+        for(
+            let x =
+                -canvas.width;
+            x <
+                canvas.width * 2;
             x += 260
-        ) {
+        ){
             context.fillText(
                 text,
                 x,
@@ -369,27 +709,28 @@ async function createPdfThumbnailWithWatermark(file) {
 // --------------------------
 // PDF選択
 // --------------------------
-if (pdfInput) {
+if(pdfInput){
     pdfInput.addEventListener(
         "change",
         async () => {
             const file =
                 pdfInput.files?.[0];
-            if (!file) {
+            if(!file){
                 return;
             }
             selectedPdfFile =
                 file;
-            // 新しくPDFを選択した場合
-            // workData.pdf は実ファイル送信用に保持
+            // 新しいPDFを選択
             workData.pdf =
                 file;
             showThumbnail("");
-            if (thumbnailPreview) {
-                thumbnailPreview.alt =
-                    "サムネイル作成中…";
+            if(thumbnailPreview){
+                thumbnailPreview.innerHTML =
+                    `<span>
+                        サムネイル作成中…🥹
+                    </span>`;
             }
-            try {
+            try{
                 const thumbnail =
                     await createPdfThumbnailWithWatermark(
                         file
@@ -399,7 +740,7 @@ if (pdfInput) {
                 showThumbnail(
                     thumbnail
                 );
-            } catch (error) {
+            }catch(error){
                 console.error(
                     "サムネイル生成エラー:",
                     error
@@ -415,8 +756,8 @@ if (pdfInput) {
 // --------------------------
 // カテゴリ取得
 // --------------------------
-function getSelectedCategories() {
-    if (!form) {
+function getSelectedCategories(){
+    if(!form){
         return [];
     }
     return [
@@ -424,13 +765,16 @@ function getSelectedCategories() {
             'input[type="checkbox"][data-category]:checked'
         )
     ]
-        .map(input => input.value)
+        .map(
+            input =>
+                input.value
+        )
         .filter(Boolean);
 }
 // --------------------------
-// フォームからデータ取得
+// フォームデータ取得
 // --------------------------
-function collectFormData() {
+function collectFormData(){
     const title =
         document.getElementById(
             "title"
@@ -442,22 +786,15 @@ function collectFormData() {
     const level =
         Number(
             document.getElementById(
-                "level"
+                "difficulty"
             )?.value || 1
         );
+    const size =
+        document.getElementById(
+            "size"
+        )?.value || "A4";
     // --------------------------
-    // 既存タグ
-    // --------------------------
-    const selectedFixedTags =
-        getSelectedChoiceValues(
-            fixedTagChoices
-        );
-    const selectedFreeTags =
-        getSelectedChoiceValues(
-            freeTagChoices
-        );
-    // --------------------------
-    // 新しいタグ
+    // 新規タグ
     // --------------------------
     const newFixedTags =
         toArray(
@@ -471,45 +808,50 @@ function collectFormData() {
                 "newFreeTag"
             )
         );
-    const fixedTags =
-        uniqueArray([
-            ...selectedFixedTags,
-            ...newFixedTags
-        ]);
-    const freeTags =
-        uniqueArray([
-            ...selectedFreeTags,
-            ...newFreeTags
-        ]);
-    // --------------------------
-    // シリーズ
-    // --------------------------
-    const selectedSeries =
-        getSelectedChoiceValues(
-            seriesChoices
-        )[0] || "";
     const newSeries =
         getInputValue(
             "newSeries"
         );
-    const series =
-        newSeries ||
-        selectedSeries;
     // --------------------------
-    // サムネイル
+    // 新規タグを追加
     // --------------------------
-    const thumbnail =
-        workData.thumbnail || "";
+    if(newFixedTags.length){
+        workData.fixedTags =
+            uniqueArray([
+                ...workData.fixedTags,
+                ...newFixedTags
+            ]);
+    }
+    if(newFreeTags.length){
+        workData.freeTags =
+            uniqueArray([
+                ...workData.freeTags,
+                ...newFreeTags
+            ]);
+    }
+    if(newSeries){
+        workData.series =
+            newSeries;
+    }
     return {
         title,
         description,
         category:
             getSelectedCategories(),
-        fixedTags,
-        freeTags,
-        series,
+        fixedTags:
+            uniqueArray(
+                workData.fixedTags
+            ),
+        freeTags:
+            uniqueArray(
+                workData.freeTags
+            ),
+        series:
+            workData.series || "",
         level,
-        thumbnail,
+        size,
+        thumbnail:
+            workData.thumbnail || "",
         pdf:
             selectedPdfFile ||
             workData.pdf ||
@@ -523,28 +865,35 @@ function collectFormData() {
 // --------------------------
 // バリデーション
 // --------------------------
-function validateForm(data) {
-    if (!data.title) {
+function validateForm(data){
+    if(!data.title){
         alert(
             "作品タイトルを入力してください🥹"
         );
         return false;
     }
-    if (!data.category.length) {
+    if(!data.category.length){
         alert(
             "カテゴリを1つ以上選択してください🥹"
         );
         return false;
     }
     // 新規投稿時のみPDF必須
-    if (!editId && !selectedPdfFile) {
+    if(
+        !editId &&
+        !selectedPdfFile
+    ){
         alert(
             "PDFファイルを選択してください🥹"
         );
         return false;
     }
-    // 新規投稿時
-    if (!editId && !data.thumbnail) {
+    // 新規投稿時のみ
+    // サムネイル必須
+    if(
+        !editId &&
+        !data.thumbnail
+    ){
         alert(
             "PDFからサムネイルを作成してください🥹"
         );
@@ -555,54 +904,65 @@ function validateForm(data) {
 // --------------------------
 // 次の作品ID
 // --------------------------
-function getNextWorkId() {
-    if (!works.length) {
+function getNextWorkId(){
+    if(!works.length){
         return 1;
     }
     return Math.max(
         ...works.map(
-            work => Number(work.id) || 0
+            work =>
+                Number(work.id) || 0
         )
     ) + 1;
 }
 // --------------------------
 // 次の作品番号
 // --------------------------
-function getNextWorkNo() {
-    if (!works.length) {
+function getNextWorkNo(){
+    if(!works.length){
         return "PL-000001";
     }
     const maxNo =
         Math.max(
-            ...works.map(work => {
-                const match =
-                    String(
-                        work.workNo || ""
-                    ).match(
-                        /(\d+)$/
-                    );
-                return match
-                    ? Number(match[1])
-                    : 0;
-            })
+            ...works.map(
+                work => {
+                    const match =
+                        String(
+                            work.workNo || ""
+                        ).match(
+                            /(\d+)$/
+                        );
+                    return match
+                        ? Number(
+                            match[1]
+                        )
+                        : 0;
+                }
+            )
         );
     return `PL-${String(
         maxNo + 1
-    ).padStart(6, "0")}`;
+    ).padStart(
+        6,
+        "0"
+    )}`;
 }
 // --------------------------
 // 作品データ生成
 // --------------------------
-function generateWorkData() {
+function generateWorkData(){
     const data =
         collectFormData();
-    if (!validateForm(data)) {
+    if(!validateForm(data)){
         return null;
     }
     const now =
         new Date()
             .toISOString()
-            .slice(0, 10);
+            .slice(
+                0,
+                10
+            );
     const existing =
         editId
             ? works.find(
@@ -632,6 +992,8 @@ function generateWorkData() {
             data.series,
         level:
             data.level,
+        size:
+            data.size,
         thumbnail:
             data.thumbnail,
         watermark:
@@ -670,10 +1032,10 @@ function generateWorkData() {
 // --------------------------
 // 保存
 // --------------------------
-function saveWork() {
+function saveWork(){
     const data =
         generateWorkData();
-    if (!data) {
+    if(!data){
         return null;
     }
     workData =
@@ -681,18 +1043,21 @@ function saveWork() {
     return data;
 }
 // --------------------------
-// 公開データ送信
+// 公開
 // --------------------------
-async function triggerGitHubPublish() {
+async function triggerGitHubPublish(){
     const data =
         saveWork();
-    if (!data) {
+    if(!data){
         return;
     }
     // --------------------------
     // 新規投稿
     // --------------------------
-    if (!editId && !selectedPdfFile) {
+    if(
+        !editId &&
+        !selectedPdfFile
+    ){
         alert(
             "PDFファイルを選択してください🥹"
         );
@@ -700,15 +1065,15 @@ async function triggerGitHubPublish() {
     }
     // --------------------------
     // 現在のWorker仕様では
-    // 新規投稿時にPDFが必要
+    // PDFが必要
     // --------------------------
-    if (!selectedPdfFile) {
+    if(!selectedPdfFile){
         alert(
             "現在の公開処理ではPDFファイルが必要です。\n編集する場合も、いったんPDFを再選択してください🙏"
         );
         return;
     }
-    try {
+    try{
         publishButton.disabled =
             true;
         publishButton.textContent =
@@ -747,7 +1112,13 @@ async function triggerGitHubPublish() {
         );
         formData.append(
             "level",
-            String(data.level)
+            String(
+                data.level
+            )
+        );
+        formData.append(
+            "size",
+            data.size
         );
         formData.append(
             "workNo",
@@ -755,34 +1126,51 @@ async function triggerGitHubPublish() {
         );
         formData.append(
             "workId",
-            String(data.id)
+            String(
+                data.id
+            )
         );
         formData.append(
             "pdf",
             selectedPdfFile
         );
+        // --------------------------
         // 自動生成サムネイル
+        // --------------------------
         const thumbnailBlob =
-            await dataUrlToBlob(
+            dataUrlToBlob(
                 data.thumbnail
             );
+        if(!thumbnailBlob){
+            throw new Error(
+                "サムネイルの作成に失敗しました。"
+            );
+        }
         formData.append(
             "thumbnail",
             thumbnailBlob,
             `${data.title}.jpg`
         );
+        // --------------------------
+        // Worker
+        // --------------------------
         const response =
             await fetch(
                 API_WORKER_URL,
                 {
-                    method: "POST",
-                    body: formData
+                    method:
+                        "POST",
+                    body:
+                        formData
                 }
             );
         const result =
-            await response.json()
-                .catch(() => ({}));
-        if (!response.ok) {
+            await response
+                .json()
+                .catch(
+                    () => ({})
+                );
+        if(!response.ok){
             throw new Error(
                 result.error ||
                 `HTTP ${response.status}`
@@ -792,7 +1180,7 @@ async function triggerGitHubPublish() {
             "作品を追加しました😊✨\n\nGitHub Actionsで公開処理が始まります🚀"
         );
         resetForm();
-    } catch (error) {
+    }catch(error){
         console.error(
             "公開エラー:",
             error
@@ -800,22 +1188,29 @@ async function triggerGitHubPublish() {
         alert(
             `公開に失敗しました🥲\n\n${error.message}`
         );
-    } finally {
+    }finally{
         publishButton.disabled =
             false;
         publishButton.textContent =
-            "🚀 公開する";
+            editId
+                ? "🚀 更新する"
+                : "🚀 公開する";
     }
 }
 // --------------------------
 // Data URL → Blob
 // --------------------------
-function dataUrlToBlob(dataUrl) {
-    if (!dataUrl) {
+function dataUrlToBlob(
+    dataUrl
+){
+    if(!dataUrl){
         return null;
     }
     const parts =
         dataUrl.split(",");
+    if(parts.length < 2){
+        return null;
+    }
     const mimeMatch =
         parts[0].match(
             /:(.*?);/
@@ -825,129 +1220,159 @@ function dataUrlToBlob(dataUrl) {
             ? mimeMatch[1]
             : "image/jpeg";
     const binary =
-        atob(parts[1]);
-    const length =
-        binary.length;
+        atob(
+            parts[1]
+        );
     const bytes =
-        new Uint8Array(length);
-    for (
+        new Uint8Array(
+            binary.length
+        );
+    for(
         let i = 0;
-        i < length;
+        i < binary.length;
         i++
-    ) {
+    ){
         bytes[i] =
             binary.charCodeAt(i);
     }
     return new Blob(
         [bytes],
-        { type: mime }
+        {
+            type:
+                mime
+        }
     );
 }
 // --------------------------
 // 作品一覧
 // --------------------------
-function renderList() {
-    if (!workList) {
+function renderList(){
+    if(!workList){
         return;
     }
     workList.innerHTML =
         "";
-    if (!works.length) {
+    if(!works.length){
         workList.innerHTML =
-            `<p>まだ作品がありません。</p>`;
+            `<tr>
+                <td colspan="5">
+                    まだ作品がありません。
+                </td>
+            </tr>`;
         return;
     }
-    works.forEach(work => {
-        const row =
-            document.createElement("div");
-        row.className =
-            "work-row";
-        const categories =
-            Array.isArray(work.category)
-                ? work.category.join(" / ")
-                : work.category || "";
-        row.innerHTML = `
-            <div class="work-row-no">
-                ${escapeHtml(
-                    work.workNo || ""
-                )}
-            </div>
-            <div class="work-row-title">
-                ${escapeHtml(
-                    work.title || ""
-                )}
-            </div>
-            <div class="work-row-category">
-                ${escapeHtml(
-                    categories
-                )}
-            </div>
-            <div class="work-row-level">
-                ${"★".repeat(
-                    Number(work.level) || 1
-                )}
-            </div>
-            <div class="work-row-actions">
-                <button
-                    type="button"
-                    class="edit-work-button"
-                    data-id="${work.id}"
-                >
-                    ✏️ 編集
-                </button>
-                <button
-                    type="button"
-                    class="delete-work-button"
-                    data-id="${work.id}"
-                >
-                    🗑️ 削除
-                </button>
-            </div>
-        `;
-        workList.appendChild(
-            row
-        );
-    });
+    works.forEach(
+        work => {
+            const row =
+                document.createElement(
+                    "tr"
+                );
+            const categories =
+                Array.isArray(
+                    work.category
+                )
+                    ? work.category.join(
+                        " / "
+                    )
+                    : (
+                        work.category ||
+                        ""
+                    );
+            row.innerHTML = `
+                <td>
+                    ${escapeHtml(
+                        work.workNo || ""
+                    )}
+                </td>
+                <td>
+                    ${escapeHtml(
+                        work.title || ""
+                    )}
+                </td>
+                <td>
+                    ${escapeHtml(
+                        categories
+                    )}
+                </td>
+                <td>
+                    ${"★".repeat(
+                        Number(
+                            work.level
+                        ) || 1
+                    )}
+                </td>
+                <td>
+                    <button
+                        type="button"
+                        class="edit-work-button"
+                        data-id="${work.id}"
+                    >
+                        ✏️ 編集
+                    </button>
+                    <button
+                        type="button"
+                        class="delete-work-button"
+                        data-id="${work.id}"
+                    >
+                        🗑️ 削除
+                    </button>
+                </td>
+            `;
+            workList.appendChild(
+                row
+            );
+        }
+    );
+    // --------------------------
+    // 編集
+    // --------------------------
     workList
         .querySelectorAll(
             ".edit-work-button"
         )
-        .forEach(button => {
-            button.addEventListener(
-                "click",
-                () => {
-                    editWork(
-                        button.dataset.id
-                    );
-                }
-            );
-        });
+        .forEach(
+            button => {
+                button.addEventListener(
+                    "click",
+                    () => {
+                        editWork(
+                            button.dataset.id
+                        );
+                    }
+                );
+            }
+        );
+    // --------------------------
+    // 削除
+    // --------------------------
     workList
         .querySelectorAll(
             ".delete-work-button"
         )
-        .forEach(button => {
-            button.addEventListener(
-                "click",
-                () => {
-                    deleteWork(
-                        button.dataset.id
-                    );
-                }
-            );
-        });
+        .forEach(
+            button => {
+                button.addEventListener(
+                    "click",
+                    () => {
+                        deleteWork(
+                            button.dataset.id
+                        );
+                    }
+                );
+            }
+        );
 }
 // --------------------------
 // 編集
 // --------------------------
-function editWork(id) {
+function editWork(id){
     const work =
         works.find(
             item =>
                 String(item.id) ===
                 String(id)
         );
-    if (!work) {
+    if(!work){
         alert(
             "作品が見つかりません🥲"
         );
@@ -955,7 +1380,7 @@ function editWork(id) {
     }
     editId =
         work.id;
-    if (editIdInput) {
+    if(editIdInput){
         editIdInput.value =
             work.id;
     }
@@ -989,9 +1414,13 @@ function editWork(id) {
     ).value =
         work.description || "";
     document.getElementById(
-        "level"
+        "difficulty"
     ).value =
         work.level || 1;
+    document.getElementById(
+        "size"
+    ).value =
+        work.size || "A4";
     document.getElementById(
         "newFixedTag"
     ).value =
@@ -1011,56 +1440,75 @@ function editWork(id) {
         .querySelectorAll(
             'input[type="checkbox"][data-category]'
         )
-        .forEach(input => {
-            input.checked =
-                workData.category.includes(
-                    input.value
-                );
-        });
+        .forEach(
+            input => {
+                input.checked =
+                    workData.category.includes(
+                        input.value
+                    );
+            }
+        );
     // --------------------------
-    // タグ・シリーズ
+    // 検索欄
     // --------------------------
-    renderTagAndSeriesChoices();
+    if(fixedTagSearch){
+        fixedTagSearch.value =
+            "";
+    }
+    if(freeTagSearch){
+        freeTagSearch.value =
+            "";
+    }
+    if(seriesSearch){
+        seriesSearch.value =
+            "";
+    }
     // --------------------------
-    // 既存サムネイル
+    // 選択状態
     // --------------------------
-    if (work.thumbnail) {
+    renderAllChoices();
+    // --------------------------
+    // サムネイル
+    // --------------------------
+    if(work.thumbnail){
         showThumbnail(
             work.thumbnail
         );
-    } else {
+    }else{
         resetThumbnail();
     }
     // --------------------------
-    // PDF input
+    // PDF
     // --------------------------
-    if (pdfInput) {
+    if(pdfInput){
         pdfInput.value =
             "";
     }
     // --------------------------
-    // ボタン表示
+    // ボタン
     // --------------------------
-    if (publishButton) {
+    if(publishButton){
         publishButton.textContent =
             "🚀 更新する";
     }
     window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+        top:
+            0,
+        behavior:
+            "smooth"
     });
 }
 // --------------------------
 // 削除
 // --------------------------
-function deleteWork(id) {
+function deleteWork(id){
     const work =
         works.find(
             item =>
                 String(item.id) ===
                 String(id)
         );
-    if (!work) {
+    if(!work){
         alert(
             "作品が見つかりません🥲"
         );
@@ -1070,7 +1518,7 @@ function deleteWork(id) {
         confirm(
             `「${work.title}」を削除しますか？\n\n※現在は管理画面上の確認のみです。GitHub上の作品ファイルはまだ削除されません。`
         );
-    if (!confirmed) {
+    if(!confirmed){
         return;
     }
     alert(
@@ -1080,8 +1528,8 @@ function deleteWork(id) {
 // --------------------------
 // フォームリセット
 // --------------------------
-function resetForm() {
-    if (form) {
+function resetForm(){
+    if(form){
         form.reset();
     }
     editId =
@@ -1090,13 +1538,79 @@ function resetForm() {
         null;
     workData =
         createEmptyWorkData();
-    if (editIdInput) {
+    if(editIdInput){
         editIdInput.value =
             "";
     }
+    // --------------------------
+    // 検索欄
+    // --------------------------
+    if(fixedTagSearch){
+        fixedTagSearch.value =
+            "";
+    }
+    if(freeTagSearch){
+        freeTagSearch.value =
+            "";
+    }
+    if(seriesSearch){
+        seriesSearch.value =
+            "";
+    }
+    // --------------------------
+    // 新規入力
+    // --------------------------
+    [
+        "newFixedTagArea",
+        "newFreeTagArea",
+        "newSeriesArea"
+    ]
+        .forEach(
+            id => {
+                const area =
+                    document.getElementById(
+                        id
+                    );
+                if(area){
+                    area.classList.remove(
+                        "open"
+                    );
+                }
+            }
+        );
+    if(
+        document.getElementById(
+            "newFixedTagToggle"
+        )
+    ){
+        document.getElementById(
+            "newFixedTagToggle"
+        ).textContent =
+            "＋ 新しい固定タグを作る";
+    }
+    if(
+        document.getElementById(
+            "newFreeTagToggle"
+        )
+    ){
+        document.getElementById(
+            "newFreeTagToggle"
+        ).textContent =
+            "＋ 新しい自由タグを作る";
+    }
+    if(
+        document.getElementById(
+            "newSeriesToggle"
+        )
+    ){
+        document.getElementById(
+            "newSeriesToggle"
+        ).textContent =
+            "＋ 新しいシリーズを作る";
+    }
     resetThumbnail();
-    renderTagAndSeriesChoices();
-    if (publishButton) {
+    renderAllChoices();
+    if(publishButton){
         publishButton.textContent =
             "🚀 公開する";
     }
@@ -1104,13 +1618,13 @@ function resetForm() {
 // --------------------------
 // 下書き
 // --------------------------
-if (draftButton) {
+if(draftButton){
     draftButton.addEventListener(
         "click",
         () => {
             const data =
                 generateWorkData();
-            if (!data) {
+            if(!data){
                 return;
             }
             data.status =
@@ -1124,7 +1638,7 @@ if (draftButton) {
 // --------------------------
 // 公開
 // --------------------------
-if (publishButton) {
+if(publishButton){
     publishButton.addEventListener(
         "click",
         event => {
@@ -1136,11 +1650,11 @@ if (publishButton) {
 // --------------------------
 // 初期表示
 // --------------------------
-renderTagAndSeriesChoices();
+renderAllChoices();
 renderList();
 // --------------------------
 // 起動ログ
 // --------------------------
 console.log(
-    "Project Library admin.js Version 8.0"
+    "Project Library admin.js Version 9.0"
 );
