@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // library.js
-// Version 4.0
+// Version 5.0
 // ==========================
 
 
@@ -230,6 +230,74 @@ function shouldInsertAd(index, total){
 }
 
 
+// =====================================================
+// パンくず用 件数取得
+// =====================================================
+
+function getCategoryCount(categoryName){
+
+    if(!categoryName){
+
+        return 0;
+
+    }
+
+    return works.filter(work => {
+
+        return(
+            Array.isArray(work.category) &&
+            work.category.includes(categoryName)
+        );
+
+    }).length;
+
+}
+
+
+function getTagCount(tagName, categoryName = null){
+
+    if(!tagName){
+
+        return 0;
+
+    }
+
+    return works.filter(work => {
+
+        // カテゴリ指定がある場合
+        if(categoryName){
+
+            if(
+                !Array.isArray(work.category) ||
+                !work.category.includes(categoryName)
+            ){
+
+                return false;
+
+            }
+
+        }
+
+        const fixedTags =
+            Array.isArray(work.fixedTags)
+                ? work.fixedTags
+                : [];
+
+        const freeTags =
+            Array.isArray(work.freeTags)
+                ? work.freeTags
+                : [];
+
+        return(
+            fixedTags.includes(tagName) ||
+            freeTags.includes(tagName)
+        );
+
+    }).length;
+
+}
+
+
 // --------------------------
 // パンくず生成
 // --------------------------
@@ -259,6 +327,9 @@ function createBreadcrumb(){
 
     if(category){
 
+        const categoryCount =
+            getCategoryCount(category);
+
         query =
             `category=${encodeURIComponent(category)}`;
 
@@ -268,7 +339,7 @@ function createBreadcrumb(){
 
 <a href="library.html?${query}">
 
-${category}
+${category} (${categoryCount})
 
 </a>
 
@@ -283,6 +354,12 @@ ${category}
 
     if(tag){
 
+        const tagCount =
+            getTagCount(
+                tag,
+                category
+            );
+
         query +=
             `${query ? "&" : ""}tag=${encodeURIComponent(tag)}`;
 
@@ -292,7 +369,7 @@ ${category}
 
 <a href="library.html?${query}">
 
-${tag}
+${tag} (${tagCount})
 
 </a>
 
@@ -708,6 +785,6 @@ if(sortSelect){
 
 console.log(
 
-    "Project Library library.js Version4.0"
+    "Project Library library.js Version5.0"
 
 );
