@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // admin.js
-// Version 10.0
+// Version 10.1
 // ==========================
 
 // --------------------------
@@ -217,9 +217,6 @@ function escapeHtml(value){
 // --------------------------
 // 全登録タグ取得
 // --------------------------
-// ※検索用
-// ここでは「全件」を取得する
-// --------------------------
 
 function getAllFixedTags(){
 
@@ -321,9 +318,6 @@ function getAllSeries(){
 
 // --------------------------
 // 最新5件取得
-// --------------------------
-// 直近の作品から使われたタグを
-// 重複なしで最大5件取得
 // --------------------------
 
 function getRecentChoices(
@@ -614,12 +608,6 @@ function renderSelectedChoices(
 // --------------------------
 // 候補表示
 // --------------------------
-// 検索なし
-// → 最新5件
-//
-// 検索あり
-// → 全登録から検索
-// --------------------------
 
 function renderChoiceResults(
     container,
@@ -648,10 +636,6 @@ function renderChoiceResults(
     let values = [];
 
 
-    // --------------------------
-    // 検索なし
-    // --------------------------
-
     if(!keyword){
 
         values =
@@ -660,10 +644,6 @@ function renderChoiceResults(
             );
 
     }
-
-    // --------------------------
-    // 検索あり
-    // --------------------------
 
     else{
 
@@ -679,10 +659,6 @@ function renderChoiceResults(
 
     }
 
-
-    // --------------------------
-    // 該当なし
-    // --------------------------
 
     if(!values.length){
 
@@ -707,10 +683,6 @@ function renderChoiceResults(
 
     }
 
-
-    // --------------------------
-    // ボタン生成
-    // --------------------------
 
     values.forEach(
         value => {
@@ -828,10 +800,6 @@ function renderAllChoices(){
         getAllSeries();
 
 
-    // --------------------------
-    // 選択中
-    // --------------------------
-
     renderSelectedChoices(
         fixedTagSelected,
         workData.fixedTags,
@@ -852,10 +820,6 @@ function renderAllChoices(){
         "series"
     );
 
-
-    // --------------------------
-    // 候補
-    // --------------------------
 
     renderChoiceResults(
         fixedTagChoices,
@@ -2088,11 +2052,13 @@ function dataUrlToBlob(
 
 
 // --------------------------
-// 直前の作品を取得
+// 直前に登録した作品を取得
 // --------------------------
-// 基本は works.js の最後の作品。
-// ただし公開日・更新日がある場合は
-// 日付を比較して最新を優先。
+// 「前回」は日付ではなく
+// 作品IDが最大の作品を使用する。
+// これにより、将来編集機能が追加されても
+// 「直前に登録した作品」という意味が
+// ブレにくくなる。
 // --------------------------
 
 function getPreviousWork(){
@@ -2108,36 +2074,13 @@ function getPreviousWork(){
         [...works].sort(
             (a,b) => {
 
-                const dateA =
-                    String(
-                        a.updateDate ||
-                        a.publishDate ||
-                        ""
-                    );
+                const idA =
+                    Number(a.id) || 0;
 
-                const dateB =
-                    String(
-                        b.updateDate ||
-                        b.publishDate ||
-                        ""
-                    );
+                const idB =
+                    Number(b.id) || 0;
 
-
-                if(dateA !== dateB){
-
-                    return dateB.localeCompare(
-                        dateA
-                    );
-
-                }
-
-
-                return (
-                    Number(b.id) || 0
-                ) -
-                (
-                    Number(a.id) || 0
-                );
+                return idB - idA;
 
             }
         );
@@ -2150,6 +2093,9 @@ function getPreviousWork(){
 
 // --------------------------
 // 前回データを反映
+// --------------------------
+// ※編集ではない
+// ※必ず新規投稿として開始
 // --------------------------
 
 function usePreviousWork(){
@@ -2169,12 +2115,14 @@ function usePreviousWork(){
     }
 
 
-    // --------------------------
-    // 新規投稿状態に戻す
-    // --------------------------
+    // ==================================================
+    // 重要
+    // 必ず「新規投稿」にする
+    // ==================================================
 
     editId =
         null;
+
 
     if(editIdInput){
 
@@ -2188,12 +2136,12 @@ function usePreviousWork(){
         null;
 
 
-    // --------------------------
-    // データをコピー
-    // --------------------------
-    // PDF・サムネイルは
-    // 絶対にコピーしない
-    // --------------------------
+    // ==================================================
+    // 前回作品のデータをコピー
+    // ==================================================
+    // PDF・サムネイル・ID・作品番号・日付は
+    // コピーしない
+    // ==================================================
 
     workData = {
 
@@ -2232,34 +2180,31 @@ function usePreviousWork(){
             previousWork.size ||
             "A4",
 
-        // ----------------------
-        // PDFはコピーしない
-        // ----------------------
-
+        // 新しい作品なので空欄
         pdf:
             "",
-
-        // ----------------------
-        // サムネイルもコピーしない
-        // ----------------------
 
         thumbnail:
             "",
 
-        watermark:
-            true,
+        // 新規作品用
+        id:
+            null,
 
-        recommend:
-            false,
-
-        isNew:
-            true,
+        workNo:
+            "",
 
         publishDate:
             "",
 
         updateDate:
             "",
+
+        recommend:
+            false,
+
+        isNew:
+            true,
 
         etsy:
             "",
@@ -2280,87 +2225,142 @@ function usePreviousWork(){
     // タイトル
     // --------------------------
 
-    document.getElementById(
-        "title"
-    ).value =
-        workData.title;
+    const titleInput =
+        document.getElementById(
+            "title"
+        );
+
+    if(titleInput){
+
+        titleInput.value =
+            workData.title;
+
+    }
 
 
     // --------------------------
     // 説明
     // --------------------------
 
-    document.getElementById(
-        "description"
-    ).value =
-        workData.description;
+    const descriptionInput =
+        document.getElementById(
+            "description"
+        );
+
+    if(descriptionInput){
+
+        descriptionInput.value =
+            workData.description;
+
+    }
 
 
     // --------------------------
     // 難易度
     // --------------------------
 
-    document.getElementById(
-        "difficulty"
-    ).value =
-        String(
-            workData.level
+    const difficultyInput =
+        document.getElementById(
+            "difficulty"
         );
+
+    if(difficultyInput){
+
+        difficultyInput.value =
+            String(
+                workData.level
+            );
+
+    }
 
 
     // --------------------------
     // サイズ
     // --------------------------
 
-    document.getElementById(
-        "size"
-    ).value =
-        workData.size;
+    const sizeInput =
+        document.getElementById(
+            "size"
+        );
+
+    if(sizeInput){
+
+        sizeInput.value =
+            workData.size;
+
+    }
 
 
     // --------------------------
-    // 新規入力欄を空にする
+    // 新規入力欄
     // --------------------------
 
-    document.getElementById(
-        "newFixedTag"
-    ).value =
-        "";
+    const newFixedTag =
+        document.getElementById(
+            "newFixedTag"
+        );
 
-    document.getElementById(
-        "newFreeTag"
-    ).value =
-        "";
+    if(newFixedTag){
 
-    document.getElementById(
-        "newSeries"
-    ).value =
-        "";
+        newFixedTag.value =
+            "";
+
+    }
+
+
+    const newFreeTag =
+        document.getElementById(
+            "newFreeTag"
+        );
+
+    if(newFreeTag){
+
+        newFreeTag.value =
+            "";
+
+    }
+
+
+    const newSeries =
+        document.getElementById(
+            "newSeries"
+        );
+
+    if(newSeries){
+
+        newSeries.value =
+            "";
+
+    }
 
 
     // --------------------------
     // カテゴリ
     // --------------------------
 
-    form
-        .querySelectorAll(
-            'input[type="checkbox"][data-category]'
-        )
-        .forEach(
-            input => {
+    if(form){
 
-                input.checked =
-                    workData.category
-                        .includes(
-                            input.value
-                        );
+        form
+            .querySelectorAll(
+                'input[type="checkbox"][data-category]'
+            )
+            .forEach(
+                input => {
 
-            }
-        );
+                    input.checked =
+                        workData.category
+                            .includes(
+                                input.value
+                            );
+
+                }
+            );
+
+    }
 
 
     // --------------------------
-    // 検索欄をクリア
+    // 検索欄
     // --------------------------
 
     if(fixedTagSearch){
@@ -2386,7 +2386,7 @@ function usePreviousWork(){
 
 
     // --------------------------
-    // PDF入力を空にする
+    // PDF入力
     // --------------------------
 
     if(pdfInput){
@@ -2398,7 +2398,7 @@ function usePreviousWork(){
 
 
     // --------------------------
-    // サムネイルを空にする
+    // サムネイル
     // --------------------------
 
     resetThumbnail();
@@ -2411,6 +2411,10 @@ function usePreviousWork(){
     renderAllChoices();
 
 
+    // --------------------------
+    // 公開ボタン
+    // --------------------------
+
     if(publishButton){
 
         publishButton.textContent =
@@ -2420,7 +2424,7 @@ function usePreviousWork(){
 
 
     // --------------------------
-    // タイトル欄へ移動
+    // 上部へ移動
     // --------------------------
 
     window.scrollTo({
@@ -2460,7 +2464,7 @@ function usePreviousWork(){
 
 
     alert(
-        `「${previousWork.title}」のデータを反映しました😊\n\nタイトルを変更して、PDFを選択すれば新しい作品として公開できます✨`
+        `「${previousWork.title}」のデータを反映しました😊\n\nこれは新規投稿です✨\nタイトルを変更して、PDFを選択すれば新しい作品として公開できます！`
     );
 
 }
@@ -3132,5 +3136,5 @@ renderList();
 // ==================================================
 
 console.log(
-    "Project Library admin.js Version 10.0"
+    "Project Library admin.js Version 10.1"
 );
