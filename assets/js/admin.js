@@ -2462,11 +2462,6 @@ function usePreviousWork(){
         400
     );
 
-
-    alert(
-        `「${previousWork.title}」のデータを反映しました😊\n\nこれは新規投稿です✨\nタイトルを変更して、PDFを選択すれば新しい作品として公開できます！`
-    );
-
 }
 
 
