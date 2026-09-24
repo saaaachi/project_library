@@ -9,6 +9,7 @@
 <title>
 管理画面 | Project Library
 </title>
+
 <!-- ======================================
      管理画面ログイン確認
      ====================================== -->
@@ -21,14 +22,17 @@ if(
     location.href =
         "admin-login.html";
 }
+
 function logout(){
     sessionStorage.removeItem(
         "adminLoggedIn"
     );
+
     location.href =
         "admin-login.html";
 }
 </script>
+
 <!-- ======================================
      共通CSS
      ====================================== -->
@@ -36,14 +40,45 @@ function logout(){
     rel="stylesheet"
     href="assets/css/style.css"
 >
+
 <style>
+
 /* ======================================
-   管理画面 Version 9.0
-   タグ・カテゴリ用
+   管理画面 Version 10.0
    ====================================== */
+
+/* --------------------------------------
+   前回データ反映
+   -------------------------------------- */
+
+.previous-data-button{
+    width:100%;
+    max-width:520px;
+    margin:0 0 18px;
+    padding:11px 14px;
+    border:1px solid #c9dced;
+    border-radius:8px;
+    background:#f5faff;
+    color:#315f86;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.previous-data-button:hover{
+    background:#edf7ff;
+}
+
+.previous-data-help{
+    margin:-10px 0 18px;
+    color:#777;
+    font-size:12px;
+    line-height:1.5;
+}
+
 /* --------------------------------------
    カテゴリ
    -------------------------------------- */
+
 .admin-category-grid{
     display:grid;
     grid-template-columns:
@@ -51,6 +86,7 @@ function logout(){
     gap:10px;
     max-width:520px;
 }
+
 .admin-category-grid label{
     display:flex;
     align-items:center;
@@ -62,16 +98,20 @@ function logout(){
     cursor:pointer;
     line-height:1.4;
 }
+
 .admin-category-grid input{
     flex-shrink:0;
 }
+
 /* --------------------------------------
    タグ・シリーズ検索
    -------------------------------------- */
+
 .choice-search-wrap{
     position:relative;
     margin-bottom:10px;
 }
+
 .choice-search{
     width:100%;
     box-sizing:border-box;
@@ -81,6 +121,7 @@ function logout(){
     font-size:14px;
     background:#fff;
 }
+
 .choice-search-icon{
     position:absolute;
     left:12px;
@@ -90,15 +131,18 @@ function logout(){
     color:#888;
     pointer-events:none;
 }
+
 /* --------------------------------------
    選択中
    -------------------------------------- */
+
 .selected-choice-area{
     display:flex;
     flex-wrap:wrap;
     gap:6px;
     margin-bottom:10px;
 }
+
 .selected-choice{
     display:inline-flex;
     align-items:center;
@@ -111,6 +155,7 @@ function logout(){
     font-size:13px;
     line-height:1.3;
 }
+
 .selected-choice button{
     border:0;
     background:transparent;
@@ -121,9 +166,11 @@ function logout(){
     line-height:1;
     cursor:pointer;
 }
+
 /* --------------------------------------
    候補一覧
    -------------------------------------- */
+
 .choice-results{
     display:flex;
     flex-wrap:wrap;
@@ -132,6 +179,7 @@ function logout(){
     overflow-y:auto;
     margin-bottom:10px;
 }
+
 .choice-button{
     border:1px solid #ddd;
     background:#fff;
@@ -141,22 +189,27 @@ function logout(){
     line-height:1.4;
     cursor:pointer;
 }
+
 .choice-button:hover{
     background:#f7f7f7;
 }
+
 .choice-button.selected{
     background:#eaf4ff;
     border-color:#76aee8;
     color:#245a8d;
 }
+
 .choice-empty{
     margin:5px 0;
     color:#888;
     font-size:13px;
 }
+
 /* --------------------------------------
    新規作成
    -------------------------------------- */
+
 .new-choice-toggle{
     border:0;
     background:transparent;
@@ -165,29 +218,36 @@ function logout(){
     font-size:13px;
     cursor:pointer;
 }
+
 .new-choice-area{
     display:none;
     margin-top:8px;
 }
+
 .new-choice-area.open{
     display:block;
 }
+
 .new-choice-area input{
     width:100%;
     box-sizing:border-box;
 }
+
 /* --------------------------------------
    補足
    -------------------------------------- */
+
 .admin-help-text{
     margin:7px 0 0;
     font-size:13px;
     color:#777;
     line-height:1.6;
 }
+
 /* --------------------------------------
    サムネイル
    -------------------------------------- */
+
 .admin-thumbnail-preview{
     width:220px;
     max-width:100%;
@@ -200,47 +260,63 @@ function logout(){
     border-radius:6px;
     background:#fafafa;
 }
+
 .admin-thumbnail-preview img{
     display:block;
     width:220px;
     max-width:100%;
     height:auto;
 }
+
 /* --------------------------------------
    スマホ
    -------------------------------------- */
+
 @media(
     max-width:600px
 ){
     .admin-category-grid{
         gap:8px;
     }
+
     .admin-category-grid label{
         padding:9px 8px;
         font-size:13px;
     }
+
     .choice-results{
         max-height:150px;
     }
+
+    .previous-data-button{
+        font-size:13px;
+    }
 }
+
 </style>
 </head>
+
 <body>
+
 <!-- ======================================
      ヘッダー
      ====================================== -->
 <header id="header"></header>
+
 <!-- ======================================
      サイドバー
      ====================================== -->
 <div id="sidebar"></div>
+
 <!-- ======================================
      メイン
      ====================================== -->
 <main class="admin-container">
+
 <!-- ======================================
      タイトル・ログアウト
      ====================================== -->
+
 <div
     style="
         display:flex;
@@ -251,35 +327,65 @@ function logout(){
     "
 >
     <div>
+
         <h1>
             📚 Project Library 管理画面
         </h1>
+
         <p class="admin-subtitle">
             作品登録・編集・管理を行います
         </p>
+
     </div>
+
     <button
         type="button"
         onclick="logout()"
     >
         ログアウト
     </button>
+
 </div>
+
+
+<!-- ======================================
+     前回データ反映
+     ====================================== -->
+
+<button
+    type="button"
+    id="usePreviousDataButton"
+    class="previous-data-button"
+>
+    📋 前回のデータを反映
+</button>
+
+<p class="previous-data-help">
+    直前に登録した作品の設定をコピーします。
+    PDF・サムネイルはコピーされません。
+</p>
+
+
 <!-- ======================================
      作品登録フォーム
      ====================================== -->
+
 <form
     id="workForm"
 >
+
 <!-- ======================================
      タイトル
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label
         for="title"
     >
         タイトル
     </label>
+
     <input
         type="text"
         id="title"
@@ -287,115 +393,153 @@ function logout(){
         placeholder="作品タイトルを入力"
         required
     >
+
 </div>
+
+
 <!-- ======================================
      PDF
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label
         for="pdfFile"
     >
         PDFファイル
     </label>
+
     <input
         type="file"
         id="pdfFile"
         name="pdfFile"
         accept=".pdf,application/pdf"
     >
+
     <p class="admin-help-text">
         PDFを選択すると、
         1ページ目からサムネイルを自動作成します。
     </p>
+
 </div>
+
+
 <!-- ======================================
      サムネイル
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label>
         サムネイル
     </label>
+
     <div
         id="thumbnailPreview"
         class="admin-thumbnail-preview"
     >
+
         <span>
             PDFを選択すると表示されます
         </span>
+
     </div>
+
 </div>
+
+
 <!-- ======================================
      カテゴリ
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label>
         カテゴリ
     </label>
+
     <div class="admin-category-grid">
+
         <label>
             <input
                 type="checkbox"
                 value="幼児向け"
                 data-category
             >
+
             <span>
                 幼児向け
             </span>
         </label>
+
         <label>
             <input
                 type="checkbox"
                 value="子ども向け"
                 data-category
             >
+
             <span>
                 子ども向け
             </span>
         </label>
+
         <label>
             <input
                 type="checkbox"
                 value="大人向け"
                 data-category
             >
+
             <span>
                 大人向け
             </span>
         </label>
+
         <label>
             <input
                 type="checkbox"
                 value="シニア・リハビリ"
                 data-category
             >
+
             <span>
                 シニア・リハビリ
             </span>
         </label>
+
     </div>
+
     <p class="admin-help-text">
         複数選択できます。
     </p>
+
 </div>
+
+
 <!-- ======================================
      固定タグ
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label>
         固定タグ
     </label>
-    <!-- 選択中 -->
+
     <div
         id="fixedTagSelected"
         class="selected-choice-area"
     ></div>
-    <!-- 検索 -->
+
     <div class="choice-search-wrap">
+
         <span
             class="choice-search-icon"
         >
             🔎
         </span>
+
         <input
             type="text"
             id="fixedTagSearch"
@@ -403,13 +547,14 @@ function logout(){
             placeholder="タグを検索"
             autocomplete="off"
         >
+
     </div>
-    <!-- 候補 -->
+
     <div
         id="fixedTagChoices"
         class="choice-results"
     ></div>
-    <!-- 新規 -->
+
     <button
         type="button"
         id="newFixedTagToggle"
@@ -417,40 +562,51 @@ function logout(){
     >
         ＋ 新しい固定タグを作る
     </button>
+
     <div
         id="newFixedTagArea"
         class="new-choice-area"
     >
+
         <input
             type="text"
             id="newFixedTag"
             name="newFixedTag"
             placeholder="新しい固定タグ"
         >
+
         <p class="admin-help-text">
             複数作る場合はカンマ区切り
         </p>
+
     </div>
+
 </div>
+
+
 <!-- ======================================
      自由タグ
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label>
         自由タグ
     </label>
-    <!-- 選択中 -->
+
     <div
         id="freeTagSelected"
         class="selected-choice-area"
     ></div>
-    <!-- 検索 -->
+
     <div class="choice-search-wrap">
+
         <span
             class="choice-search-icon"
         >
             🔎
         </span>
+
         <input
             type="text"
             id="freeTagSearch"
@@ -458,13 +614,14 @@ function logout(){
             placeholder="タグを検索"
             autocomplete="off"
         >
+
     </div>
-    <!-- 候補 -->
+
     <div
         id="freeTagChoices"
         class="choice-results"
     ></div>
-    <!-- 新規 -->
+
     <button
         type="button"
         id="newFreeTagToggle"
@@ -472,40 +629,51 @@ function logout(){
     >
         ＋ 新しい自由タグを作る
     </button>
+
     <div
         id="newFreeTagArea"
         class="new-choice-area"
     >
+
         <input
             type="text"
             id="newFreeTag"
             name="newFreeTag"
             placeholder="新しい自由タグ"
         >
+
         <p class="admin-help-text">
             複数作る場合はカンマ区切り
         </p>
+
     </div>
+
 </div>
+
+
 <!-- ======================================
      シリーズ
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label>
         シリーズ
     </label>
-    <!-- 選択中 -->
+
     <div
         id="seriesSelected"
         class="selected-choice-area"
     ></div>
-    <!-- 検索 -->
+
     <div class="choice-search-wrap">
+
         <span
             class="choice-search-icon"
         >
             🔎
         </span>
+
         <input
             type="text"
             id="seriesSearch"
@@ -513,13 +681,14 @@ function logout(){
             placeholder="シリーズを検索"
             autocomplete="off"
         >
+
     </div>
-    <!-- 候補 -->
+
     <div
         id="seriesChoices"
         class="choice-results"
     ></div>
-    <!-- 新規 -->
+
     <button
         type="button"
         id="newSeriesToggle"
@@ -527,159 +696,229 @@ function logout(){
     >
         ＋ 新しいシリーズを作る
     </button>
+
     <div
         id="newSeriesArea"
         class="new-choice-area"
     >
+
         <input
             type="text"
             id="newSeries"
             name="newSeries"
             placeholder="新しいシリーズ名"
         >
+
     </div>
+
 </div>
+
+
 <!-- ======================================
      難易度
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label
         for="difficulty"
     >
         難易度
     </label>
+
     <select
         id="difficulty"
         name="difficulty"
     >
+
         <option value="1">
             ★☆☆ 初級
         </option>
+
         <option value="2">
             ★★☆ 中級
         </option>
+
         <option value="3">
             ★★★ 上級
         </option>
+
     </select>
+
 </div>
+
+
 <!-- ======================================
      印刷サイズ
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label
         for="size"
     >
         印刷サイズ
     </label>
+
     <select
         id="size"
         name="size"
     >
+
         <option value="A4">
             A4
         </option>
+
         <option value="A3">
             A3
         </option>
+
     </select>
+
 </div>
+
+
 <!-- ======================================
      説明
      ====================================== -->
+
 <div class="admin-form-item">
+
     <label
         for="description"
     >
         説明
     </label>
+
     <textarea
         id="description"
         name="description"
         rows="6"
         placeholder="作品の説明を入力してください"
     ></textarea>
+
 </div>
+
+
 <!-- ======================================
      編集ID
      ====================================== -->
+
 <input
     type="hidden"
     id="editId"
     name="editId"
 >
+
 </form>
+
+
 <!-- ======================================
      下部操作ボタン
      ====================================== -->
+
 <div class="admin-bottom-bar">
+
     <button
         type="button"
         class="draft"
     >
         下書き保存
     </button>
+
     <button
         type="button"
         class="publish"
     >
         🚀 公開する
     </button>
+
 </div>
+
+
 <!-- ======================================
      登録済み作品
      ====================================== -->
+
 <section class="admin-list">
+
     <h2>
         登録済み作品
     </h2>
+
     <table class="admin-table">
+
         <thead>
+
             <tr>
+
                 <th>
                     No
                 </th>
+
                 <th>
                     タイトル
                 </th>
+
                 <th>
                     カテゴリ
                 </th>
+
                 <th>
                     難易度
                 </th>
+
                 <th>
                     操作
                 </th>
+
             </tr>
+
         </thead>
+
         <tbody
             id="workList"
         ></tbody>
+
     </table>
+
 </section>
+
 </main>
+
+
 <!-- ======================================
      フッター
      ====================================== -->
+
 <footer id="footer"></footer>
+
+
 <!-- ======================================
      共通JS
      ====================================== -->
+
 <script
     src="assets/js/common.js"
 ></script>
+
+
 <!-- ======================================
      作品データ
      ====================================== -->
+
 <script
     src="assets/data/works.js"
 ></script>
+
+
 <!-- ======================================
      管理画面JS
      ====================================== -->
+
 <script
     src="assets/js/admin.js"
 ></script>
+
 </body>
 </html>
