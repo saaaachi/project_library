@@ -1,3116 +1,2178 @@
-// ==========================
-// Project Library
-// admin.js
-// Version 11.0
-// ==========================
+/* ======================================
+   Project Library
+   admin.js
+   Version 12.0
+   ====================================== */
 
 
-// --------------------------
-// API Worker
-// --------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
 
-const API_WORKER_URL =
-    "https://project-library-api.saaachi-app.workers.dev";
+        /* ==================================
+           基本要素
+           ================================== */
 
+        const form =
+            document.getElementById(
+                "workForm"
+            );
 
-// --------------------------
-// 要素取得
-// --------------------------
+        const titleInput =
+            document.getElementById(
+                "title"
+            );
 
-const form =
-    document.getElementById("workForm");
+        const pdfFileInput =
+            document.getElementById(
+                "pdfFile"
+            );
 
-const draftButton =
-    document.querySelector(".draft");
+        const thumbnailPreview =
+            document.getElementById(
+                "thumbnailPreview"
+            );
 
-const publishButton =
-    document.querySelector(".publish");
+        const difficultyInput =
+            document.getElementById(
+                "difficulty"
+            );
 
-const pdfInput =
-    document.getElementById("pdfFile");
+        const sizeInput =
+            document.getElementById(
+                "size"
+            );
 
-const thumbnailPreview =
-    document.getElementById("thumbnailPreview");
+        const descriptionInput =
+            document.getElementById(
+                "description"
+            );
 
-const fixedTagChoices =
-    document.getElementById("fixedTagChoices");
-
-const freeTagChoices =
-    document.getElementById("freeTagChoices");
-
-const seriesChoices =
-    document.getElementById("seriesChoices");
-
-const fixedTagSelected =
-    document.getElementById("fixedTagSelected");
-
-const freeTagSelected =
-    document.getElementById("freeTagSelected");
-
-const seriesSelected =
-    document.getElementById("seriesSelected");
-
-const fixedTagSearch =
-    document.getElementById("fixedTagSearch");
-
-const freeTagSearch =
-    document.getElementById("freeTagSearch");
-
-const seriesSearch =
-    document.getElementById("seriesSearch");
-
-const editIdInput =
-    document.getElementById("editId");
-
-const usePreviousDataButton =
-    document.getElementById(
-        "usePreviousDataButton"
-    );
-
-const workNumberSearch =
-    document.getElementById(
-        "workNumberSearch"
-    );
-
-const workNumberSearchButton =
-    document.getElementById(
-        "workNumberSearchButton"
-    );
-
-const adminSearchResult =
-    document.getElementById(
-        "adminSearchResult"
-    );
+        const editIdInput =
+            document.getElementById(
+                "editId"
+            );
 
 
-// --------------------------
-// 状態
-// --------------------------
+        /* ==================================
+           前回データ
+           ================================== */
 
-let editId = null;
-
-let selectedPdfFile = null;
-
-let workData =
-    createEmptyWorkData();
+        const usePreviousDataButton =
+            document.getElementById(
+                "usePreviousDataButton"
+            );
 
 
-// --------------------------
-// 空データ
-// --------------------------
+        /* ==================================
+           カテゴリ
+           ================================== */
 
-function createEmptyWorkData(){
-
-    return {
-
-        id: null,
-
-        workNo: "",
-
-        title: "",
-
-        description: "",
-
-        category: [],
-
-        fixedTags: [],
-
-        freeTags: [],
-
-        series: "",
-
-        level: 1,
-
-        size: "A4",
-
-        thumbnail: "",
-
-        watermark: true,
-
-        pdf: "",
-
-        recommend: false,
-
-        isNew: true,
-
-        publishDate: "",
-
-        updateDate: "",
-
-        etsy: "",
-
-        related: [],
-
-        author: "あたまのストレッチ",
-
-        status: "public"
-
-    };
-
-}
+        const categoryInputs =
+            document.querySelectorAll(
+                "[data-category]"
+            );
 
 
-// --------------------------
-// 共通関数
-// --------------------------
+        /* ==================================
+           タグ・シリーズ
+           ================================== */
 
-function toArray(value){
+        const fixedTagSearch =
+            document.getElementById(
+                "fixedTagSearch"
+            );
 
-    if(Array.isArray(value)){
+        const fixedTagChoices =
+            document.getElementById(
+                "fixedTagChoices"
+            );
 
-        return value
-            .map(
-                v =>
-                    String(v).trim()
+        const fixedTagSelected =
+            document.getElementById(
+                "fixedTagSelected"
+            );
+
+        const newFixedTagToggle =
+            document.getElementById(
+                "newFixedTagToggle"
+            );
+
+        const newFixedTagArea =
+            document.getElementById(
+                "newFixedTagArea"
+            );
+
+        const newFixedTag =
+            document.getElementById(
+                "newFixedTag"
+            );
+
+
+        const freeTagSearch =
+            document.getElementById(
+                "freeTagSearch"
+            );
+
+        const freeTagChoices =
+            document.getElementById(
+                "freeTagChoices"
+            );
+
+        const freeTagSelected =
+            document.getElementById(
+                "freeTagSelected"
+            );
+
+        const newFreeTagToggle =
+            document.getElementById(
+                "newFreeTagToggle"
+            );
+
+        const newFreeTagArea =
+            document.getElementById(
+                "newFreeTagArea"
+            );
+
+        const newFreeTag =
+            document.getElementById(
+                "newFreeTag"
+            );
+
+
+        const seriesSearch =
+            document.getElementById(
+                "seriesSearch"
+            );
+
+        const seriesChoices =
+            document.getElementById(
+                "seriesChoices"
+            );
+
+        const seriesSelected =
+            document.getElementById(
+                "seriesSelected"
+            );
+
+        const newSeriesToggle =
+            document.getElementById(
+                "newSeriesToggle"
+            );
+
+        const newSeriesArea =
+            document.getElementById(
+                "newSeriesArea"
+            );
+
+        const newSeries =
+            document.getElementById(
+                "newSeries"
+            );
+
+
+        /* ==================================
+           作品管理検索
+           ================================== */
+
+        const workNumberSearch =
+            document.getElementById(
+                "workNumberSearch"
+            );
+
+        const workNumberSearchButton =
+            document.getElementById(
+                "workNumberSearchButton"
+            );
+
+        const adminSearchResult =
+            document.getElementById(
+                "adminSearchResult"
+            );
+
+
+        /* ==================================
+           選択状態
+           ================================== */
+
+        let selectedFixedTags = [];
+
+        let selectedFreeTags = [];
+
+        let selectedSeries = [];
+
+
+        /* ==================================
+           PDF関連
+           ================================== */
+
+        let generatedThumbnailBlob =
+            null;
+
+
+        /* ==================================
+           works確認
+           ================================== */
+
+        const workList =
+            Array.isArray(window.works)
+                ? window.works
+                : [];
+
+
+        /* ==================================
+           エスケープ
+           ================================== */
+
+        function escapeHtml(
+            value
+        ){
+
+            return String(
+                value ?? ""
             )
-            .filter(Boolean);
-
-    }
-
-    if(!value){
-
-        return [];
-
-    }
-
-    return String(value)
-        .split(",")
-        .map(
-            v =>
-                v.trim()
-        )
-        .filter(Boolean);
-
-}
-
-
-function uniqueArray(array){
-
-    return [
-        ...new Set(
-            array
-                .map(
-                    v =>
-                        String(v).trim()
+                .replace(
+                    /&/g,
+                    "&amp;"
                 )
-                .filter(Boolean)
-        )
-    ];
-
-}
-
-
-function escapeHtml(value){
-
-    return String(value ?? "")
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-// --------------------------
-// 全登録タグ取得
-// --------------------------
-
-function getAllFixedTags(){
-
-    const tags = [];
-
-    works.forEach(
-        work => {
-
-            if(
-                Array.isArray(
-                    work.fixedTags
+                .replace(
+                    /</g,
+                    "&lt;"
                 )
-            ){
-
-                tags.push(
-                    ...work.fixedTags
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
                 );
 
-            }
+        }
+
+
+        /* ==================================
+           カテゴリ取得
+           ================================== */
+
+        function getSelectedCategories(){
+
+            return Array.from(
+                categoryInputs
+            )
+            .filter(
+                input =>
+                    input.checked
+            )
+            .map(
+                input =>
+                    input.value
+            );
 
         }
-    );
-
-    return uniqueArray(tags)
-        .sort(
-            (a,b) =>
-                a.localeCompare(
-                    b,
-                    "ja"
-                )
-        );
-
-}
 
 
-function getAllFreeTags(){
+        /* ==================================
+           選択タグ描画
+           ================================== */
 
-    const tags = [];
+        function renderSelectedChoices(
+            container,
+            items,
+            removeCallback
+        ){
 
-    works.forEach(
-        work => {
-
-            if(
-                Array.isArray(
-                    work.freeTags
-                )
-            ){
-
-                tags.push(
-                    ...work.freeTags
-                );
-
+            if(!container){
+                return;
             }
 
-        }
-    );
 
-    return uniqueArray(tags)
-        .sort(
-            (a,b) =>
-                a.localeCompare(
-                    b,
-                    "ja"
-                )
-        );
+            container.innerHTML =
+                "";
 
-}
-
-
-function getAllSeries(){
-
-    const series = [];
-
-    works.forEach(
-        work => {
-
-            if(work.series){
-
-                series.push(
-                    work.series
-                );
-
-            }
-
-        }
-    );
-
-    return uniqueArray(series)
-        .sort(
-            (a,b) =>
-                a.localeCompare(
-                    b,
-                    "ja"
-                )
-        );
-
-}
-
-
-// --------------------------
-// 最新5件取得
-// --------------------------
-
-function getRecentChoices(
-    type
-){
-
-    const values = [];
-
-    const reversedWorks =
-        [...works].reverse();
-
-    reversedWorks.forEach(
-        work => {
-
-            let items = [];
-
-            if(type === "fixed"){
-
-                items =
-                    toArray(
-                        work.fixedTags
-                    );
-
-            }
-
-            if(type === "free"){
-
-                items =
-                    toArray(
-                        work.freeTags
-                    );
-
-            }
-
-            if(type === "series"){
-
-                items =
-                    work.series
-                        ? [work.series]
-                        : [];
-
-            }
 
             items.forEach(
-                value => {
+                function(item){
+
+                    const span =
+                        document.createElement(
+                            "span"
+                        );
+
+                    span.className =
+                        "selected-choice";
+
+
+                    span.innerHTML =
+                        `
+                        <span>
+                            ${escapeHtml(item)}
+                        </span>
+
+                        <button
+                            type="button"
+                            aria-label="削除"
+                        >
+                            ×
+                        </button>
+                        `;
+
+
+                    span
+                        .querySelector("button")
+                        .addEventListener(
+                            "click",
+                            function(){
+
+                                removeCallback(
+                                    item
+                                );
+
+                            }
+                        );
+
+
+                    container.appendChild(
+                        span
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           候補描画
+           ================================== */
+
+        function renderChoiceResults(
+            container,
+            items,
+            selectedItems,
+            addCallback
+        ){
+
+            if(!container){
+                return;
+            }
+
+
+            container.innerHTML =
+                "";
+
+
+            if(
+                !items ||
+                items.length === 0
+            ){
+
+                container.innerHTML =
+                    `
+                    <p class="choice-empty">
+                        候補がありません。
+                    </p>
+                    `;
+
+                return;
+
+            }
+
+
+            items.forEach(
+                function(item){
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+                    button.type =
+                        "button";
+
+                    button.className =
+                        "choice-button";
+
 
                     if(
-                        value &&
-                        !values.includes(
-                            value
-                        )
+                        selectedItems
+                            .includes(item)
                     ){
 
-                        values.push(
-                            value
+                        button.classList.add(
+                            "selected"
                         );
 
                     }
 
-                }
-            );
 
-        }
-    );
+                    button.textContent =
+                        item;
 
-    return values.slice(
-        0,
-        5
-    );
 
-}
+                    button.addEventListener(
+                        "click",
+                        function(){
 
+                            addCallback(
+                                item
+                            );
 
-// --------------------------
-// 選択状態
-// --------------------------
-
-function isSelected(
-    type,
-    value
-){
-
-    if(type === "fixed"){
-
-        return workData.fixedTags
-            .includes(value);
-
-    }
-
-    if(type === "free"){
-
-        return workData.freeTags
-            .includes(value);
-
-    }
-
-    if(type === "series"){
-
-        return workData.series === value;
-
-    }
-
-    return false;
-
-}
-
-
-// --------------------------
-// タグ追加
-// --------------------------
-
-function addChoice(
-    type,
-    value
-){
-
-    if(!value){
-
-        return;
-
-    }
-
-    if(type === "fixed"){
-
-        workData.fixedTags =
-            uniqueArray([
-                ...workData.fixedTags,
-                value
-            ]);
-
-    }
-
-    if(type === "free"){
-
-        workData.freeTags =
-            uniqueArray([
-                ...workData.freeTags,
-                value
-            ]);
-
-    }
-
-    if(type === "series"){
-
-        workData.series =
-            value;
-
-    }
-
-}
-
-
-// --------------------------
-// タグ削除
-// --------------------------
-
-function removeChoice(
-    type,
-    value
-){
-
-    if(type === "fixed"){
-
-        workData.fixedTags =
-            workData.fixedTags.filter(
-                item =>
-                    item !== value
-            );
-
-    }
-
-    if(type === "free"){
-
-        workData.freeTags =
-            workData.freeTags.filter(
-                item =>
-                    item !== value
-            );
-
-    }
-
-    if(type === "series"){
-
-        if(
-            workData.series === value
-        ){
-
-            workData.series =
-                "";
-
-        }
-
-    }
-
-}
-
-
-// --------------------------
-// 選択中表示
-// --------------------------
-
-function renderSelectedChoices(
-    container,
-    values,
-    type
-){
-
-    if(!container){
-
-        return;
-
-    }
-
-    container.innerHTML =
-        "";
-
-    if(!values.length){
-
-        return;
-
-    }
-
-    values.forEach(
-        value => {
-
-            const item =
-                document.createElement(
-                    "span"
-                );
-
-            item.className =
-                "selected-choice";
-
-            const text =
-                document.createElement(
-                    "span"
-                );
-
-            text.textContent =
-                value;
-
-            const removeButton =
-                document.createElement(
-                    "button"
-                );
-
-            removeButton.type =
-                "button";
-
-            removeButton.textContent =
-                "×";
-
-            removeButton.title =
-                "選択を解除";
-
-            removeButton.addEventListener(
-                "click",
-                () => {
-
-                    removeChoice(
-                        type,
-                        value
+                        }
                     );
 
-                    renderAllChoices();
+
+                    container.appendChild(
+                        button
+                    );
 
                 }
             );
 
-            item.appendChild(
-                text
+        }
+
+
+        /* ==================================
+           固定タグ
+           ================================== */
+
+        function getAllFixedTags(){
+
+            const set =
+                new Set();
+
+
+            workList.forEach(
+                function(work){
+
+                    (
+                        work.fixedTags ||
+                        []
+                    )
+                    .forEach(
+                        function(tag){
+
+                            set.add(
+                                tag
+                            );
+
+                        }
+                    );
+
+                }
             );
 
-            item.appendChild(
-                removeButton
-            );
 
-            container.appendChild(
-                item
+            return Array.from(
+                set
             );
 
         }
-    );
-
-}
 
 
-// --------------------------
-// 候補表示
-// --------------------------
+        function renderFixedTags(){
 
-function renderChoiceResults(
-    container,
-    allValues,
-    type,
-    searchText
-){
-
-    if(!container){
-
-        return;
-
-    }
-
-    container.innerHTML =
-        "";
-
-    const keyword =
-        String(
-            searchText || ""
-        )
-            .trim()
-            .toLowerCase();
+            const keyword =
+                String(
+                    fixedTagSearch?.value ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
 
 
-    let values = [];
-
-
-    if(!keyword){
-
-        values =
-            getRecentChoices(
-                type
-            );
-
-    }
-
-    else{
-
-        values =
-            allValues.filter(
-                value =>
-                    value
-                        .toLowerCase()
-                        .includes(
-                            keyword
-                        )
-            );
-
-    }
-
-
-    if(!values.length){
-
-        if(keyword){
-
-            container.innerHTML =
-                `<p class="choice-empty">
-                    「${escapeHtml(keyword)}」に
-                    該当するものがありません
-                </p>`;
-
-        }else{
-
-            container.innerHTML =
-                `<p class="choice-empty">
-                    まだ登録されていません
-                </p>`;
-
-        }
-
-        return;
-
-    }
-
-
-    values.forEach(
-        value => {
-
-            const button =
-                document.createElement(
-                    "button"
+            const candidates =
+                getAllFixedTags()
+                .filter(
+                    tag =>
+                        !keyword ||
+                        String(tag)
+                            .toLowerCase()
+                            .includes(
+                                keyword
+                            )
                 );
 
-            button.type =
-                "button";
 
-            button.className =
-                "choice-button";
+            renderChoiceResults(
+                fixedTagChoices,
+                candidates,
+                selectedFixedTags,
+                function(tag){
 
-            button.textContent =
-                value;
+                    if(
+                        selectedFixedTags
+                            .includes(tag)
+                    ){
 
+                        selectedFixedTags =
+                            selectedFixedTags
+                                .filter(
+                                    item =>
+                                        item !== tag
+                                );
+
+                    }else{
+
+                        selectedFixedTags.push(
+                            tag
+                        );
+
+                    }
+
+
+                    renderFixedTags();
+
+                    renderSelectedChoices(
+                        fixedTagSelected,
+                        selectedFixedTags,
+                        function(item){
+
+                            selectedFixedTags =
+                                selectedFixedTags
+                                    .filter(
+                                        tag =>
+                                            tag !== item
+                                    );
+
+                            renderFixedTags();
+
+                            renderSelectedChoices(
+                                fixedTagSelected,
+                                selectedFixedTags,
+                                arguments.callee
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+            renderSelectedChoices(
+                fixedTagSelected,
+                selectedFixedTags,
+                function(item){
+
+                    selectedFixedTags =
+                        selectedFixedTags
+                            .filter(
+                                tag =>
+                                    tag !== item
+                            );
+
+                    renderFixedTags();
+
+                    renderSelectedChoices(
+                        fixedTagSelected,
+                        selectedFixedTags,
+                        function(removeItem){
+
+                            selectedFixedTags =
+                                selectedFixedTags
+                                    .filter(
+                                        tag =>
+                                            tag !== removeItem
+                                    );
+
+                            renderFixedTags();
+
+                            renderSelectedChoices(
+                                fixedTagSelected,
+                                selectedFixedTags,
+                                arguments.callee
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           自由タグ
+           ================================== */
+
+        function getAllFreeTags(){
+
+            const set =
+                new Set();
+
+
+            workList.forEach(
+                function(work){
+
+                    (
+                        work.freeTags ||
+                        []
+                    )
+                    .forEach(
+                        function(tag){
+
+                            set.add(
+                                tag
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+            return Array.from(
+                set
+            );
+
+        }
+
+
+        function renderFreeTags(){
+
+            const keyword =
+                String(
+                    freeTagSearch?.value ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const candidates =
+                getAllFreeTags()
+                .filter(
+                    tag =>
+                        !keyword ||
+                        String(tag)
+                            .toLowerCase()
+                            .includes(
+                                keyword
+                            )
+                );
+
+
+            renderChoiceResults(
+                freeTagChoices,
+                candidates,
+                selectedFreeTags,
+                function(tag){
+
+                    if(
+                        selectedFreeTags
+                            .includes(tag)
+                    ){
+
+                        selectedFreeTags =
+                            selectedFreeTags
+                                .filter(
+                                    item =>
+                                        item !== tag
+                                );
+
+                    }else{
+
+                        selectedFreeTags.push(
+                            tag
+                        );
+
+                    }
+
+
+                    renderFreeTags();
+
+                    renderSelectedChoices(
+                        freeTagSelected,
+                        selectedFreeTags,
+                        function(item){
+
+                            selectedFreeTags =
+                                selectedFreeTags
+                                    .filter(
+                                        tag =>
+                                            tag !== item
+                                    );
+
+                            renderFreeTags();
+
+                        }
+                    );
+
+                }
+            );
+
+
+            renderSelectedChoices(
+                freeTagSelected,
+                selectedFreeTags,
+                function(item){
+
+                    selectedFreeTags =
+                        selectedFreeTags
+                            .filter(
+                                tag =>
+                                    tag !== item
+                            );
+
+                    renderFreeTags();
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           シリーズ
+           ================================== */
+
+        function getAllSeries(){
+
+            const set =
+                new Set();
+
+
+            workList.forEach(
+                function(work){
+
+                    (
+                        work.series ||
+                        []
+                    )
+                    .forEach(
+                        function(series){
+
+                            set.add(
+                                series
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+            return Array.from(
+                set
+            );
+
+        }
+
+
+        function renderSeries(){
+
+            const keyword =
+                String(
+                    seriesSearch?.value ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const candidates =
+                getAllSeries()
+                .filter(
+                    series =>
+                        !keyword ||
+                        String(series)
+                            .toLowerCase()
+                            .includes(
+                                keyword
+                            )
+                );
+
+
+            renderChoiceResults(
+                seriesChoices,
+                candidates,
+                selectedSeries,
+                function(series){
+
+                    if(
+                        selectedSeries
+                            .includes(series)
+                    ){
+
+                        selectedSeries =
+                            selectedSeries
+                                .filter(
+                                    item =>
+                                        item !== series
+                                );
+
+                    }else{
+
+                        selectedSeries.push(
+                            series
+                        );
+
+                    }
+
+
+                    renderSeries();
+
+                    renderSelectedChoices(
+                        seriesSelected,
+                        selectedSeries,
+                        function(item){
+
+                            selectedSeries =
+                                selectedSeries
+                                    .filter(
+                                        value =>
+                                            value !== item
+                                    );
+
+                            renderSeries();
+
+                        }
+                    );
+
+                }
+            );
+
+
+            renderSelectedChoices(
+                seriesSelected,
+                selectedSeries,
+                function(item){
+
+                    selectedSeries =
+                        selectedSeries
+                            .filter(
+                                value =>
+                                    value !== item
+                            );
+
+                    renderSeries();
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           新規タグ・シリーズ
+           ================================== */
+
+        function setupToggle(
+            button,
+            area
+        ){
 
             if(
-                isSelected(
-                    type,
-                    value
-                )
+                !button ||
+                !area
             ){
 
-                button.classList.add(
-                    "selected"
-                );
+                return;
 
             }
 
 
             button.addEventListener(
                 "click",
-                () => {
+                function(){
 
-                    if(
-                        type === "series"
-                    ){
-
-                        if(
-                            workData.series ===
-                            value
-                        ){
-
-                            removeChoice(
-                                type,
-                                value
-                            );
-
-                        }else{
-
-                            addChoice(
-                                type,
-                                value
-                            );
-
-                        }
-
-                    }else{
-
-                        if(
-                            isSelected(
-                                type,
-                                value
-                            )
-                        ){
-
-                            removeChoice(
-                                type,
-                                value
-                            );
-
-                        }else{
-
-                            addChoice(
-                                type,
-                                value
-                            );
-
-                        }
-
-                    }
-
-                    renderAllChoices();
-
-                }
-            );
-
-
-            container.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
-
-
-// --------------------------
-// 全UI更新
-// --------------------------
-
-function renderAllChoices(){
-
-    const fixedTags =
-        getAllFixedTags();
-
-    const freeTags =
-        getAllFreeTags();
-
-    const series =
-        getAllSeries();
-
-
-    renderSelectedChoices(
-        fixedTagSelected,
-        workData.fixedTags,
-        "fixed"
-    );
-
-    renderSelectedChoices(
-        freeTagSelected,
-        workData.freeTags,
-        "free"
-    );
-
-    renderSelectedChoices(
-        seriesSelected,
-        workData.series
-            ? [workData.series]
-            : [],
-        "series"
-    );
-
-
-    renderChoiceResults(
-        fixedTagChoices,
-        fixedTags,
-        "fixed",
-        fixedTagSearch?.value
-    );
-
-    renderChoiceResults(
-        freeTagChoices,
-        freeTags,
-        "free",
-        freeTagSearch?.value
-    );
-
-    renderChoiceResults(
-        seriesChoices,
-        series,
-        "series",
-        seriesSearch?.value
-    );
-
-}
-
-
-// --------------------------
-// 検索イベント
-// --------------------------
-
-if(fixedTagSearch){
-
-    fixedTagSearch.addEventListener(
-        "input",
-        () => {
-
-            renderAllChoices();
-
-        }
-    );
-
-}
-
-
-if(freeTagSearch){
-
-    freeTagSearch.addEventListener(
-        "input",
-        () => {
-
-            renderAllChoices();
-
-        }
-    );
-
-}
-
-
-if(seriesSearch){
-
-    seriesSearch.addEventListener(
-        "input",
-        () => {
-
-            renderAllChoices();
-
-        }
-    );
-
-}
-
-
-// --------------------------
-// 新規作成エリア
-// --------------------------
-
-function setupNewChoiceToggle(
-    buttonId,
-    areaId
-){
-
-    const button =
-        document.getElementById(
-            buttonId
-        );
-
-    const area =
-        document.getElementById(
-            areaId
-        );
-
-    if(
-        !button ||
-        !area
-    ){
-
-        return;
-
-    }
-
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            area.classList.toggle(
-                "open"
-            );
-
-
-            if(
-                area.classList.contains(
-                    "open"
-                )
-            ){
-
-                button.textContent =
-                    "− 新しいものを閉じる";
-
-            }else{
-
-                if(
-                    buttonId ===
-                    "newFixedTagToggle"
-                ){
-
-                    button.textContent =
-                        "＋ 新しい固定タグを作る";
-
-                }
-
-                if(
-                    buttonId ===
-                    "newFreeTagToggle"
-                ){
-
-                    button.textContent =
-                        "＋ 新しい自由タグを作る";
-
-                }
-
-                if(
-                    buttonId ===
-                    "newSeriesToggle"
-                ){
-
-                    button.textContent =
-                        "＋ 新しいシリーズを作る";
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-setupNewChoiceToggle(
-    "newFixedTagToggle",
-    "newFixedTagArea"
-);
-
-setupNewChoiceToggle(
-    "newFreeTagToggle",
-    "newFreeTagArea"
-);
-
-setupNewChoiceToggle(
-    "newSeriesToggle",
-    "newSeriesArea"
-);
-
-
-// --------------------------
-// 入力値
-// --------------------------
-
-function getInputValue(id){
-
-    const element =
-        document.getElementById(id);
-
-    return element
-        ? element.value.trim()
-        : "";
-
-}
-
-
-// --------------------------
-// サムネイル表示
-// --------------------------
-
-function showThumbnail(src){
-
-    if(!thumbnailPreview){
-
-        return;
-
-    }
-
-    thumbnailPreview.innerHTML =
-        "";
-
-    if(!src){
-
-        thumbnailPreview.innerHTML =
-            `<span>
-                PDFを選択すると表示されます
-            </span>`;
-
-        return;
-
-    }
-
-    const image =
-        document.createElement(
-            "img"
-        );
-
-    image.src =
-        src;
-
-    image.alt =
-        "作品サムネイル";
-
-    thumbnailPreview.appendChild(
-        image
-    );
-
-}
-
-
-function resetThumbnail(){
-
-    showThumbnail("");
-
-}
-
-
-// --------------------------
-// PDF.js
-// --------------------------
-
-let pdfjsLibPromise = null;
-
-
-function loadPdfJs(){
-
-    if(!pdfjsLibPromise){
-
-        pdfjsLibPromise =
-            import(
-                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-            )
-                .then(
-                    pdfjsLib => {
-
-                        pdfjsLib
-                            .GlobalWorkerOptions
-                            .workerSrc =
-                            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
-
-                        return pdfjsLib;
-
-                    }
-                );
-
-    }
-
-    return pdfjsLibPromise;
-
-}
-
-
-// --------------------------
-// PDF → サムネイル生成
-// --------------------------
-
-async function createPdfThumbnailWithWatermark(
-    file
-){
-
-    const pdfjsLib =
-        await loadPdfJs();
-
-    const arrayBuffer =
-        await file.arrayBuffer();
-
-    const pdf =
-        await pdfjsLib
-            .getDocument({
-                data:
-                    arrayBuffer
-            })
-            .promise;
-
-    const page =
-        await pdf.getPage(1);
-
-    const viewport =
-        page.getViewport({
-            scale:
-                1.2
-        });
-
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
-
-    const context =
-        canvas.getContext(
-            "2d"
-        );
-
-    canvas.width =
-        viewport.width;
-
-    canvas.height =
-        viewport.height;
-
-    await page.render({
-        canvasContext:
-            context,
-        viewport:
-            viewport
-    }).promise;
-
-
-    // --------------------------
-    // 透かし
-    // --------------------------
-
-    context.save();
-
-    context.globalAlpha =
-        0.16;
-
-    context.fillStyle =
-        "#777";
-
-    context.font =
-        "bold 26px sans-serif";
-
-    context.textAlign =
-        "center";
-
-    context.textBaseline =
-        "middle";
-
-    const text =
-        "Project Library";
-
-    const text2 =
-        "無料プリント";
-
-    context.rotate(
-        -25 * Math.PI / 180
-    );
-
-
-    for(
-        let y =
-            -canvas.height;
-        y <
-            canvas.height * 2;
-        y += 150
-    ){
-
-        for(
-            let x =
-                -canvas.width;
-            x <
-                canvas.width * 2;
-            x += 260
-        ){
-
-            context.fillText(
-                text,
-                x,
-                y
-            );
-
-            context.fillText(
-                text2,
-                x,
-                y + 34
-            );
-
-        }
-
-    }
-
-    context.restore();
-
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        0.82
-    );
-
-}
-
-
-// --------------------------
-// PDF選択
-// --------------------------
-
-if(pdfInput){
-
-    pdfInput.addEventListener(
-        "change",
-        async () => {
-
-            const file =
-                pdfInput.files?.[0];
-
-            if(!file){
-
-                return;
-
-            }
-
-            selectedPdfFile =
-                file;
-
-            workData.pdf =
-                file;
-
-
-            showThumbnail("");
-
-
-            if(thumbnailPreview){
-
-                thumbnailPreview.innerHTML =
-                    `<span>
-                        サムネイル作成中…🥹
-                    </span>`;
-
-            }
-
-
-            try{
-
-                const thumbnail =
-                    await createPdfThumbnailWithWatermark(
-                        file
-                    );
-
-                workData.thumbnail =
-                    thumbnail;
-
-                showThumbnail(
-                    thumbnail
-                );
-
-            }catch(error){
-
-                console.error(
-                    "サムネイル生成エラー:",
-                    error
-                );
-
-                alert(
-                    "PDFからサムネイルを作成できませんでした🥲"
-                );
-
-                resetThumbnail();
-
-            }
-
-        }
-    );
-
-}
-
-
-// --------------------------
-// カテゴリ取得
-// --------------------------
-
-function getSelectedCategories(){
-
-    if(!form){
-
-        return [];
-
-    }
-
-    return [
-        ...form.querySelectorAll(
-            'input[type="checkbox"][data-category]:checked'
-        )
-    ]
-        .map(
-            input =>
-                input.value
-        )
-        .filter(Boolean);
-
-}
-
-
-// --------------------------
-// フォームデータ取得
-// --------------------------
-
-function collectFormData(){
-
-    const title =
-        document.getElementById(
-            "title"
-        )?.value.trim() || "";
-
-
-    const description =
-        document.getElementById(
-            "description"
-        )?.value.trim() || "";
-
-
-    const level =
-        Number(
-            document.getElementById(
-                "difficulty"
-            )?.value || 1
-        );
-
-
-    const size =
-        document.getElementById(
-            "size"
-        )?.value || "A4";
-
-
-    const newFixedTags =
-        toArray(
-            getInputValue(
-                "newFixedTag"
-            )
-        );
-
-
-    const newFreeTags =
-        toArray(
-            getInputValue(
-                "newFreeTag"
-            )
-        );
-
-
-    const newSeries =
-        getInputValue(
-            "newSeries"
-        );
-
-
-    if(newFixedTags.length){
-
-        workData.fixedTags =
-            uniqueArray([
-                ...workData.fixedTags,
-                ...newFixedTags
-            ]);
-
-    }
-
-
-    if(newFreeTags.length){
-
-        workData.freeTags =
-            uniqueArray([
-                ...workData.freeTags,
-                ...newFreeTags
-            ]);
-
-    }
-
-
-    if(newSeries){
-
-        workData.series =
-            newSeries;
-
-    }
-
-
-    return {
-
-        title,
-
-        description,
-
-        category:
-            getSelectedCategories(),
-
-        fixedTags:
-            uniqueArray(
-                workData.fixedTags
-            ),
-
-        freeTags:
-            uniqueArray(
-                workData.freeTags
-            ),
-
-        series:
-            workData.series || "",
-
-        level,
-
-        size,
-
-        thumbnail:
-            workData.thumbnail || "",
-
-        pdf:
-            selectedPdfFile ||
-            workData.pdf ||
-            "",
-
-        author:
-            "あたまのストレッチ",
-
-        status:
-            "public"
-
-    };
-
-}
-
-
-// --------------------------
-// バリデーション
-// --------------------------
-
-function validateForm(data){
-
-    if(!data.title){
-
-        alert(
-            "作品タイトルを入力してください🥹"
-        );
-
-        return false;
-
-    }
-
-
-    if(!data.category.length){
-
-        alert(
-            "カテゴリを1つ以上選択してください🥹"
-        );
-
-        return false;
-
-    }
-
-
-    if(
-        !editId &&
-        !selectedPdfFile
-    ){
-
-        alert(
-            "PDFファイルを選択してください🥹"
-        );
-
-        return false;
-
-    }
-
-
-    if(
-        !editId &&
-        !data.thumbnail
-    ){
-
-        alert(
-            "PDFからサムネイルを作成してください🥹"
-        );
-
-        return false;
-
-    }
-
-
-    return true;
-
-}
-
-
-// --------------------------
-// 次の作品ID
-// --------------------------
-
-function getNextWorkId(){
-
-    if(!works.length){
-
-        return 1;
-
-    }
-
-    return Math.max(
-        ...works.map(
-            work =>
-                Number(work.id) || 0
-        )
-    ) + 1;
-
-}
-
-
-// --------------------------
-// 次の作品番号
-// --------------------------
-
-function getNextWorkNo(){
-
-    if(!works.length){
-
-        return "PL-000001";
-
-    }
-
-    const maxNo =
-        Math.max(
-            ...works.map(
-                work => {
-
-                    const match =
-                        String(
-                            work.workNo || ""
-                        ).match(
-                            /(\d+)$/
-                        );
-
-                    return match
-                        ? Number(
-                            match[1]
-                        )
-                        : 0;
-
-                }
-            )
-        );
-
-    return `PL-${String(
-        maxNo + 1
-    ).padStart(
-        6,
-        "0"
-    )}`;
-
-}
-
-
-// --------------------------
-// 作品データ生成
-// --------------------------
-
-function generateWorkData(){
-
-    const data =
-        collectFormData();
-
-
-    if(!validateForm(data)){
-
-        return null;
-
-    }
-
-
-    const now =
-        new Date()
-            .toISOString()
-            .slice(
-                0,
-                10
-            );
-
-
-    const existing =
-        editId
-            ? works.find(
-                work =>
-                    Number(work.id) ===
-                    Number(editId)
-            )
-            : null;
-
-
-    workData = {
-
-        id:
-            existing?.id ??
-            getNextWorkId(),
-
-        workNo:
-            existing?.workNo ??
-            getNextWorkNo(),
-
-        title:
-            data.title,
-
-        description:
-            data.description,
-
-        category:
-            data.category,
-
-        fixedTags:
-            data.fixedTags,
-
-        freeTags:
-            data.freeTags,
-
-        series:
-            data.series,
-
-        level:
-            data.level,
-
-        size:
-            data.size,
-
-        thumbnail:
-            data.thumbnail,
-
-        watermark:
-            true,
-
-        pdf:
-            selectedPdfFile
-                ? selectedPdfFile
-                : (
-                    existing?.pdf ??
-                    data.pdf ??
-                    ""
-                ),
-
-        recommend:
-            existing?.recommend ??
-            false,
-
-        isNew:
-            true,
-
-        publishDate:
-            existing?.publishDate ??
-            now,
-
-        updateDate:
-            now,
-
-        etsy:
-            existing?.etsy ??
-            "",
-
-        related:
-            existing?.related ??
-            [],
-
-        author:
-            "あたまのストレッチ",
-
-        status:
-            "public"
-
-    };
-
-
-    return workData;
-
-}
-
-
-// --------------------------
-// 保存
-// --------------------------
-
-function saveWork(){
-
-    const data =
-        generateWorkData();
-
-
-    if(!data){
-
-        return null;
-
-    }
-
-
-    workData =
-        data;
-
-
-    return data;
-
-}
-
-
-// --------------------------
-// 公開
-// --------------------------
-
-async function triggerGitHubPublish(){
-
-    const data =
-        saveWork();
-
-
-    if(!data){
-
-        return;
-
-    }
-
-
-    if(
-        !editId &&
-        !selectedPdfFile
-    ){
-
-        alert(
-            "PDFファイルを選択してください🥹"
-        );
-
-        return;
-
-    }
-
-
-    if(!selectedPdfFile){
-
-        alert(
-            "現在の公開処理ではPDFファイルが必要です。\n編集する場合も、いったんPDFを再選択してください🙏"
-        );
-
-        return;
-
-    }
-
-
-    try{
-
-        publishButton.disabled =
-            true;
-
-        publishButton.textContent =
-            "🚀 公開処理中…";
-
-
-        const formData =
-            new FormData();
-
-
-        formData.append(
-            "title",
-            data.title
-        );
-
-
-        formData.append(
-            "description",
-            data.description
-        );
-
-
-        formData.append(
-            "category",
-            JSON.stringify(
-                data.category
-            )
-        );
-
-
-        formData.append(
-            "fixedTags",
-            JSON.stringify(
-                data.fixedTags
-            )
-        );
-
-
-        formData.append(
-            "freeTags",
-            JSON.stringify(
-                data.freeTags
-            )
-        );
-
-
-        formData.append(
-            "series",
-            data.series
-        );
-
-
-        formData.append(
-            "level",
-            String(
-                data.level
-            )
-        );
-
-
-        formData.append(
-            "size",
-            data.size
-        );
-
-
-        formData.append(
-            "workNo",
-            data.workNo
-        );
-
-
-        formData.append(
-            "workId",
-            String(
-                data.id
-            )
-        );
-
-
-        formData.append(
-            "pdf",
-            selectedPdfFile
-        );
-
-
-        const thumbnailBlob =
-            dataUrlToBlob(
-                data.thumbnail
-            );
-
-
-        if(!thumbnailBlob){
-
-            throw new Error(
-                "サムネイルの作成に失敗しました。"
-            );
-
-        }
-
-
-        formData.append(
-            "thumbnail",
-            thumbnailBlob,
-            `${data.title}.jpg`
-        );
-
-
-        const response =
-            await fetch(
-                API_WORKER_URL,
-                {
-                    method:
-                        "POST",
-                    body:
-                        formData
-                }
-            );
-
-
-        const result =
-            await response
-                .json()
-                .catch(
-                    () => ({})
-                );
-
-
-        if(!response.ok){
-
-            throw new Error(
-                result.error ||
-                `HTTP ${response.status}`
-            );
-
-        }
-
-
-        alert(
-            "作品を追加しました😊✨\n\nGitHub Actionsで公開処理が始まります🚀"
-        );
-
-
-        resetForm();
-
-
-    }catch(error){
-
-        console.error(
-            "公開エラー:",
-            error
-        );
-
-
-        alert(
-            `公開に失敗しました🥲\n\n${error.message}`
-        );
-
-
-    }finally{
-
-        publishButton.disabled =
-            false;
-
-        publishButton.textContent =
-            editId
-                ? "🚀 更新する"
-                : "🚀 公開する";
-
-    }
-
-}
-
-
-// --------------------------
-// Data URL → Blob
-// --------------------------
-
-function dataUrlToBlob(
-    dataUrl
-){
-
-    if(!dataUrl){
-
-        return null;
-
-    }
-
-
-    const parts =
-        dataUrl.split(",");
-
-
-    if(parts.length < 2){
-
-        return null;
-
-    }
-
-
-    const mimeMatch =
-        parts[0].match(
-            /:(.*?);/
-        );
-
-
-    const mime =
-        mimeMatch
-            ? mimeMatch[1]
-            : "image/jpeg";
-
-
-    const binary =
-        atob(
-            parts[1]
-        );
-
-
-    const bytes =
-        new Uint8Array(
-            binary.length
-        );
-
-
-    for(
-        let i = 0;
-        i < binary.length;
-        i++
-    ){
-
-        bytes[i] =
-            binary.charCodeAt(i);
-
-    }
-
-
-    return new Blob(
-        [bytes],
-        {
-            type:
-                mime
-        }
-    );
-
-}
-
-
-// ==================================================
-// 前回データ
-// ==================================================
-
-function getPreviousWork(){
-
-    if(!works.length){
-
-        return null;
-
-    }
-
-
-    const sorted =
-        [...works].sort(
-            (a,b) => {
-
-                const idA =
-                    Number(a.id) || 0;
-
-                const idB =
-                    Number(b.id) || 0;
-
-                return idB - idA;
-
-            }
-        );
-
-
-    return sorted[0] || null;
-
-}
-
-
-function usePreviousWork(){
-
-    const previousWork =
-        getPreviousWork();
-
-
-    if(!previousWork){
-
-        alert(
-            "まだ登録済みの作品がありません🥹"
-        );
-
-        return;
-
-    }
-
-
-    editId =
-        null;
-
-
-    if(editIdInput){
-
-        editIdInput.value =
-            "";
-
-    }
-
-
-    selectedPdfFile =
-        null;
-
-
-    workData = {
-
-        ...createEmptyWorkData(),
-
-        title:
-            previousWork.title || "",
-
-        description:
-            previousWork.description || "",
-
-        category:
-            toArray(
-                previousWork.category
-            ),
-
-        fixedTags:
-            toArray(
-                previousWork.fixedTags
-            ),
-
-        freeTags:
-            toArray(
-                previousWork.freeTags
-            ),
-
-        series:
-            previousWork.series || "",
-
-        level:
-            Number(
-                previousWork.level
-            ) || 1,
-
-        size:
-            previousWork.size ||
-            "A4",
-
-        pdf:
-            "",
-
-        thumbnail:
-            "",
-
-        id:
-            null,
-
-        workNo:
-            "",
-
-        publishDate:
-            "",
-
-        updateDate:
-            "",
-
-        recommend:
-            false,
-
-        isNew:
-            true,
-
-        etsy:
-            "",
-
-        related:
-            [],
-
-        author:
-            "あたまのストレッチ",
-
-        status:
-            "public"
-
-    };
-
-
-    const titleInput =
-        document.getElementById(
-            "title"
-        );
-
-    if(titleInput){
-
-        titleInput.value =
-            workData.title;
-
-    }
-
-
-    const descriptionInput =
-        document.getElementById(
-            "description"
-        );
-
-    if(descriptionInput){
-
-        descriptionInput.value =
-            workData.description;
-
-    }
-
-
-    const difficultyInput =
-        document.getElementById(
-            "difficulty"
-        );
-
-    if(difficultyInput){
-
-        difficultyInput.value =
-            String(
-                workData.level
-            );
-
-    }
-
-
-    const sizeInput =
-        document.getElementById(
-            "size"
-        );
-
-    if(sizeInput){
-
-        sizeInput.value =
-            workData.size;
-
-    }
-
-
-    const newFixedTag =
-        document.getElementById(
-            "newFixedTag"
-        );
-
-    if(newFixedTag){
-
-        newFixedTag.value =
-            "";
-
-    }
-
-
-    const newFreeTag =
-        document.getElementById(
-            "newFreeTag"
-        );
-
-    if(newFreeTag){
-
-        newFreeTag.value =
-            "";
-
-    }
-
-
-    const newSeries =
-        document.getElementById(
-            "newSeries"
-        );
-
-    if(newSeries){
-
-        newSeries.value =
-            "";
-
-    }
-
-
-    if(form){
-
-        form
-            .querySelectorAll(
-                'input[type="checkbox"][data-category]'
-            )
-            .forEach(
-                input => {
-
-                    input.checked =
-                        workData.category
-                            .includes(
-                                input.value
-                            );
-
-                }
-            );
-
-    }
-
-
-    if(fixedTagSearch){
-
-        fixedTagSearch.value =
-            "";
-
-    }
-
-    if(freeTagSearch){
-
-        freeTagSearch.value =
-            "";
-
-    }
-
-    if(seriesSearch){
-
-        seriesSearch.value =
-            "";
-
-    }
-
-
-    if(pdfInput){
-
-        pdfInput.value =
-            "";
-
-    }
-
-
-    resetThumbnail();
-
-    renderAllChoices();
-
-
-    if(publishButton){
-
-        publishButton.textContent =
-            "🚀 公開する";
-
-    }
-
-
-    window.scrollTo({
-
-        top:
-            0,
-
-        behavior:
-            "smooth"
-
-    });
-
-
-    setTimeout(
-        () => {
-
-            const titleInput =
-                document.getElementById(
-                    "title"
-                );
-
-            if(titleInput){
-
-                titleInput.focus();
-
-                titleInput.select();
-
-            }
-
-        },
-        400
-    );
-
-}
-
-
-if(usePreviousDataButton){
-
-    usePreviousDataButton.addEventListener(
-        "click",
-        () => {
-
-            usePreviousWork();
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// 作品番号検索
-// ==================================================
-
-function clearSearchResult(){
-
-    if(!adminSearchResult){
-
-        return;
-
-    }
-
-    adminSearchResult.innerHTML = `
-
-        <p class="admin-search-empty">
-
-            作品番号を入力して検索してください。
-
-        </p>
-
-    `;
-
-}
-
-
-function searchWorkByNumber(){
-
-    if(!adminSearchResult){
-
-        return;
-
-    }
-
-
-    const keyword =
-        String(
-            workNumberSearch?.value || ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    if(!keyword){
-
-        clearSearchResult();
-
-        return;
-
-    }
-
-
-    const work =
-        works.find(
-            item =>
-                String(
-                    item.workNo || ""
-                )
-                    .toLowerCase() ===
-                keyword
-        );
-
-
-    if(!work){
-
-        adminSearchResult.innerHTML = `
-
-            <p class="admin-search-empty">
-
-                「${escapeHtml(keyword)}」の作品は
-                見つかりませんでした🥲
-
-            </p>
-
-        `;
-
-        return;
-
-    }
-
-
-    renderSearchResult(work);
-
-}
-
-
-function renderSearchResult(work){
-
-    if(!adminSearchResult){
-
-        return;
-
-    }
-
-
-    const categories =
-        Array.isArray(
-            work.category
-        )
-            ? work.category.join(
-                " / "
-            )
-            : (
-                work.category ||
-                ""
-            );
-
-
-    const thumbnail =
-        work.thumbnail
-            ? `
-                <img
-                    src="${escapeHtml(
-                        work.thumbnail
-                    )}"
-                    alt="${escapeHtml(
-                        work.title || ""
-                    )}"
-                >
-              `
-            : `
-                <span>
-                    画像なし
-                </span>
-              `;
-
-
-    adminSearchResult.innerHTML = `
-
-        <div class="admin-search-card">
-
-            <div class="admin-search-image">
-
-                ${thumbnail}
-
-            </div>
-
-
-            <div class="admin-search-info">
-
-                <h3>
-                    ${escapeHtml(
-                        work.title || ""
-                    )}
-                </h3>
-
-                <p class="admin-search-workno">
-
-                    作品番号：
-                    <strong>
-                        ${escapeHtml(
-                            work.workNo || ""
-                        )}
-                    </strong>
-
-                </p>
-
-                <p class="admin-search-category">
-
-                    カテゴリ：
-                    ${escapeHtml(
-                        categories
-                    )}
-
-                </p>
-
-                <div class="admin-search-actions">
-
-                    <button
-                        type="button"
-                        class="admin-search-edit"
-                        data-id="${escapeHtml(
-                            work.id
-                        )}"
-                    >
-                        ✏️ 編集
-                    </button>
-
-                    <button
-                        type="button"
-                        class="admin-search-delete"
-                        data-id="${escapeHtml(
-                            work.id
-                        )}"
-                    >
-                        🗑️ 削除
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    const editButton =
-        adminSearchResult.querySelector(
-            ".admin-search-edit"
-        );
-
-
-    if(editButton){
-
-        editButton.addEventListener(
-            "click",
-            () => {
-
-                editWork(
-                    editButton.dataset.id
-                );
-
-            }
-        );
-
-    }
-
-
-    const deleteButton =
-        adminSearchResult.querySelector(
-            ".admin-search-delete"
-        );
-
-
-    if(deleteButton){
-
-        deleteButton.addEventListener(
-            "click",
-            () => {
-
-                deleteWork(
-                    deleteButton.dataset.id
-                );
-
-            }
-        );
-
-    }
-
-}
-
-
-// --------------------------
-// 検索ボタン
-// --------------------------
-
-if(workNumberSearchButton){
-
-    workNumberSearchButton.addEventListener(
-        "click",
-        () => {
-
-            searchWorkByNumber();
-
-        }
-    );
-
-}
-
-
-// --------------------------
-// Enterキー
-// --------------------------
-
-if(workNumberSearch){
-
-    workNumberSearch.addEventListener(
-        "keydown",
-        event => {
-
-            if(
-                event.key ===
-                "Enter"
-            ){
-
-                event.preventDefault();
-
-                searchWorkByNumber();
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// 編集
-// ==================================================
-
-function editWork(id){
-
-    const work =
-        works.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
-
-    if(!work){
-
-        alert(
-            "作品が見つかりません🥲"
-        );
-
-        return;
-
-    }
-
-
-    editId =
-        work.id;
-
-
-    if(editIdInput){
-
-        editIdInput.value =
-            work.id;
-
-    }
-
-
-    workData = {
-
-        ...createEmptyWorkData(),
-
-        ...work,
-
-        category:
-            toArray(
-                work.category
-            ),
-
-        fixedTags:
-            toArray(
-                work.fixedTags
-            ),
-
-        freeTags:
-            toArray(
-                work.freeTags
-            )
-
-    };
-
-
-    selectedPdfFile =
-        null;
-
-
-    document.getElementById(
-        "title"
-    ).value =
-        work.title || "";
-
-
-    document.getElementById(
-        "description"
-    ).value =
-        work.description || "";
-
-
-    document.getElementById(
-        "difficulty"
-    ).value =
-        work.level || 1;
-
-
-    document.getElementById(
-        "size"
-    ).value =
-        work.size || "A4";
-
-
-    document.getElementById(
-        "newFixedTag"
-    ).value =
-        "";
-
-
-    document.getElementById(
-        "newFreeTag"
-    ).value =
-        "";
-
-
-    document.getElementById(
-        "newSeries"
-    ).value =
-        "";
-
-
-    form
-        .querySelectorAll(
-            'input[type="checkbox"][data-category]'
-        )
-        .forEach(
-            input => {
-
-                input.checked =
-                    workData.category
-                        .includes(
-                            input.value
-                        );
-
-            }
-        );
-
-
-    if(fixedTagSearch){
-
-        fixedTagSearch.value =
-            "";
-
-    }
-
-
-    if(freeTagSearch){
-
-        freeTagSearch.value =
-            "";
-
-    }
-
-
-    if(seriesSearch){
-
-        seriesSearch.value =
-            "";
-
-    }
-
-
-    renderAllChoices();
-
-
-    if(work.thumbnail){
-
-        showThumbnail(
-            work.thumbnail
-        );
-
-    }else{
-
-        resetThumbnail();
-
-    }
-
-
-    if(pdfInput){
-
-        pdfInput.value =
-            "";
-
-    }
-
-
-    if(publishButton){
-
-        publishButton.textContent =
-            "🚀 更新する";
-
-    }
-
-
-    window.scrollTo({
-
-        top:
-            0,
-
-        behavior:
-            "smooth"
-
-    });
-
-}
-
-
-// ==================================================
-// 削除
-// ==================================================
-
-function deleteWork(id){
-
-    const work =
-        works.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
-
-    if(!work){
-
-        alert(
-            "作品が見つかりません🥲"
-        );
-
-        return;
-
-    }
-
-
-    const confirmed =
-        confirm(
-            `「${work.title}」\n\n作品番号：${work.workNo}\n\nこの作品を削除しますか？`
-        );
-
-
-    if(!confirmed){
-
-        return;
-
-    }
-
-
-    alert(
-        "削除機能は次の段階でGitHubまで連動させます🙏"
-    );
-
-}
-
-
-// ==================================================
-// フォームリセット
-// ==================================================
-
-function resetForm(){
-
-    if(form){
-
-        form.reset();
-
-    }
-
-
-    editId =
-        null;
-
-
-    selectedPdfFile =
-        null;
-
-
-    workData =
-        createEmptyWorkData();
-
-
-    if(editIdInput){
-
-        editIdInput.value =
-            "";
-
-    }
-
-
-    if(fixedTagSearch){
-
-        fixedTagSearch.value =
-            "";
-
-    }
-
-
-    if(freeTagSearch){
-
-        freeTagSearch.value =
-            "";
-
-    }
-
-
-    if(seriesSearch){
-
-        seriesSearch.value =
-            "";
-
-    }
-
-
-    [
-        "newFixedTagArea",
-        "newFreeTagArea",
-        "newSeriesArea"
-    ]
-        .forEach(
-            id => {
-
-                const area =
-                    document.getElementById(
-                        id
-                    );
-
-                if(area){
-
-                    area.classList.remove(
+                    area.classList.toggle(
                         "open"
                     );
 
                 }
+            );
+
+        }
+
+
+        setupToggle(
+            newFixedTagToggle,
+            newFixedTagArea
+        );
+
+
+        setupToggle(
+            newFreeTagToggle,
+            newFreeTagArea
+        );
+
+
+        setupToggle(
+            newSeriesToggle,
+            newSeriesArea
+        );
+
+
+        fixedTagSearch?.addEventListener(
+            "input",
+            renderFixedTags
+        );
+
+
+        freeTagSearch?.addEventListener(
+            "input",
+            renderFreeTags
+        );
+
+
+        seriesSearch?.addEventListener(
+            "input",
+            renderSeries
+        );
+
+
+        /* ==================================
+           PDF → サムネイル
+           ================================== */
+
+        pdfFileInput?.addEventListener(
+            "change",
+            async function(){
+
+                const file =
+                    pdfFileInput.files?.[0];
+
+
+                if(!file){
+
+                    generatedThumbnailBlob =
+                        null;
+
+                    if(thumbnailPreview){
+
+                        thumbnailPreview.innerHTML =
+                            `
+                            <span>
+                                PDFを選択すると表示されます
+                            </span>
+                            `;
+
+                    }
+
+                    return;
+
+                }
+
+
+                if(
+                    typeof pdfjsLib ===
+                    "undefined"
+                ){
+
+                    alert(
+                        "PDF読み込み機能を準備中です。"
+                    );
+
+                    return;
+
+                }
+
+
+                try{
+
+                    const arrayBuffer =
+                        await file.arrayBuffer();
+
+
+                    const pdf =
+                        await pdfjsLib
+                            .getDocument({
+                                data:
+                                    arrayBuffer
+                            })
+                            .promise;
+
+
+                    const page =
+                        await pdf.getPage(1);
+
+
+                    const viewport =
+                        page.getViewport({
+                            scale:1
+                        });
+
+
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
+
+
+                    const context =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+
+                    const scale =
+                        220 /
+                        viewport.width;
+
+
+                    canvas.width =
+                        220;
+
+                    canvas.height =
+                        viewport.height *
+                        scale;
+
+
+                    const scaledViewport =
+                        page.getViewport({
+                            scale
+                        });
+
+
+                    await page.render({
+
+                        canvasContext:
+                            context,
+
+                        viewport:
+                            scaledViewport
+
+                    }).promise;
+
+
+                    generatedThumbnailBlob =
+                        await new Promise(
+                            function(resolve){
+
+                                canvas.toBlob(
+                                    resolve,
+                                    "image/jpeg",
+                                    0.85
+                                );
+
+                            }
+                        );
+
+
+                    if(thumbnailPreview){
+
+                        const url =
+                            URL.createObjectURL(
+                                generatedThumbnailBlob
+                            );
+
+
+                        thumbnailPreview.innerHTML =
+                            `
+                            <img
+                                src="${url}"
+                                alt="サムネイルプレビュー"
+                            >
+                            `;
+
+                    }
+
+                }catch(error){
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "サムネイルの作成に失敗しました。"
+                    );
+
+                }
 
             }
         );
 
 
-    const newFixedTagToggle =
-        document.getElementById(
-            "newFixedTagToggle"
+        /* ==================================
+           前回データ
+           ================================== */
+
+        usePreviousDataButton?.addEventListener(
+            "click",
+            function(){
+
+                const lastData =
+                    localStorage.getItem(
+                        "projectLibraryLastWork"
+                    );
+
+
+                if(!lastData){
+
+                    alert(
+                        "前回の登録データがありません。"
+                    );
+
+                    return;
+
+                }
+
+
+                try{
+
+                    const data =
+                        JSON.parse(
+                            lastData
+                        );
+
+
+                    titleInput.value =
+                        data.title || "";
+
+
+                    descriptionInput.value =
+                        data.description || "";
+
+
+                    difficultyInput.value =
+                        data.difficulty || "1";
+
+
+                    sizeInput.value =
+                        data.size || "A4";
+
+
+                    categoryInputs.forEach(
+                        function(input){
+
+                            input.checked =
+                                (
+                                    data.category ||
+                                    []
+                                )
+                                .includes(
+                                    input.value
+                                );
+
+                        }
+                    );
+
+
+                    selectedFixedTags =
+                        Array.isArray(
+                            data.fixedTags
+                        )
+                            ? [
+                                ...data.fixedTags
+                            ]
+                            : [];
+
+
+                    selectedFreeTags =
+                        Array.isArray(
+                            data.freeTags
+                        )
+                            ? [
+                                ...data.freeTags
+                            ]
+                            : [];
+
+
+                    selectedSeries =
+                        Array.isArray(
+                            data.series
+                        )
+                            ? [
+                                ...data.series
+                            ]
+                            : [];
+
+
+                    renderFixedTags();
+                    renderFreeTags();
+                    renderSeries();
+
+
+                    alert(
+                        "前回のデータを反映しました😊"
+                    );
+
+                }catch(error){
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "前回データの読み込みに失敗しました。"
+                    );
+
+                }
+
+            }
         );
 
-    if(newFixedTagToggle){
 
-        newFixedTagToggle.textContent =
-            "＋ 新しい固定タグを作る";
+        /* ==================================
+           検索結果クリア
+           ================================== */
 
-    }
+        function clearSearchResult(){
 
-
-    const newFreeTagToggle =
-        document.getElementById(
-            "newFreeTagToggle"
-        );
-
-    if(newFreeTagToggle){
-
-        newFreeTagToggle.textContent =
-            "＋ 新しい自由タグを作る";
-
-    }
+            if(!adminSearchResult){
+                return;
+            }
 
 
-    const newSeriesToggle =
-        document.getElementById(
-            "newSeriesToggle"
-        );
+            adminSearchResult.innerHTML =
+                `
+                <p class="admin-search-empty">
 
-    if(newSeriesToggle){
+                    作品番号の一部または
+                    タイトルの一部を入力して検索してください。
 
-        newSeriesToggle.textContent =
-            "＋ 新しいシリーズを作る";
+                </p>
+                `;
 
-    }
-
-
-    resetThumbnail();
-
-    renderAllChoices();
+        }
 
 
-    if(publishButton){
+        /* ==================================
+           検索結果カード
+           ================================== */
 
-        publishButton.textContent =
-            "🚀 公開する";
+        function createSearchCard(
+            work
+        ){
 
-    }
-
-}
-
-
-// ==================================================
-// 下書き
-// ==================================================
-
-if(draftButton){
-
-    draftButton.addEventListener(
-        "click",
-        () => {
-
-            const data =
-                generateWorkData();
+            const workNo =
+                String(
+                    work.workNo ||
+                    ""
+                ).trim();
 
 
-            if(!data){
+            const title =
+                String(
+                    work.title ||
+                    "無題"
+                );
+
+
+            const category =
+                Array.isArray(
+                    work.category
+                )
+                    ? work.category.join(
+                        " / "
+                    )
+                    : String(
+                        work.category ||
+                        ""
+                    );
+
+
+            const thumbnail =
+                String(
+                    work.thumbnail ||
+                    ""
+                );
+
+
+            return `
+                <article
+                    class="admin-search-card"
+                >
+
+                    <div
+                        class="admin-search-image"
+                    >
+
+                        ${
+                            thumbnail
+                                ? `
+                                    <img
+                                        src="${escapeHtml(thumbnail)}"
+                                        alt="${escapeHtml(title)}"
+                                    >
+                                  `
+                                : `
+                                    <div
+                                        style="
+                                            padding:20px;
+                                            text-align:center;
+                                            color:#999;
+                                            font-size:13px;
+                                        "
+                                    >
+                                        サムネイルなし
+                                    </div>
+                                  `
+                        }
+
+                    </div>
+
+
+                    <div
+                        class="admin-search-info"
+                    >
+
+                        <p
+                            class="admin-search-workno"
+                        >
+
+                            作品番号：
+
+                            <strong>
+                                ${
+                                    escapeHtml(
+                                        workNo ||
+                                        "未登録"
+                                    )
+                                }
+                            </strong>
+
+                        </p>
+
+
+                        <h3>
+                            ${escapeHtml(title)}
+                        </h3>
+
+
+                        <p
+                            class="admin-search-category"
+                        >
+
+                            ${
+                                category
+                                    ? escapeHtml(
+                                        category
+                                    )
+                                    : "カテゴリ未設定"
+                            }
+
+                        </p>
+
+
+                        <div
+                            class="admin-search-actions"
+                        >
+
+                            <button
+                                type="button"
+                                class="admin-search-edit"
+                                data-edit-id="${escapeHtml(
+                                    work.id ||
+                                    work.workId ||
+                                    work.workNo ||
+                                    ""
+                                )}"
+                            >
+                                ✏️ 編集
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="admin-search-delete"
+                                data-delete-id="${escapeHtml(
+                                    work.id ||
+                                    work.workId ||
+                                    work.workNo ||
+                                    ""
+                                )}"
+                            >
+                                🗑️ 削除
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+            `;
+
+        }
+
+
+        /* ==================================
+           検索結果表示
+           ================================== */
+
+        function renderSearchResults(
+            matchedWorks,
+            keyword
+        ){
+
+            if(!adminSearchResult){
+                return;
+            }
+
+
+            if(
+                !matchedWorks ||
+                matchedWorks.length === 0
+            ){
+
+                adminSearchResult.innerHTML =
+                    `
+                    <p class="admin-search-empty">
+
+                        「${escapeHtml(keyword)}」
+                        に一致する作品が見つかりませんでした🥲
+
+                    </p>
+                    `;
 
                 return;
 
             }
 
 
-            data.status =
-                "draft";
+            adminSearchResult.innerHTML =
+                `
+                <p
+                    class="admin-search-count"
+                >
+
+                    検索結果：
+                    ${matchedWorks.length}件
+                    ${
+                        matchedWorks.length >= 3
+                            ? "（最大3件）"
+                            : ""
+                    }
+
+                </p>
+
+                ${
+                    matchedWorks
+                        .map(
+                            createSearchCard
+                        )
+                        .join("")
+                }
+                `;
 
 
-            alert(
-                "下書きデータを作成しました😊\n\n※現在はブラウザ上での準備のみです。GitHubには公開されません。"
+            adminSearchResult
+                .querySelectorAll(
+                    "[data-edit-id]"
+                )
+                .forEach(
+                    function(button){
+
+                        button.addEventListener(
+                            "click",
+                            function(){
+
+                                const id =
+                                    button
+                                        .dataset
+                                        .editId;
+
+
+                                editWork(
+                                    id
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+            adminSearchResult
+                .querySelectorAll(
+                    "[data-delete-id]"
+                )
+                .forEach(
+                    function(button){
+
+                        button.addEventListener(
+                            "click",
+                            function(){
+
+                                const id =
+                                    button
+                                        .dataset
+                                        .deleteId;
+
+
+                                deleteWork(
+                                    id
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /* ==================================
+           作品検索 Version 12.0
+           ================================== */
+
+        function searchWorkByNumber(){
+
+            if(!adminSearchResult){
+                return;
+            }
+
+
+            const keyword =
+                String(
+                    workNumberSearch?.value ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if(!keyword){
+
+                clearSearchResult();
+
+                return;
+
+            }
+
+
+            const matchedWorks =
+                workList
+                    .filter(
+                        function(work){
+
+                            const workNo =
+                                String(
+                                    work.workNo ||
+                                    ""
+                                )
+                                .toLowerCase();
+
+
+                            const title =
+                                String(
+                                    work.title ||
+                                    ""
+                                )
+                                .toLowerCase();
+
+
+                            return (
+                                workNo.includes(
+                                    keyword
+                                )
+                                ||
+                                title.includes(
+                                    keyword
+                                )
+                            );
+
+                        }
+                    )
+                    .slice(
+                        0,
+                        3
+                    );
+
+
+            renderSearchResults(
+                matchedWorks,
+                keyword
             );
 
         }
-    );
-
-}
 
 
-// ==================================================
-// 公開
-// ==================================================
+        workNumberSearchButton?.addEventListener(
+            "click",
+            searchWorkByNumber
+        );
 
-if(publishButton){
 
-    publishButton.addEventListener(
-        "click",
-        event => {
+        workNumberSearch?.addEventListener(
+            "keydown",
+            function(event){
 
-            event.preventDefault();
+                if(
+                    event.key ===
+                    "Enter"
+                ){
 
-            triggerGitHubPublish();
+                    event.preventDefault();
+
+                    searchWorkByNumber();
+
+                }
+
+            }
+        );
+
+
+        /* ==================================
+           編集
+           ================================== */
+
+        function editWork(
+            id
+        ){
+
+            const work =
+                workList.find(
+                    function(item){
+
+                        return (
+                            String(
+                                item.id ||
+                                item.workId ||
+                                item.workNo ||
+                                ""
+                            )
+                            ===
+                            String(id)
+                        );
+
+                    }
+                );
+
+
+            if(!work){
+
+                alert(
+                    "作品データが見つかりません。"
+                );
+
+                return;
+
+            }
+
+
+            titleInput.value =
+                work.title || "";
+
+
+            descriptionInput.value =
+                work.description || "";
+
+
+            difficultyInput.value =
+                work.level || "1";
+
+
+            sizeInput.value =
+                work.size || "A4";
+
+
+            categoryInputs.forEach(
+                function(input){
+
+                    input.checked =
+                        (
+                            Array.isArray(
+                                work.category
+                            )
+                                ? work.category
+                                : [work.category]
+                        )
+                        .includes(
+                            input.value
+                        );
+
+                }
+            );
+
+
+            selectedFixedTags =
+                Array.isArray(
+                    work.fixedTags
+                )
+                    ? [
+                        ...work.fixedTags
+                    ]
+                    : [];
+
+
+            selectedFreeTags =
+                Array.isArray(
+                    work.freeTags
+                )
+                    ? [
+                        ...work.freeTags
+                    ]
+                    : [];
+
+
+            selectedSeries =
+                Array.isArray(
+                    work.series
+                )
+                    ? [
+                        ...work.series
+                    ]
+                    : [];
+
+
+            editIdInput.value =
+                work.id ||
+                work.workId ||
+                work.workNo ||
+                "";
+
+
+            renderFixedTags();
+            renderFreeTags();
+            renderSeries();
+
+
+            window.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
 
         }
-    );
-
-}
 
 
-// ==================================================
-// 初期表示
-// ==================================================
+        /* ==================================
+           削除
+           ================================== */
 
-renderAllChoices();
+        function deleteWork(
+            id
+        ){
 
-clearSearchResult();
+            const work =
+                workList.find(
+                    function(item){
+
+                        return (
+                            String(
+                                item.id ||
+                                item.workId ||
+                                item.workNo ||
+                                ""
+                            )
+                            ===
+                            String(id)
+                        );
+
+                    }
+                );
 
 
-// ==================================================
-// 起動ログ
-// ==================================================
+            if(!work){
 
-console.log(
-    "Project Library admin.js Version 11.0"
+                alert(
+                    "作品データが見つかりません。"
+                );
+
+                return;
+
+            }
+
+
+            const workNo =
+                work.workNo ||
+                "作品番号不明";
+
+
+            const title =
+                work.title ||
+                "無題";
+
+
+            const confirmed =
+                confirm(
+                    `「${title}」\n作品番号：${workNo}\n\nこの作品を削除しますか？`
+                );
+
+
+            if(!confirmed){
+                return;
+            }
+
+
+            alert(
+                "現在は削除確認までの機能です。\n\n実際のGitHub上の作品削除機能は今後追加します。"
+            );
+
+        }
+
+
+        /* ==================================
+           公開
+           ================================== */
+
+        const publishButton =
+            document.querySelector(
+                ".publish"
+            );
+
+
+        publishButton?.addEventListener(
+            "click",
+            async function(){
+
+                if(!form){
+                    return;
+                }
+
+
+                const title =
+                    titleInput.value.trim();
+
+
+                if(!title){
+
+                    alert(
+                        "タイトルを入力してください。"
+                    );
+
+                    return;
+
+                }
+
+
+                const categories =
+                    getSelectedCategories();
+
+
+                if(
+                    categories.length === 0
+                ){
+
+                    alert(
+                        "カテゴリを1つ以上選択してください。"
+                    );
+
+                    return;
+
+                }
+
+
+                const pdfFile =
+                    pdfFileInput
+                        ?.files?.[0];
+
+
+                const editId =
+                    editIdInput.value.trim();
+
+
+                if(
+                    !pdfFile &&
+                    !editId
+                ){
+
+                    alert(
+                        "PDFファイルを選択してください。"
+                    );
+
+                    return;
+
+                }
+
+
+                try{
+
+                    const formData =
+                        new FormData();
+
+
+                    formData.append(
+                        "title",
+                        title
+                    );
+
+
+                    formData.append(
+                        "description",
+                        descriptionInput.value.trim()
+                    );
+
+
+                    formData.append(
+                        "category",
+                        JSON.stringify(
+                            categories
+                        )
+                    );
+
+
+                    formData.append(
+                        "fixedTags",
+                        JSON.stringify(
+                            selectedFixedTags
+                        )
+                    );
+
+
+                    formData.append(
+                        "freeTags",
+                        JSON.stringify(
+                            selectedFreeTags
+                        )
+                    );
+
+
+                    formData.append(
+                        "series",
+                        JSON.stringify(
+                            selectedSeries
+                        )
+                    );
+
+
+                    formData.append(
+                        "level",
+                        difficultyInput.value
+                    );
+
+
+                    formData.append(
+                        "size",
+                        sizeInput.value
+                    );
+
+
+                    formData.append(
+                        "workId",
+                        editId
+                    );
+
+
+                    if(pdfFile){
+
+                        formData.append(
+                            "pdf",
+                            pdfFile
+                        );
+
+                    }
+
+
+                    if(generatedThumbnailBlob){
+
+                        const thumbnailFile =
+                            new File(
+                                [
+                                    generatedThumbnailBlob
+                                ],
+                                "thumbnail.jpg",
+                                {
+                                    type:
+                                        "image/jpeg"
+                                }
+                            );
+
+
+                        formData.append(
+                            "thumbnail",
+                            thumbnailFile
+                        );
+
+                    }
+
+
+                    const response =
+                        await fetch(
+                            "https://project-library-api.saaachi-app.workers.dev",
+                            {
+                                method:
+                                    "POST",
+
+                                body:
+                                    formData
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if(
+                        !response.ok
+                    ){
+
+                        throw new Error(
+                            result?.error ||
+                            "公開に失敗しました。"
+                        );
+
+                    }
+
+
+                    localStorage.setItem(
+                        "projectLibraryLastWork",
+                        JSON.stringify({
+
+                            title,
+
+                            description:
+                                descriptionInput
+                                    .value
+                                    .trim(),
+
+                            category:
+                                categories,
+
+                            fixedTags:
+                                selectedFixedTags,
+
+                            freeTags:
+                                selectedFreeTags,
+
+                            series:
+                                selectedSeries,
+
+                            difficulty:
+                                difficultyInput
+                                    .value,
+
+                            size:
+                                sizeInput
+                                    .value
+
+                        })
+                    );
+
+
+                    alert(
+                        "🚀 公開リクエストを送信しました！\n\nGitHub Actionsが実行されます😊"
+                    );
+
+
+                    form.reset();
+
+
+                    selectedFixedTags =
+                        [];
+
+                    selectedFreeTags =
+                        [];
+
+                    selectedSeries =
+                        [];
+
+
+                    editIdInput.value =
+                        "";
+
+
+                    generatedThumbnailBlob =
+                        null;
+
+
+                    renderFixedTags();
+                    renderFreeTags();
+                    renderSeries();
+
+
+                    if(thumbnailPreview){
+
+                        thumbnailPreview.innerHTML =
+                            `
+                            <span>
+                                PDFを選択すると表示されます
+                            </span>
+                            `;
+
+                    }
+
+
+                }catch(error){
+
+                    console.error(
+                        error
+                    );
+
+
+                    alert(
+                        "公開に失敗しました。\n\n" +
+                        error.message
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* ==================================
+           下書き保存
+           ================================== */
+
+        const draftButton =
+            document.querySelector(
+                ".draft"
+            );
+
+
+        draftButton?.addEventListener(
+            "click",
+            function(){
+
+                const draft = {
+
+                    title:
+                        titleInput.value.trim(),
+
+                    description:
+                        descriptionInput.value.trim(),
+
+                    category:
+                        getSelectedCategories(),
+
+                    fixedTags:
+                        selectedFixedTags,
+
+                    freeTags:
+                        selectedFreeTags,
+
+                    series:
+                        selectedSeries,
+
+                    difficulty:
+                        difficultyInput.value,
+
+                    size:
+                        sizeInput.value
+
+                };
+
+
+                localStorage.setItem(
+                    "projectLibraryDraft",
+                    JSON.stringify(
+                        draft
+                    )
+                );
+
+
+                alert(
+                    "下書きを保存しました😊"
+                );
+
+            }
+        );
+
+
+        /* ==================================
+           初期表示
+           ================================== */
+
+        renderFixedTags();
+
+        renderFreeTags();
+
+        renderSeries();
+
+        clearSearchResult();
+
+    }
 );
