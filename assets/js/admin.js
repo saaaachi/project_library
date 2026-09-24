@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 12.0
+   Version 12.1
    ====================================== */
 
 
@@ -212,11 +212,14 @@ document.addEventListener(
 
         /* ==================================
            works確認
+           Version 12.1 修正
            ================================== */
 
         const workList =
-            Array.isArray(window.works)
-                ? window.works
+            typeof works !== "undefined"
+            &&
+            Array.isArray(works)
+                ? works
                 : [];
 
 
@@ -1514,7 +1517,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 12.0
+           作品検索 Version 12.1
            ================================== */
 
         function searchWorkByNumber(){
