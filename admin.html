@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
 <meta charset="UTF-8">
+
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
 >
+
 <title>
 管理画面 | Project Library
 </title>
 
+
 <!-- ======================================
      管理画面ログイン確認
      ====================================== -->
+
 <script>
+
 if(
     sessionStorage.getItem("adminLoggedIn")
     !==
     "true"
 ){
+
     location.href =
         "admin-login.html";
+
 }
+
 
 function logout(){
 
@@ -33,21 +42,26 @@ function logout(){
         "admin-login.html";
 
 }
+
 </script>
+
 
 <!-- ======================================
      共通CSS
      ====================================== -->
+
 <link
     rel="stylesheet"
     href="assets/css/style.css"
 >
 
+
 <style>
 
 /* ======================================
-   管理画面 Version 11.0
+   管理画面 Version 12.0
    ====================================== */
+
 
 /* --------------------------------------
    前回データ反映
@@ -57,7 +71,9 @@ function logout(){
 
     width:100%;
     max-width:520px;
+
     margin:0 0 18px;
+
     padding:11px 14px;
 
     border:1px solid #c9dced;
@@ -72,11 +88,13 @@ function logout(){
 
 }
 
+
 .previous-data-button:hover{
 
     background:#edf7ff;
 
 }
+
 
 .previous-data-help{
 
@@ -108,11 +126,13 @@ function logout(){
 
 }
 
+
 .admin-manage-section h2{
 
     margin-top:0;
 
 }
+
 
 .admin-manage-help{
 
@@ -122,9 +142,10 @@ function logout(){
 
     font-size:13px;
 
-    line-height:1.5;
+    line-height:1.6;
 
 }
+
 
 .admin-work-search-row{
 
@@ -135,6 +156,7 @@ function logout(){
     max-width:520px;
 
 }
+
 
 .admin-work-search-input{
 
@@ -155,6 +177,7 @@ function logout(){
 
 }
 
+
 .admin-work-search-button{
 
     flex-shrink:0;
@@ -173,6 +196,7 @@ function logout(){
 
 }
 
+
 .admin-work-search-button:hover{
 
     opacity:.9;
@@ -190,6 +214,18 @@ function logout(){
 
 }
 
+
+.admin-search-count{
+
+    margin:0 0 10px;
+
+    color:#666;
+
+    font-size:13px;
+
+}
+
+
 .admin-search-empty{
 
     padding:15px;
@@ -203,6 +239,7 @@ function logout(){
     font-size:13px;
 
 }
+
 
 .admin-search-card{
 
@@ -221,6 +258,14 @@ function logout(){
 
 }
 
+
+.admin-search-card + .admin-search-card{
+
+    margin-top:12px;
+
+}
+
+
 .admin-search-image{
 
     flex:0 0 150px;
@@ -237,6 +282,7 @@ function logout(){
 
 }
 
+
 .admin-search-image img{
 
     display:block;
@@ -247,6 +293,7 @@ function logout(){
 
 }
 
+
 .admin-search-info{
 
     flex:1;
@@ -254,6 +301,7 @@ function logout(){
     min-width:0;
 
 }
+
 
 .admin-search-info h3{
 
@@ -265,15 +313,44 @@ function logout(){
 
 }
 
+
+/* --------------------------------------
+   作品番号
+   -------------------------------------- */
+
 .admin-search-workno{
 
-    margin:0 0 8px;
+    display:inline-flex;
 
-    color:#666;
+    align-items:center;
+
+    gap:6px;
+
+    margin:0 0 10px;
+
+    padding:7px 10px;
+
+    border-radius:7px;
+
+    background:#eef6ff;
+
+    color:#315f86;
 
     font-size:13px;
 
+    font-weight:600;
+
 }
+
+
+.admin-search-workno strong{
+
+    font-size:15px;
+
+    letter-spacing:.03em;
+
+}
+
 
 .admin-search-category{
 
@@ -287,6 +364,7 @@ function logout(){
 
 }
 
+
 .admin-search-actions{
 
     display:flex;
@@ -296,6 +374,7 @@ function logout(){
     gap:8px;
 
 }
+
 
 .admin-search-actions button{
 
@@ -309,6 +388,7 @@ function logout(){
 
 }
 
+
 .admin-search-edit{
 
     border:1px solid #8db6d8;
@@ -318,6 +398,7 @@ function logout(){
     color:#315f86;
 
 }
+
 
 .admin-search-delete{
 
@@ -347,6 +428,7 @@ function logout(){
 
 }
 
+
 .admin-category-grid label{
 
     display:flex;
@@ -369,6 +451,7 @@ function logout(){
 
 }
 
+
 .admin-category-grid input{
 
     flex-shrink:0;
@@ -388,6 +471,7 @@ function logout(){
 
 }
 
+
 .choice-search{
 
     width:100%;
@@ -405,6 +489,7 @@ function logout(){
     background:#fff;
 
 }
+
 
 .choice-search-icon{
 
@@ -440,6 +525,7 @@ function logout(){
 
 }
 
+
 .selected-choice{
 
     display:inline-flex;
@@ -463,6 +549,7 @@ function logout(){
     line-height:1.3;
 
 }
+
 
 .selected-choice button{
 
@@ -505,6 +592,7 @@ function logout(){
 
 }
 
+
 .choice-button{
 
     border:1px solid #ddd;
@@ -523,11 +611,13 @@ function logout(){
 
 }
 
+
 .choice-button:hover{
 
     background:#f7f7f7;
 
 }
+
 
 .choice-button.selected{
 
@@ -538,6 +628,7 @@ function logout(){
     color:#245a8d;
 
 }
+
 
 .choice-empty{
 
@@ -570,6 +661,7 @@ function logout(){
 
 }
 
+
 .new-choice-area{
 
     display:none;
@@ -578,11 +670,13 @@ function logout(){
 
 }
 
+
 .new-choice-area.open{
 
     display:block;
 
 }
+
 
 .new-choice-area input{
 
@@ -638,6 +732,7 @@ function logout(){
 
 }
 
+
 .admin-thumbnail-preview img{
 
     display:block;
@@ -665,6 +760,7 @@ function logout(){
 
     }
 
+
     .admin-category-grid label{
 
         padding:9px 8px;
@@ -673,11 +769,13 @@ function logout(){
 
     }
 
+
     .choice-results{
 
         max-height:150px;
 
     }
+
 
     .previous-data-button{
 
@@ -685,11 +783,13 @@ function logout(){
 
     }
 
+
     .admin-work-search-row{
 
         flex-direction:column;
 
     }
+
 
     .admin-work-search-button{
 
@@ -697,11 +797,13 @@ function logout(){
 
     }
 
+
     .admin-search-card{
 
         flex-direction:column;
 
     }
+
 
     .admin-search-image{
 
@@ -713,11 +815,13 @@ function logout(){
 
     }
 
+
     .admin-search-info{
 
         width:100%;
 
     }
+
 
     .admin-search-actions button{
 
@@ -728,31 +832,20 @@ function logout(){
 }
 
 </style>
+
 </head>
+
 
 <body>
 
-<!-- ======================================
-     ヘッダー
-     ====================================== -->
+
 <header id="header"></header>
 
-
-<!-- ======================================
-     サイドバー
-     ====================================== -->
 <div id="sidebar"></div>
 
 
-<!-- ======================================
-     メイン
-     ====================================== -->
 <main class="admin-container">
 
-
-<!-- ======================================
-     タイトル・ログアウト
-     ====================================== -->
 
 <div
     style="
@@ -776,6 +869,7 @@ function logout(){
 
     </div>
 
+
     <button
         type="button"
         onclick="logout()"
@@ -786,10 +880,6 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     前回データ反映
-     ====================================== -->
-
 <button
     type="button"
     id="usePreviousDataButton"
@@ -797,6 +887,7 @@ function logout(){
 >
     📋 前回のデータを反映
 </button>
+
 
 <p class="previous-data-help">
 
@@ -806,18 +897,8 @@ function logout(){
 </p>
 
 
-<!-- ======================================
-     作品登録フォーム
-     ====================================== -->
+<form id="workForm">
 
-<form
-    id="workForm"
->
-
-
-<!-- ======================================
-     タイトル
-     ====================================== -->
 
 <div class="admin-form-item">
 
@@ -826,6 +907,7 @@ function logout(){
     >
         タイトル
     </label>
+
 
     <input
         type="text"
@@ -838,10 +920,6 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     PDF
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label
@@ -850,12 +928,14 @@ function logout(){
         PDFファイル
     </label>
 
+
     <input
         type="file"
         id="pdfFile"
         name="pdfFile"
         accept=".pdf,application/pdf"
     >
+
 
     <p class="admin-help-text">
 
@@ -867,15 +947,12 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     サムネイル
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label>
         サムネイル
     </label>
+
 
     <div
         id="thumbnailPreview"
@@ -891,17 +968,15 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     カテゴリ
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label>
         カテゴリ
     </label>
 
+
     <div class="admin-category-grid">
+
 
         <label>
 
@@ -917,6 +992,7 @@ function logout(){
 
         </label>
 
+
         <label>
 
             <input
@@ -930,6 +1006,7 @@ function logout(){
             </span>
 
         </label>
+
 
         <label>
 
@@ -945,6 +1022,7 @@ function logout(){
 
         </label>
 
+
         <label>
 
             <input
@@ -959,7 +1037,9 @@ function logout(){
 
         </label>
 
+
     </div>
+
 
     <p class="admin-help-text">
         複数選択できます。
@@ -968,20 +1048,18 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     固定タグ
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label>
         固定タグ
     </label>
 
+
     <div
         id="fixedTagSelected"
         class="selected-choice-area"
     ></div>
+
 
     <div class="choice-search-wrap">
 
@@ -990,6 +1068,7 @@ function logout(){
         >
             🔎
         </span>
+
 
         <input
             type="text"
@@ -1001,10 +1080,12 @@ function logout(){
 
     </div>
 
+
     <div
         id="fixedTagChoices"
         class="choice-results"
     ></div>
+
 
     <button
         type="button"
@@ -1013,6 +1094,7 @@ function logout(){
     >
         ＋ 新しい固定タグを作る
     </button>
+
 
     <div
         id="newFixedTagArea"
@@ -1026,6 +1108,7 @@ function logout(){
             placeholder="新しい固定タグ"
         >
 
+
         <p class="admin-help-text">
             複数作る場合はカンマ区切り
         </p>
@@ -1035,20 +1118,18 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     自由タグ
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label>
         自由タグ
     </label>
 
+
     <div
         id="freeTagSelected"
         class="selected-choice-area"
     ></div>
+
 
     <div class="choice-search-wrap">
 
@@ -1057,6 +1138,7 @@ function logout(){
         >
             🔎
         </span>
+
 
         <input
             type="text"
@@ -1068,10 +1150,12 @@ function logout(){
 
     </div>
 
+
     <div
         id="freeTagChoices"
         class="choice-results"
     ></div>
+
 
     <button
         type="button"
@@ -1080,6 +1164,7 @@ function logout(){
     >
         ＋ 新しい自由タグを作る
     </button>
+
 
     <div
         id="newFreeTagArea"
@@ -1093,6 +1178,7 @@ function logout(){
             placeholder="新しい自由タグ"
         >
 
+
         <p class="admin-help-text">
             複数作る場合はカンマ区切り
         </p>
@@ -1102,20 +1188,18 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     シリーズ
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label>
         シリーズ
     </label>
 
+
     <div
         id="seriesSelected"
         class="selected-choice-area"
     ></div>
+
 
     <div class="choice-search-wrap">
 
@@ -1124,6 +1208,7 @@ function logout(){
         >
             🔎
         </span>
+
 
         <input
             type="text"
@@ -1135,10 +1220,12 @@ function logout(){
 
     </div>
 
+
     <div
         id="seriesChoices"
         class="choice-results"
     ></div>
+
 
     <button
         type="button"
@@ -1147,6 +1234,7 @@ function logout(){
     >
         ＋ 新しいシリーズを作る
     </button>
+
 
     <div
         id="newSeriesArea"
@@ -1165,10 +1253,6 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     難易度
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label
@@ -1176,6 +1260,7 @@ function logout(){
     >
         難易度
     </label>
+
 
     <select
         id="difficulty"
@@ -1199,10 +1284,6 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     印刷サイズ
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label
@@ -1210,6 +1291,7 @@ function logout(){
     >
         印刷サイズ
     </label>
+
 
     <select
         id="size"
@@ -1229,10 +1311,6 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     説明
-     ====================================== -->
-
 <div class="admin-form-item">
 
     <label
@@ -1240,6 +1318,7 @@ function logout(){
     >
         説明
     </label>
+
 
     <textarea
         id="description"
@@ -1251,22 +1330,15 @@ function logout(){
 </div>
 
 
-<!-- ======================================
-     編集ID
-     ====================================== -->
-
 <input
     type="hidden"
     id="editId"
     name="editId"
 >
 
+
 </form>
 
-
-<!-- ======================================
-     下部操作ボタン
-     ====================================== -->
 
 <div class="admin-bottom-bar">
 
@@ -1276,6 +1348,7 @@ function logout(){
     >
         下書き保存
     </button>
+
 
     <button
         type="button"
@@ -1293,26 +1366,32 @@ function logout(){
 
 <section class="admin-manage-section">
 
+
     <h2>
         🔎 作品を管理
     </h2>
 
+
     <p class="admin-manage-help">
 
-        作品番号を入力すると、
-        登録済み作品を確認できます。
+        作品番号の一部（例：123）または
+        タイトルの一部で検索できます。
+        最大3件まで表示します。
 
     </p>
 
+
     <div class="admin-work-search-row">
+
 
         <input
             type="text"
             id="workNumberSearch"
             class="admin-work-search-input"
-            placeholder="例：PL-000001"
+            placeholder="例：123 / 消防車"
             autocomplete="off"
         >
+
 
         <button
             type="button"
@@ -1322,20 +1401,26 @@ function logout(){
             🔎 検索
         </button>
 
+
     </div>
+
 
     <div
         id="adminSearchResult"
         class="admin-search-result"
     >
 
+
         <p class="admin-search-empty">
 
-            作品番号を入力して検索してください。
+            作品番号の一部または
+            タイトルの一部を入力して検索してください。
 
         </p>
 
+
     </div>
+
 
 </section>
 
@@ -1343,38 +1428,23 @@ function logout(){
 </main>
 
 
-<!-- ======================================
-     フッター
-     ====================================== -->
-
 <footer id="footer"></footer>
 
-
-<!-- ======================================
-     共通JS
-     ====================================== -->
 
 <script
     src="assets/js/common.js"
 ></script>
 
 
-<!-- ======================================
-     作品データ
-     ====================================== -->
-
 <script
     src="assets/data/works.js"
 ></script>
 
 
-<!-- ======================================
-     管理画面JS
-     ====================================== -->
-
 <script
     src="assets/js/admin.js"
 ></script>
+
 
 </body>
 </html>
