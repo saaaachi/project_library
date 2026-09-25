@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 12.1
+   Version 12.2
    ====================================== */
 
 
@@ -212,7 +212,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 12.1 修正
+           Version 12.2
            ================================== */
 
         const workList =
@@ -221,6 +221,14 @@ document.addEventListener(
             Array.isArray(works)
                 ? works
                 : [];
+
+
+        /* ==================================
+           API URL
+           ================================== */
+
+        const API_URL =
+            "https://project-library-api.saaachi-app.workers.dev";
 
 
         /* ==================================
@@ -1517,7 +1525,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 12.1
+           作品検索 Version 12.2
            ================================== */
 
         function searchWorkByNumber(){
@@ -1742,9 +1750,10 @@ document.addEventListener(
 
         /* ==================================
            削除
+           Version 12.2
            ================================== */
 
-        function deleteWork(
+        async function deleteWork(
             id
         ){
 
@@ -1778,30 +1787,201 @@ document.addEventListener(
             }
 
 
+            const workId =
+                String(
+                    work.id ||
+                    work.workId ||
+                    ""
+                );
+
+
             const workNo =
-                work.workNo ||
-                "作品番号不明";
+                String(
+                    work.workNo ||
+                    "作品番号不明"
+                );
 
 
             const title =
-                work.title ||
-                "無題";
+                String(
+                    work.title ||
+                    "無題"
+                );
 
+
+            /* ----------------------------------
+               最終確認
+               ---------------------------------- */
 
             const confirmed =
                 confirm(
-                    `「${title}」\n作品番号：${workNo}\n\nこの作品を削除しますか？`
+                    `⚠️ 作品を削除します\n\n` +
+                    `「${title}」\n` +
+                    `作品番号：${workNo}\n\n` +
+                    `PDF・サムネイル・作品情報が` +
+                    `GitHubから削除されます。\n\n` +
+                    `本当に削除しますか？`
                 );
 
 
             if(!confirmed){
+
                 return;
+
             }
 
 
-            alert(
-                "現在は削除確認までの機能です。\n\n実際のGitHub上の作品削除機能は今後追加します。"
-            );
+            /* ----------------------------------
+               削除ボタン取得
+               ---------------------------------- */
+
+            const deleteButtons =
+                adminSearchResult
+                    ?.querySelectorAll(
+                        ".admin-search-delete"
+                    );
+
+
+            /* ----------------------------------
+               二重送信防止
+               ---------------------------------- */
+
+            if(deleteButtons){
+
+                deleteButtons.forEach(
+                    function(button){
+
+                        button.disabled =
+                            true;
+
+                        button.textContent =
+                            "⏳ 削除中...";
+
+                    }
+                );
+
+            }
+
+
+            try{
+
+                /* ------------------------------
+                   FormData
+                   ------------------------------ */
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "action",
+                    "delete"
+                );
+
+
+                formData.append(
+                    "workId",
+                    workId
+                );
+
+
+                formData.append(
+                    "workNo",
+                    workNo
+                );
+
+
+                formData.append(
+                    "title",
+                    title
+                );
+
+
+                /* ------------------------------
+                   Cloudflare API
+                   ------------------------------ */
+
+                const response =
+                    await fetch(
+                        API_URL,
+                        {
+                            method:
+                                "POST",
+
+                            body:
+                                formData
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                /* ------------------------------
+                   エラー
+                   ------------------------------ */
+
+                if(
+                    !response.ok ||
+                    !result.success
+                ){
+
+                    throw new Error(
+                        result?.error ||
+                        "削除リクエストの送信に失敗しました。"
+                    );
+
+                }
+
+
+                /* ------------------------------
+                   成功
+                   ------------------------------ */
+
+                alert(
+                    "🗑️ 削除リクエストを送信しました！\n\n" +
+                    `「${title}」\n` +
+                    `作品番号：${workNo}\n\n` +
+                    "GitHub Actionsで削除処理が実行されます😊\n\n" +
+                    "処理完了後、ページを更新すると作品が消えます。"
+                );
+
+
+            }catch(error){
+
+                console.error(
+                    error
+                );
+
+
+                alert(
+                    "削除に失敗しました。\n\n" +
+                    error.message
+                );
+
+
+                /* ------------------------------
+                   エラー時はボタンを戻す
+                   ------------------------------ */
+
+                if(deleteButtons){
+
+                    deleteButtons.forEach(
+                        function(button){
+
+                            button.disabled =
+                                false;
+
+                            button.textContent =
+                                "🗑️ 削除";
+
+                        }
+                    );
+
+                }
+
+            }
 
         }
 
@@ -1983,7 +2163,7 @@ document.addEventListener(
 
                     const response =
                         await fetch(
-                            "https://project-library-api.saaachi-app.workers.dev",
+                            API_URL,
                             {
                                 method:
                                     "POST",
