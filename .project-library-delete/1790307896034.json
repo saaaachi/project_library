@@ -1,0 +1,10 @@
+{
+  "version": "8.3",
+  "action": "delete",
+  "deleteId": "1790307896034",
+  "workId": "3",
+  "workNo": "PL-000003",
+  "title": "テスト",
+  "requestedAt": "2026-09-25",
+  "status": "delete_requested"
+}
