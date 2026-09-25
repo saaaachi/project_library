@@ -68,33 +68,6 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
-    },
-    {
-        "id": 3,
-        "workNo": "PL-000003",
-        "title": "テスト",
-        "category": [
-            "幼児向け"
-        ],
-        "fixedTags": [],
-        "freeTags": [],
-        "series": "",
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "",
-        "thumbnail": "assets/images/thumbnail/テスト_1789976514284.jpg",
-        "pdf": "assets/pdf/テスト_1789976514284.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-21",
-        "updateDate": "2026-09-21",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
     }
 ];
 
