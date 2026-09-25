@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 12.2
+   Version 12.3
    ====================================== */
 
 
@@ -212,7 +212,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 12.2
+           Version 12.3
            ================================== */
 
         const workList =
@@ -1525,7 +1525,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 12.2
+           作品検索 Version 12.3
            ================================== */
 
         function searchWorkByNumber(){
@@ -1750,7 +1750,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 12.2
+           Version 12.3
            ================================== */
 
         async function deleteWork(
@@ -1920,7 +1920,7 @@ document.addEventListener(
 
                 /* ------------------------------
                    エラー
-                   ------------------------------ */
+                   -------------------------------- */
 
                 if(
                     !response.ok ||
@@ -1937,7 +1937,30 @@ document.addEventListener(
 
                 /* ------------------------------
                    成功
-                   ------------------------------ */
+                   -------------------------------- */
+
+                if(deleteButtons){
+
+                    deleteButtons.forEach(
+                        function(button){
+
+                            button.disabled =
+                                false;
+
+                            button.textContent =
+                                "🗑️ 削除";
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * GitHub Actionsはバックグラウンドで
+                 * 削除処理を続行するため、
+                 * 管理画面ではここで待機を終了する。
+                 */
 
                 alert(
                     "🗑️ 削除リクエストを送信しました！\n\n" +
