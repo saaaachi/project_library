@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 12.3
+   Version 13.0
    ====================================== */
 
 
@@ -211,8 +211,16 @@ document.addEventListener(
 
 
         /* ==================================
+           PDF.js読み込み状態
+           ================================== */
+
+        let pdfJsLoadingPromise =
+            null;
+
+
+        /* ==================================
            works確認
-           Version 12.3
+           Version 13.0
            ================================== */
 
         const workList =
@@ -555,7 +563,18 @@ document.addEventListener(
                             renderSelectedChoices(
                                 fixedTagSelected,
                                 selectedFixedTags,
-                                arguments.callee
+                                function(removeItem){
+
+                                    selectedFixedTags =
+                                        selectedFixedTags
+                                            .filter(
+                                                tag =>
+                                                    tag !== removeItem
+                                            );
+
+                                    renderFixedTags();
+
+                                }
                             );
 
                         }
@@ -578,29 +597,6 @@ document.addEventListener(
                             );
 
                     renderFixedTags();
-
-                    renderSelectedChoices(
-                        fixedTagSelected,
-                        selectedFixedTags,
-                        function(removeItem){
-
-                            selectedFixedTags =
-                                selectedFixedTags
-                                    .filter(
-                                        tag =>
-                                            tag !== removeItem
-                                    );
-
-                            renderFixedTags();
-
-                            renderSelectedChoices(
-                                fixedTagSelected,
-                                selectedFixedTags,
-                                arguments.callee
-                            );
-
-                        }
-                    );
 
                 }
             );
@@ -942,7 +938,273 @@ document.addEventListener(
 
 
         /* ==================================
+           PDF.jsを動的読み込み
+           ================================== */
+
+        function loadPdfJs(){
+
+            if(
+                typeof pdfjsLib !==
+                "undefined"
+            ){
+
+                return Promise.resolve(
+                    pdfjsLib
+                );
+
+            }
+
+
+            if(
+                pdfJsLoadingPromise
+            ){
+
+                return pdfJsLoadingPromise;
+
+            }
+
+
+            pdfJsLoadingPromise =
+                new Promise(
+                    function(resolve, reject){
+
+                        const script =
+                            document.createElement(
+                                "script"
+                            );
+
+
+                        script.src =
+                            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+
+
+                        script.async =
+                            true;
+
+
+                        script.onload =
+                            function(){
+
+                                if(
+                                    typeof pdfjsLib ===
+                                    "undefined"
+                                ){
+
+                                    reject(
+                                        new Error(
+                                            "PDF.jsの読み込みに失敗しました。"
+                                        )
+                                    );
+
+                                    return;
+
+                                }
+
+
+                                pdfjsLib
+                                    .GlobalWorkerOptions
+                                    .workerSrc =
+                                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+                                resolve(
+                                    pdfjsLib
+                                );
+
+                            };
+
+
+                        script.onerror =
+                            function(){
+
+                                reject(
+                                    new Error(
+                                        "PDF.jsを読み込めませんでした。"
+                                    )
+                                );
+
+                            };
+
+
+                        document.head.appendChild(
+                            script
+                        );
+
+                    }
+                );
+
+
+            return pdfJsLoadingPromise;
+
+        }
+
+
+        /* ==================================
+           全体透かし描画
+           ================================== */
+
+        function drawWatermark(
+            context,
+            width,
+            height
+        ){
+
+            context.save();
+
+
+            /*
+             * 元画像を見やすくするため、
+             * かなり薄い透かしにする。
+             */
+
+            context.globalAlpha =
+                0.13;
+
+
+            context.fillStyle =
+                "#555";
+
+
+            context.font =
+                "bold 13px Arial, sans-serif";
+
+
+            context.textAlign =
+                "center";
+
+
+            context.textBaseline =
+                "middle";
+
+
+            /*
+             * 斜め方向に回転して、
+             * ページ全体へ繰り返し配置する。
+             */
+
+            const diagonal =
+                Math.sqrt(
+                    width * width +
+                    height * height
+                );
+
+
+            context.translate(
+                width / 2,
+                height / 2
+            );
+
+
+            context.rotate(
+                -25 *
+                Math.PI /
+                180
+            );
+
+
+            const spacingX =
+                125;
+
+
+            const spacingY =
+                75;
+
+
+            for(
+                let y =
+                    -diagonal;
+
+                y <=
+                    diagonal;
+
+                y +=
+                    spacingY
+            ){
+
+                for(
+                    let x =
+                        -diagonal;
+
+                    x <=
+                        diagonal;
+
+                    x +=
+                        spacingX
+                ){
+
+                    context.fillText(
+                        "Project Library",
+                        x,
+                        y
+                    );
+
+                }
+
+            }
+
+
+            /*
+             * ブランド名もページ全体に
+             * 薄く入れる。
+             */
+
+            context.globalAlpha =
+                0.10;
+
+
+            context.font =
+                "11px Arial, sans-serif";
+
+
+            const secondSpacingX =
+                170;
+
+
+            const secondSpacingY =
+                110;
+
+
+            for(
+                let y =
+                    -diagonal;
+
+                y <=
+                    diagonal;
+
+                y +=
+                    secondSpacingY
+            ){
+
+                for(
+                    let x =
+                        -diagonal;
+
+                    x <=
+                        diagonal;
+
+                    x +=
+                        secondSpacingX
+                ){
+
+                    context.fillText(
+                        "© あたまのストレッチ",
+                        x + 40,
+                        y + 35
+                    );
+
+                }
+
+            }
+
+
+            context.restore();
+
+        }
+
+
+        /* ==================================
            PDF → サムネイル
+           Version 13.0
            ================================== */
 
         pdfFileInput?.addEventListener(
@@ -975,12 +1237,48 @@ document.addEventListener(
 
 
                 if(
-                    typeof pdfjsLib ===
-                    "undefined"
+                    file.type !==
+                    "application/pdf"
+                    &&
+                    !file.name
+                        .toLowerCase()
+                        .endsWith(
+                            ".pdf"
+                        )
                 ){
 
                     alert(
-                        "PDF読み込み機能を準備中です。"
+                        "PDFファイルを選択してください。"
+                    );
+
+                    pdfFileInput.value =
+                        "";
+
+                    generatedThumbnailBlob =
+                        null;
+
+                    return;
+
+                }
+
+
+                /*
+                 * PDF.jsを読み込む
+                 */
+
+                try{
+
+                    await loadPdfJs();
+
+                }catch(error){
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "PDF読み込み機能の準備に失敗しました。\n\n" +
+                        "ページを更新して、もう一度お試しください。"
                     );
 
                     return;
@@ -989,6 +1287,18 @@ document.addEventListener(
 
 
                 try{
+
+                    if(thumbnailPreview){
+
+                        thumbnailPreview.innerHTML =
+                            `
+                            <span>
+                                サムネイルを作成中…⏳
+                            </span>
+                            `;
+
+                    }
+
 
                     const arrayBuffer =
                         await file.arrayBuffer();
@@ -1004,7 +1314,9 @@ document.addEventListener(
 
 
                     const page =
-                        await pdf.getPage(1);
+                        await pdf.getPage(
+                            1
+                        );
 
 
                     const viewport =
@@ -1025,17 +1337,26 @@ document.addEventListener(
                         );
 
 
+                    if(!context){
+
+                        throw new Error(
+                            "Canvasを利用できません。"
+                        );
+
+                    }
+
+
+                    /*
+                     * サムネイル幅
+                     */
+
+                    const thumbnailWidth =
+                        500;
+
+
                     const scale =
-                        220 /
+                        thumbnailWidth /
                         viewport.width;
-
-
-                    canvas.width =
-                        220;
-
-                    canvas.height =
-                        viewport.height *
-                        scale;
 
 
                     const scaledViewport =
@@ -1043,6 +1364,22 @@ document.addEventListener(
                             scale
                         });
 
+
+                    canvas.width =
+                        Math.ceil(
+                            scaledViewport.width
+                        );
+
+
+                    canvas.height =
+                        Math.ceil(
+                            scaledViewport.height
+                        );
+
+
+                    /*
+                     * PDFページを描画
+                     */
 
                     await page.render({
 
@@ -1055,18 +1392,51 @@ document.addEventListener(
                     }).promise;
 
 
+                    /*
+                     * PDF画像の上に
+                     * 全体透かしを描画
+                     */
+
+                    drawWatermark(
+                        context,
+                        canvas.width,
+                        canvas.height
+                    );
+
+
+                    /*
+                     * JPEG化
+                     */
+
                     generatedThumbnailBlob =
                         await new Promise(
                             function(resolve){
 
                                 canvas.toBlob(
-                                    resolve,
+                                    function(blob){
+
+                                        resolve(
+                                            blob
+                                        );
+
+                                    },
                                     "image/jpeg",
-                                    0.85
+                                    0.88
                                 );
 
                             }
                         );
+
+
+                    if(
+                        !generatedThumbnailBlob
+                    ){
+
+                        throw new Error(
+                            "サムネイル画像の作成に失敗しました。"
+                        );
+
+                    }
 
 
                     if(thumbnailPreview){
@@ -1087,14 +1457,33 @@ document.addEventListener(
 
                     }
 
+
                 }catch(error){
 
                     console.error(
                         error
                     );
 
+
+                    generatedThumbnailBlob =
+                        null;
+
+
+                    if(thumbnailPreview){
+
+                        thumbnailPreview.innerHTML =
+                            `
+                            <span>
+                                サムネイルを作成できませんでした
+                            </span>
+                            `;
+
+                    }
+
+
                     alert(
-                        "サムネイルの作成に失敗しました。"
+                        "サムネイルの作成に失敗しました。\n\n" +
+                        error.message
                     );
 
                 }
@@ -1199,7 +1588,9 @@ document.addEventListener(
 
 
                     renderFixedTags();
+
                     renderFreeTags();
+
                     renderSeries();
 
 
@@ -1212,6 +1603,7 @@ document.addEventListener(
                     console.error(
                         error
                     );
+
 
                     alert(
                         "前回データの読み込みに失敗しました。"
@@ -1525,7 +1917,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 12.3
+           作品検索 Version 13.0
            ================================== */
 
         function searchWorkByNumber(){
@@ -1736,7 +2128,9 @@ document.addEventListener(
 
 
             renderFixedTags();
+
             renderFreeTags();
+
             renderSeries();
 
 
@@ -1750,7 +2144,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 12.3
+           Version 13.0
            ================================== */
 
         async function deleteWork(
@@ -1809,10 +2203,6 @@ document.addEventListener(
                 );
 
 
-            /* ----------------------------------
-               最終確認
-               ---------------------------------- */
-
             const confirmed =
                 confirm(
                     `⚠️ 作品を削除します\n\n` +
@@ -1831,20 +2221,12 @@ document.addEventListener(
             }
 
 
-            /* ----------------------------------
-               削除ボタン取得
-               ---------------------------------- */
-
             const deleteButtons =
                 adminSearchResult
                     ?.querySelectorAll(
                         ".admin-search-delete"
                     );
 
-
-            /* ----------------------------------
-               二重送信防止
-               ---------------------------------- */
 
             if(deleteButtons){
 
@@ -1864,10 +2246,6 @@ document.addEventListener(
 
 
             try{
-
-                /* ------------------------------
-                   FormData
-                   ------------------------------ */
 
                 const formData =
                     new FormData();
@@ -1897,10 +2275,6 @@ document.addEventListener(
                 );
 
 
-                /* ------------------------------
-                   Cloudflare API
-                   ------------------------------ */
-
                 const response =
                     await fetch(
                         API_URL,
@@ -1918,10 +2292,6 @@ document.addEventListener(
                     await response.json();
 
 
-                /* ------------------------------
-                   エラー
-                   -------------------------------- */
-
                 if(
                     !response.ok ||
                     !result.success
@@ -1934,10 +2304,6 @@ document.addEventListener(
 
                 }
 
-
-                /* ------------------------------
-                   成功
-                   -------------------------------- */
 
                 if(deleteButtons){
 
@@ -1955,12 +2321,6 @@ document.addEventListener(
 
                 }
 
-
-                /*
-                 * GitHub Actionsはバックグラウンドで
-                 * 削除処理を続行するため、
-                 * 管理画面ではここで待機を終了する。
-                 */
 
                 alert(
                     "🗑️ 削除リクエストを送信しました！\n\n" +
@@ -1983,10 +2343,6 @@ document.addEventListener(
                     error.message
                 );
 
-
-                /* ------------------------------
-                   エラー時はボタンを戻す
-                   ------------------------------ */
 
                 if(deleteButtons){
 
@@ -2275,7 +2631,9 @@ document.addEventListener(
 
 
                     renderFixedTags();
+
                     renderFreeTags();
+
                     renderSeries();
 
 
