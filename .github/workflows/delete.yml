@@ -1,0 +1,816 @@
+# ======================================
+# Project Library
+# Delete Workflow
+# Version 1.0
+# ======================================
+
+name: Project Library Delete
+
+on:
+
+  workflow_dispatch:
+
+    inputs:
+
+      deleteId:
+        description: "削除依頼ID"
+        required: true
+        type: string
+
+      workId:
+        description: "削除対象作品ID"
+        required: true
+        type: string
+
+
+# --------------------------------------
+# 同時実行防止
+# --------------------------------------
+
+concurrency:
+
+  group: project-library-publish
+
+  cancel-in-progress: false
+
+
+# --------------------------------------
+# Permissions
+# --------------------------------------
+
+permissions:
+
+  contents: write
+
+
+# ======================================
+# JOB
+# ======================================
+
+jobs:
+
+  delete:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+
+      # ----------------------------------
+      # Checkout
+      # ----------------------------------
+
+      - name:
+          Checkout repository
+
+        uses:
+          actions/checkout@v4
+
+        with:
+
+          ref:
+            main
+
+          fetch-depth:
+            0
+
+
+      # ----------------------------------
+      # 基本情報確認
+      # ----------------------------------
+
+      - name:
+          Check delete request
+
+        run:
+          |
+            echo "======================================"
+            echo "Project Library Delete"
+            echo "Version 1.0"
+            echo "======================================"
+
+            echo "deleteId: ${{ inputs.deleteId }}"
+            echo "workId:   ${{ inputs.workId }}"
+
+            echo ""
+
+
+      # ----------------------------------
+      # 削除対象確認
+      # ----------------------------------
+
+      - name:
+          Find target work
+
+        env:
+
+          WORK_ID:
+            ${{ inputs.workId }}
+
+          DELETE_ID:
+            ${{ inputs.deleteId }}
+
+        run:
+          |
+            node <<'NODE'
+
+            const fs = require("fs");
+
+
+            // ----------------------------------
+            // パス
+            // ----------------------------------
+
+            const worksPath =
+              "assets/data/works.js";
+
+
+            const deleteRequestPath =
+              `.project-library-delete/${process.env.DELETE_ID}.json`;
+
+
+            // ----------------------------------
+            // works.js読み込み
+            // ----------------------------------
+
+            if (!fs.existsSync(worksPath)) {
+
+              console.error(
+                "works.js が見つかりません。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const source =
+              fs.readFileSync(
+                worksPath,
+                "utf8"
+              );
+
+
+            // ----------------------------------
+            // works配列部分を取得
+            // ----------------------------------
+
+            const startMarker =
+              "const works = ";
+
+
+            const startIndex =
+              source.indexOf(startMarker);
+
+
+            if (startIndex === -1) {
+
+              console.error(
+                "works 配列が見つかりません。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const arrayStart =
+              startIndex + startMarker.length;
+
+
+            const arrayEnd =
+              source.indexOf(
+                "];",
+                arrayStart
+              );
+
+
+            if (arrayEnd === -1) {
+
+              console.error(
+                "works 配列の終了位置が見つかりません。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const arrayText =
+              source
+                .slice(
+                  arrayStart,
+                  arrayEnd + 1
+                )
+                .trim();
+
+
+            // ----------------------------------
+            // JSONとして読み込み
+            // ----------------------------------
+
+            let works;
+
+
+            try {
+
+              works =
+                JSON.parse(arrayText);
+
+            } catch (error) {
+
+              console.error(
+                "works.js の作品データを読み込めませんでした。"
+              );
+
+              console.error(error);
+
+              process.exit(1);
+
+            }
+
+
+            // ----------------------------------
+            // 対象作品検索
+            // ----------------------------------
+
+            const workId =
+              String(
+                process.env.WORK_ID
+              );
+
+
+            const targetIndex =
+              works.findIndex(
+                work =>
+                  String(work.id) === workId
+              );
+
+
+            // ----------------------------------
+            // 対象作品がない場合
+            // ----------------------------------
+
+            if (targetIndex === -1) {
+
+              console.error(
+                `作品ID ${workId} が works.js に存在しません。`
+              );
+
+              console.error(
+                "削除処理を中止します。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const target =
+              works[targetIndex];
+
+
+            // ----------------------------------
+            // 対象情報表示
+            // ----------------------------------
+
+            console.log(
+              "削除対象作品を確認しました。"
+            );
+
+            console.log(
+              `作品ID：${target.id}`
+            );
+
+            console.log(
+              `作品番号：${target.workNo || ""}`
+            );
+
+            console.log(
+              `タイトル：${target.title || ""}`
+            );
+
+            console.log(
+              `PDF：${target.pdf || ""}`
+            );
+
+            console.log(
+              `サムネイル：${target.thumbnail || ""}`
+            );
+
+
+            // ----------------------------------
+            // PDFパス確認
+            // ----------------------------------
+
+            if (
+              typeof target.pdf !== "string" ||
+              !target.pdf.startsWith(
+                "assets/pdf/"
+              )
+            ) {
+
+              console.error(
+                "安全確認：PDFパスが不正です。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            // ----------------------------------
+            // サムネイルパス確認
+            // ----------------------------------
+
+            if (
+              typeof target.thumbnail !== "string" ||
+              !target.thumbnail.startsWith(
+                "assets/images/thumbnail/"
+              )
+            ) {
+
+              console.error(
+                "安全確認：サムネイルパスが不正です。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            // ----------------------------------
+            // 削除対象情報を保存
+            // ----------------------------------
+
+            const targetInfo = {
+
+              id:
+                target.id,
+
+              workNo:
+                target.workNo || "",
+
+              title:
+                target.title || "",
+
+              pdf:
+                target.pdf,
+
+              thumbnail:
+                target.thumbnail,
+
+              deleteRequest:
+                deleteRequestPath
+
+            };
+
+
+            fs.writeFileSync(
+
+              ".delete-target.json",
+
+              JSON.stringify(
+                targetInfo,
+                null,
+                2
+              ),
+
+              "utf8"
+
+            );
+
+
+            console.log(
+              "削除対象情報を確認しました。"
+            );
+
+            NODE
+
+
+      # ----------------------------------
+      # 削除対象情報表示
+      # ----------------------------------
+
+      - name:
+          Show delete target
+
+        run:
+          |
+            echo "======================================"
+            echo "削除対象"
+            echo "======================================"
+
+            cat .delete-target.json
+
+            echo ""
+
+
+      # ----------------------------------
+      # ファイル削除
+      # ----------------------------------
+
+      - name:
+          Delete PDF thumbnail and request
+
+        run:
+          |
+            node <<'NODE'
+
+            const fs = require("fs");
+
+
+            // ----------------------------------
+            // 削除対象情報
+            // ----------------------------------
+
+            const target =
+              JSON.parse(
+                fs.readFileSync(
+                  ".delete-target.json",
+                  "utf8"
+                )
+              );
+
+
+            // ----------------------------------
+            // 削除関数
+            // ----------------------------------
+
+            function removeFile(path) {
+
+              if (
+                !fs.existsSync(path)
+              ) {
+
+                console.log(
+                  `ファイルが存在しないためスキップ：${path}`
+                );
+
+                return;
+
+              }
+
+
+              fs.unlinkSync(path);
+
+
+              console.log(
+                `削除しました：${path}`
+              );
+
+            }
+
+
+            // ----------------------------------
+            // PDF削除
+            // ----------------------------------
+
+            removeFile(
+              target.pdf
+            );
+
+
+            // ----------------------------------
+            // サムネイル削除
+            // ----------------------------------
+
+            removeFile(
+              target.thumbnail
+            );
+
+
+            // ----------------------------------
+            // 削除依頼JSON削除
+            // ----------------------------------
+
+            removeFile(
+              target.deleteRequest
+            );
+
+
+            console.log(
+              "PDF・サムネイル・削除依頼JSONの削除が完了しました。"
+            );
+
+            NODE
+
+
+      # ----------------------------------
+      # works.js更新
+      # ----------------------------------
+
+      - name:
+          Update works.js
+
+        env:
+
+          WORK_ID:
+            ${{ inputs.workId }}
+
+        run:
+          |
+            node <<'NODE'
+
+            const fs = require("fs");
+
+
+            // ----------------------------------
+            // ファイル
+            // ----------------------------------
+
+            const worksPath =
+              "assets/data/works.js";
+
+
+            // ----------------------------------
+            // 読み込み
+            // ----------------------------------
+
+            const source =
+              fs.readFileSync(
+                worksPath,
+                "utf8"
+              );
+
+
+            // ----------------------------------
+            // works配列位置
+            // ----------------------------------
+
+            const startMarker =
+              "const works = ";
+
+
+            const startIndex =
+              source.indexOf(
+                startMarker
+              );
+
+
+            if (
+              startIndex === -1
+            ) {
+
+              console.error(
+                "works 配列が見つかりません。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const arrayStart =
+              startIndex +
+              startMarker.length;
+
+
+            const arrayEnd =
+              source.indexOf(
+                "];",
+                arrayStart
+              );
+
+
+            if (
+              arrayEnd === -1
+            ) {
+
+              console.error(
+                "works 配列の終了位置が見つかりません。"
+              );
+
+              process.exit(1);
+
+            }
+
+
+            // ----------------------------------
+            // JSON部分
+            // ----------------------------------
+
+            const arrayText =
+              source
+                .slice(
+                  arrayStart,
+                  arrayEnd + 1
+                )
+                .trim();
+
+
+            let works;
+
+
+            try {
+
+              works =
+                JSON.parse(
+                  arrayText
+                );
+
+            } catch (error) {
+
+              console.error(
+                "works.js の読み込みに失敗しました。"
+              );
+
+              console.error(error);
+
+              process.exit(1);
+
+            }
+
+
+            // ----------------------------------
+            // 対象検索
+            // ----------------------------------
+
+            const workId =
+              String(
+                process.env.WORK_ID
+              );
+
+
+            const targetIndex =
+              works.findIndex(
+                work =>
+                  String(work.id) === workId
+              );
+
+
+            if (
+              targetIndex === -1
+            ) {
+
+              console.error(
+                `作品ID ${workId} が見つかりません。`
+              );
+
+              process.exit(1);
+
+            }
+
+
+            const target =
+              works[targetIndex];
+
+
+            console.log(
+              `works.js から削除：${target.title}`
+            );
+
+
+            // ----------------------------------
+            // 作品削除
+            // ----------------------------------
+
+            works.splice(
+              targetIndex,
+              1
+            );
+
+
+            // ----------------------------------
+            // works.js再生成
+            // ----------------------------------
+
+            const newArray =
+              JSON.stringify(
+                works,
+                null,
+                4
+              );
+
+
+            const newSource =
+              source.slice(
+                0,
+                arrayStart
+              )
+              +
+              newArray
+              +
+              source.slice(
+                arrayEnd + 1
+              );
+
+
+            fs.writeFileSync(
+
+              worksPath,
+
+              newSource,
+
+              "utf8"
+
+            );
+
+
+            console.log(
+              `作品ID ${workId} を works.js から削除しました。`
+            );
+
+            console.log(
+              `現在の作品数：${works.length}件`
+            );
+
+            NODE
+
+
+      # ----------------------------------
+      # 変更確認
+      # ----------------------------------
+
+      - name:
+          Check changes
+
+        run:
+          |
+            echo "======================================"
+            echo "変更内容"
+            echo "======================================"
+
+            git status --short
+
+            echo ""
+
+            echo "======================================"
+            echo "削除対象"
+            echo "======================================"
+
+            cat .delete-target.json
+
+            echo ""
+
+
+      # ----------------------------------
+      # 不要ファイル削除
+      # ----------------------------------
+
+      - name:
+          Remove temporary target info
+
+        run:
+          |
+            rm -f .delete-target.json
+
+
+      # ----------------------------------
+      # Commit & Push
+      # ----------------------------------
+
+      - name:
+          Commit and push deletion
+
+        run:
+          |
+            git config user.name "Project Library Bot"
+
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            git add -A
+
+            if git diff --cached --quiet; then
+
+              echo "変更がありません。"
+
+              exit 1
+
+            fi
+
+
+            git commit \
+              -m "delete: work ${{ inputs.workId }}"
+
+
+            git push origin main
+
+
+      # ----------------------------------
+      # 完了
+      # ----------------------------------
+
+      - name:
+          Delete completed
+
+        run:
+          |
+            echo ""
+            echo "======================================"
+            echo "🎉 Project Library Delete"
+            echo "======================================"
+
+            echo "作品ID：${{ inputs.workId }}"
+            echo "削除依頼ID：${{ inputs.deleteId }}"
+
+            echo ""
+            echo "PDF：削除完了"
+            echo "サムネイル：削除完了"
+            echo "works.js：更新完了"
+            echo "削除依頼：削除完了"
+
+            echo ""
+            echo "正式公開ファイルの削除に成功しました！"
+            echo "======================================"
