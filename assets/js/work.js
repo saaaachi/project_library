@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // work.js
-// Version 5.0
+// Version 5.1
 // ==========================
 
 // --------------------------
@@ -26,7 +26,7 @@ const area =
 // --------------------------
 
 const work =
-    works.find(item=>item.id===id);
+    works.find(item => item.id === id);
 
 // --------------------------
 // ★表示
@@ -126,7 +126,7 @@ function createBreadcrumb(work){
 
 `;
 
-    work.category.forEach(category=>{
+    work.category.forEach(category => {
 
         html += `
 
@@ -157,6 +157,19 @@ ${work.title}
 `;
 
     return html;
+
+}
+
+// --------------------------
+// ダウンロード用ファイル名
+// --------------------------
+
+function createDownloadFileName(title){
+
+    return title
+        .replace(/[\\/:*?"<>|]/g, "")
+        .trim()
+        .replace(/\s+/g, "_") + ".pdf";
 
 }
 
@@ -223,7 +236,7 @@ ${createStars(work.level)}
 
 <div class="card-tags">
 
-${work.category.map(category=>`
+${work.category.map(category => `
 
 <a
 class="tag"
@@ -244,6 +257,7 @@ src="${work.thumbnail}"
 alt="${work.title}">
 
 </div>
+
 <div class="info-box">
 
 <div class="info-item">
@@ -292,7 +306,7 @@ ${work.description}
 
 <div class="card-tags">
 
-${work.fixedTags.map(tag=>`
+${work.fixedTags.map(tag => `
 
 <a
 class="tag"
@@ -304,7 +318,7 @@ ${tag}
 
 `).join("")}
 
-${work.freeTags.map(tag=>`
+${work.freeTags.map(tag => `
 
 <a
 class="tag"
@@ -320,21 +334,27 @@ ${tag}
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
      crossorigin="anonymous"></script>
+
 <!-- プリント横長レスポンシブ -->
+
 <ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-1299640300068792"
      data-ad-slot="6020574861"
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
+
 <script>
+
      (adsbygoogle = window.adsbygoogle || []).push({});
+
 </script>
 
 <a
 class="button download-button"
 href="${work.pdf}"
-target="_blank">
+download="${createDownloadFileName(work.title)}"
+aria-label="${work.title}のPDFをダウンロード">
 
 PDFをダウンロード
 
@@ -368,6 +388,7 @@ PDFをダウンロード
 `;
 
 }
+
 // --------------------------
 // シリーズ作品
 // --------------------------
@@ -378,7 +399,7 @@ if(work){
         document.getElementById("seriesArea");
 
     const seriesWorks =
-        works.filter(item=>
+        works.filter(item =>
 
             item.series === work.series &&
 
@@ -398,7 +419,7 @@ if(work){
 
 <div class="card-grid">
 
-${seriesWorks.map(item=>`
+${seriesWorks.map(item => `
 
 <a
 class="card"
@@ -450,7 +471,7 @@ if(work){
         document.getElementById("relatedArea");
 
     const relatedWorks =
-        works.filter(item=>{
+        works.filter(item => {
 
             if(item.id === work.id){
 
@@ -459,21 +480,21 @@ if(work){
             }
 
             const sameCategory =
-                item.category.some(category=>
+                item.category.some(category =>
 
                     work.category.includes(category)
 
                 );
 
             const sameFixedTag =
-                item.fixedTags.some(tag=>
+                item.fixedTags.some(tag =>
 
                     work.fixedTags.includes(tag)
 
                 );
 
             const sameFreeTag =
-                item.freeTags.some(tag=>
+                item.freeTags.some(tag =>
 
                     work.freeTags.includes(tag)
 
@@ -503,7 +524,7 @@ if(work){
 
 <div class="card-grid">
 
-${relatedWorks.map(item=>`
+${relatedWorks.map(item => `
 
 <a
 class="card"
@@ -544,6 +565,7 @@ ${createStars(item.level)}
     }
 
 }
+
 // --------------------------
 // 前へ・次へ
 // --------------------------
@@ -554,13 +576,13 @@ if(work){
         document.getElementById("moveArea");
 
     const index =
-        works.findIndex(item=>item.id===work.id);
+        works.findIndex(item => item.id === work.id);
 
     const prev =
-        works[index-1];
+        works[index - 1];
 
     const next =
-        works[index+1];
+        works[index + 1];
 
     moveArea.innerHTML = `
 
@@ -670,6 +692,6 @@ if(work){
 
 console.log(
 
-"Project Library work.js Version5.0"
+"Project Library work.js Version5.1"
 
 );
