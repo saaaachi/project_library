@@ -1,8 +1,9 @@
 // ==========================
 // Project Library
 // work.js
-// Version 5.1
+// Version 5.2
 // ==========================
+
 
 // --------------------------
 // URL取得
@@ -14,12 +15,14 @@ const params =
 const id =
     Number(params.get("id"));
 
+
 // --------------------------
 // 表示エリア
 // --------------------------
 
 const area =
     document.getElementById("workArea");
+
 
 // --------------------------
 // データ取得
@@ -28,13 +31,68 @@ const area =
 const work =
     works.find(item => item.id === id);
 
+
+// --------------------------
+// 安全な文字列化
+// --------------------------
+
+function safeString(value){
+
+    if(
+        value === undefined ||
+        value === null
+    ){
+
+        return "";
+
+    }
+
+    return String(value);
+
+}
+
+
+// --------------------------
+// 配列化
+// --------------------------
+
+function toArray(value){
+
+    if(Array.isArray(value)){
+
+        return value.filter(
+            item =>
+                item !== undefined &&
+                item !== null &&
+                String(item).trim() !== ""
+        );
+
+    }
+
+
+    if(
+        value === undefined ||
+        value === null ||
+        value === ""
+    ){
+
+        return [];
+
+    }
+
+
+    return [value];
+
+}
+
+
 // --------------------------
 // ★表示
 // --------------------------
 
 function createStars(level){
 
-    switch(level){
+    switch(Number(level)){
 
         case 1:
             return "★☆☆";
@@ -52,6 +110,7 @@ function createStars(level){
 
 }
 
+
 // --------------------------
 // NEW表示
 // --------------------------
@@ -63,6 +122,7 @@ function createNewBadge(work){
         return "";
 
     }
+
 
     return `
 
@@ -76,6 +136,7 @@ NEW
 
 }
 
+
 // --------------------------
 // おすすめ表示
 // --------------------------
@@ -87,6 +148,7 @@ function createRecommendBadge(work){
         return "";
 
     }
+
 
     return `
 
@@ -100,11 +162,18 @@ function createRecommendBadge(work){
 
 }
 
+
 // --------------------------
 // パンくず生成
 // --------------------------
 
 function createBreadcrumb(work){
+
+    const categories =
+        toArray(
+            work.category
+        );
+
 
     let html = `
 
@@ -126,13 +195,16 @@ function createBreadcrumb(work){
 
 `;
 
-    work.category.forEach(category => {
 
-        html += `
+    categories.forEach(
+        category => {
+
+            html += `
 
 ＞
 
-<a href="library.html?category=${encodeURIComponent(category)}">
+<a
+href="library.html?category=${encodeURIComponent(category)}">
 
 ${category}
 
@@ -140,7 +212,9 @@ ${category}
 
 `;
 
-    });
+        }
+    );
+
 
     html += `
 
@@ -148,7 +222,7 @@ ${category}
 
 <span class="current">
 
-${work.title}
+${safeString(work.title)}
 
 </span>
 
@@ -156,9 +230,11 @@ ${work.title}
 
 `;
 
+
     return html;
 
 }
+
 
 // --------------------------
 // ダウンロード用ファイル名
@@ -166,12 +242,26 @@ ${work.title}
 
 function createDownloadFileName(title){
 
-    return title
-        .replace(/[\\/:*?"<>|]/g, "")
-        .trim()
-        .replace(/\s+/g, "_") + ".pdf";
+    const safeTitle =
+        safeString(title)
+            .replace(
+                /[\\/:*?"<>|]/g,
+                ""
+            )
+            .trim()
+            .replace(
+                /\s+/g,
+                "_"
+            );
+
+
+    return (
+        safeTitle ||
+        "Project_Library"
+    ) + ".pdf";
 
 }
+
 
 // --------------------------
 // 見つからない場合
@@ -209,6 +299,41 @@ href="library.html">
 
 }else{
 
+
+// --------------------------
+// データを正規化
+// --------------------------
+
+const categories =
+    toArray(
+        work.category
+    );
+
+
+const fixedTags =
+    toArray(
+        work.fixedTags
+    );
+
+
+const freeTags =
+    toArray(
+        work.freeTags
+    );
+
+
+const tools =
+    toArray(
+        work.tools
+    );
+
+
+const series =
+    toArray(
+        work.series
+    );
+
+
 // --------------------------
 // メイン表示
 // --------------------------
@@ -224,7 +349,7 @@ ${createRecommendBadge(work)}
 
 <h1 class="section-title">
 
-${work.title}
+${safeString(work.title)}
 
 </h1>
 
@@ -234,9 +359,10 @@ ${createStars(work.level)}
 
 </p>
 
+
 <div class="card-tags">
 
-${work.category.map(category => `
+${categories.map(category => `
 
 <a
 class="tag"
@@ -250,13 +376,15 @@ ${category}
 
 </div>
 
+
 <div class="work-image">
 
 <img
-src="${work.thumbnail}"
-alt="${work.title}">
+src="${safeString(work.thumbnail)}"
+alt="${safeString(work.title)}">
 
 </div>
+
 
 <div class="info-box">
 
@@ -266,9 +394,10 @@ alt="${work.title}">
 
 <br>
 
-${work.age}
+${safeString(work.age)}
 
 </div>
+
 
 <div class="info-item">
 
@@ -276,9 +405,10 @@ ${work.age}
 
 <br>
 
-${work.size}
+${safeString(work.size)}
 
 </div>
+
 
 <div class="info-item">
 
@@ -286,17 +416,19 @@ ${work.size}
 
 <br>
 
-${work.tools.join("・")}
+${tools.join("・")}
 
 </div>
 
 </div>
+
 
 <div class="work-description">
 
-${work.description}
+${safeString(work.description)}
 
 </div>
+
 
 <h3>
 
@@ -304,9 +436,12 @@ ${work.description}
 
 </h3>
 
+
 <div class="card-tags">
 
-${work.fixedTags.map(tag => `
+${
+    fixedTags.map(
+        tag => `
 
 <a
 class="tag"
@@ -316,9 +451,13 @@ ${tag}
 
 </a>
 
-`).join("")}
+`
+    ).join("")
+}
 
-${work.freeTags.map(tag => `
+${
+    freeTags.map(
+        tag => `
 
 <a
 class="tag"
@@ -328,37 +467,84 @@ ${tag}
 
 </a>
 
-`).join("")}
+`
+    ).join("")
+}
+
+${
+    fixedTags.length === 0 &&
+    freeTags.length === 0
+        ? `
+<p
+style="
+color:#888;
+font-size:14px;
+margin:8px 0 0;
+">
+
+タグはありません。
+
+</p>
+`
+        : ""
+}
 
 </div>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
-     crossorigin="anonymous"></script>
+
+<script
+async
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
+crossorigin="anonymous">
+</script>
+
 
 <!-- プリント横長レスポンシブ -->
 
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-1299640300068792"
-     data-ad-slot="6020574861"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
+<ins
+class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-1299640300068792"
+data-ad-slot="6020574861"
+data-ad-format="auto"
+data-full-width-responsive="true">
+</ins>
+
 
 <script>
 
-     (adsbygoogle = window.adsbygoogle || []).push({});
+(adsbygoogle = window.adsbygoogle || []).push({});
 
 </script>
 
-<a
+
+<!-- ==========================
+     PDFダウンロード
+     ========================== -->
+
+<button
+type="button"
 class="button download-button"
-href="${work.pdf}"
-download="${createDownloadFileName(work.title)}"
-aria-label="${work.title}のPDFをダウンロード">
+id="pdfDownloadButton"
+aria-label="${safeString(work.title)}のPDFをダウンロード">
 
-PDFをダウンロード
+📄 PDFをダウンロード
 
-</a>
+</button>
+
+
+<p
+id="pdfDownloadHelp"
+style="
+font-size:13px;
+color:#777;
+margin-top:8px;
+">
+
+iPhoneでは「ファイルに保存」を選択できます。
+
+</p>
+
 
 <div class="section">
 
@@ -377,17 +563,294 @@ PDFをダウンロード
 
 </div>
 
+
 <div id="seriesArea"></div>
 
 <div id="relatedArea"></div>
 
 <div id="moveArea"></div>
 
+
 </section>
 
 `;
 
+
+// --------------------------
+// PDFダウンロード処理
+// --------------------------
+
+const pdfDownloadButton =
+    document.getElementById(
+        "pdfDownloadButton"
+    );
+
+
+const pdfDownloadHelp =
+    document.getElementById(
+        "pdfDownloadHelp"
+    );
+
+
+pdfDownloadButton?.addEventListener(
+    "click",
+    async function(){
+
+        if(!work.pdf){
+
+            alert(
+                "PDFファイルが見つかりません。"
+            );
+
+            return;
+
+        }
+
+
+        const originalText =
+            pdfDownloadButton.textContent;
+
+
+        pdfDownloadButton.disabled =
+            true;
+
+
+        pdfDownloadButton.textContent =
+            "📄 PDFを準備中…";
+
+
+        try{
+
+            /*
+             * PDFを取得
+             */
+
+            const response =
+                await fetch(
+                    work.pdf
+                );
+
+
+            if(!response.ok){
+
+                throw new Error(
+                    "PDFを取得できませんでした。"
+                );
+
+            }
+
+
+            const blob =
+                await response.blob();
+
+
+            /*
+             * PDFファイルを作成
+             */
+
+            const fileName =
+                createDownloadFileName(
+                    work.title
+                );
+
+
+            const pdfFile =
+                new File(
+                    [blob],
+                    fileName,
+                    {
+                        type:
+                            "application/pdf"
+                    }
+                );
+
+
+            /*
+             * iPhone / Safariなど、
+             * ファイル共有に対応している場合
+             */
+
+            if(
+                navigator.share &&
+                navigator.canShare &&
+                navigator.canShare({
+                    files:
+                        [pdfFile]
+                })
+            ){
+
+                await navigator.share({
+
+                    files:
+                        [pdfFile],
+
+                    title:
+                        fileName,
+
+                    text:
+                        `${safeString(work.title)}`
+                });
+
+
+                if(pdfDownloadHelp){
+
+                    pdfDownloadHelp.textContent =
+                        "PDFの共有・保存画面を開きました😊";
+
+                }
+
+            }else{
+
+                /*
+                 * 非対応ブラウザ用
+                 * 通常のダウンロードへ
+                 */
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                link.href =
+                    url;
+
+
+                link.download =
+                    fileName;
+
+
+                document.body.appendChild(
+                    link
+                );
+
+
+                link.click();
+
+
+                link.remove();
+
+
+                setTimeout(
+                    function(){
+
+                        URL.revokeObjectURL(
+                            url
+                        );
+
+                    },
+                    1000
+                );
+
+
+                if(pdfDownloadHelp){
+
+                    pdfDownloadHelp.textContent =
+                        "PDFのダウンロードを開始しました😊";
+
+                }
+
+            }
+
+
+        }catch(error){
+
+            console.error(
+                error
+            );
+
+
+            /*
+             * ユーザーが共有画面を
+             * 閉じただけの場合は
+             * エラー表示しない。
+             */
+
+            if(
+                error.name ===
+                "AbortError"
+            ){
+
+                if(pdfDownloadHelp){
+
+                    pdfDownloadHelp.textContent =
+                        "PDFの保存をキャンセルしました。";
+
+                }
+
+            }else{
+
+                console.error(
+                    "PDF download error:",
+                    error
+                );
+
+
+                /*
+                 * 最終フォールバックとして
+                 * PDFを新しいタブで開く
+                 */
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                link.href =
+                    work.pdf;
+
+
+                link.target =
+                    "_blank";
+
+
+                link.rel =
+                    "noopener";
+
+
+                document.body.appendChild(
+                    link
+                );
+
+
+                link.click();
+
+
+                link.remove();
+
+
+                if(pdfDownloadHelp){
+
+                    pdfDownloadHelp.textContent =
+                        "PDFを開きました。画面の共有ボタンから保存できます。";
+
+                }
+
+            }
+
+        }finally{
+
+            pdfDownloadButton.disabled =
+                false;
+
+
+            pdfDownloadButton.textContent =
+                originalText;
+
+        }
+
+    }
+);
+
 }
+
 
 // --------------------------
 // シリーズ作品
@@ -396,20 +859,61 @@ PDFをダウンロード
 if(work){
 
     const seriesArea =
-        document.getElementById("seriesArea");
-
-    const seriesWorks =
-        works.filter(item =>
-
-            item.series === work.series &&
-
-            item.id !== work.id
-
+        document.getElementById(
+            "seriesArea"
         );
 
-    if(seriesWorks.length){
 
-        seriesArea.innerHTML = `
+    const currentSeries =
+        toArray(
+            work.series
+        );
+
+
+    /*
+     * シリーズ未設定なら
+     * 何も表示しない。
+     */
+
+    if(
+        seriesArea &&
+        currentSeries.length > 0
+    ){
+
+        const seriesWorks =
+            works.filter(
+                item => {
+
+                    if(
+                        item.id ===
+                        work.id
+                    ){
+
+                        return false;
+
+                    }
+
+
+                    const itemSeries =
+                        toArray(
+                            item.series
+                        );
+
+
+                    return itemSeries.some(
+                        series =>
+                            currentSeries.includes(
+                                series
+                            )
+                    );
+
+                }
+            );
+
+
+        if(seriesWorks.length){
+
+            seriesArea.innerHTML = `
 
 <h2 class="section-title">
 
@@ -426,8 +930,8 @@ class="card"
 href="work.html?id=${item.id}">
 
 <img
-src="${item.thumbnail}"
-alt="${item.title}">
+src="${safeString(item.thumbnail)}"
+alt="${safeString(item.title)}">
 
 <div class="card-body">
 
@@ -437,7 +941,7 @@ ${createRecommendBadge(item)}
 
 <h3>
 
-${item.title}
+${safeString(item.title)}
 
 </h3>
 
@@ -457,9 +961,12 @@ ${createStars(item.level)}
 
 `;
 
+        }
+
     }
 
 }
+
 
 // --------------------------
 // 関連作品
@@ -468,51 +975,106 @@ ${createStars(item.level)}
 if(work){
 
     const relatedArea =
-        document.getElementById("relatedArea");
+        document.getElementById(
+            "relatedArea"
+        );
+
+
+    const currentCategories =
+        toArray(
+            work.category
+        );
+
+
+    const currentFixedTags =
+        toArray(
+            work.fixedTags
+        );
+
+
+    const currentFreeTags =
+        toArray(
+            work.freeTags
+        );
+
 
     const relatedWorks =
-        works.filter(item => {
+        works.filter(
+            item => {
 
-            if(item.id === work.id){
+                if(
+                    item.id ===
+                    work.id
+                ){
 
-                return false;
+                    return false;
+
+                }
+
+
+                const itemCategories =
+                    toArray(
+                        item.category
+                    );
+
+
+                const itemFixedTags =
+                    toArray(
+                        item.fixedTags
+                    );
+
+
+                const itemFreeTags =
+                    toArray(
+                        item.freeTags
+                    );
+
+
+                const sameCategory =
+                    itemCategories.some(
+                        category =>
+                            currentCategories.includes(
+                                category
+                            )
+                    );
+
+
+                const sameFixedTag =
+                    itemFixedTags.some(
+                        tag =>
+                            currentFixedTags.includes(
+                                tag
+                            )
+                    );
+
+
+                const sameFreeTag =
+                    itemFreeTags.some(
+                        tag =>
+                            currentFreeTags.includes(
+                                tag
+                            )
+                    );
+
+
+                return (
+                    sameCategory ||
+                    sameFixedTag ||
+                    sameFreeTag
+                );
 
             }
+        )
+        .slice(
+            0,
+            4
+        );
 
-            const sameCategory =
-                item.category.some(category =>
 
-                    work.category.includes(category)
-
-                );
-
-            const sameFixedTag =
-                item.fixedTags.some(tag =>
-
-                    work.fixedTags.includes(tag)
-
-                );
-
-            const sameFreeTag =
-                item.freeTags.some(tag =>
-
-                    work.freeTags.includes(tag)
-
-                );
-
-            return (
-
-                sameCategory ||
-
-                sameFixedTag ||
-
-                sameFreeTag
-
-            );
-
-        }).slice(0,4);
-
-    if(relatedWorks.length){
+    if(
+        relatedArea &&
+        relatedWorks.length
+    ){
 
         relatedArea.innerHTML = `
 
@@ -531,8 +1093,8 @@ class="card"
 href="work.html?id=${item.id}">
 
 <img
-src="${item.thumbnail}"
-alt="${item.title}">
+src="${safeString(item.thumbnail)}"
+alt="${safeString(item.title)}">
 
 <div class="card-body">
 
@@ -542,7 +1104,7 @@ ${createRecommendBadge(item)}
 
 <h3>
 
-${item.title}
+${safeString(item.title)}
 
 </h3>
 
@@ -566,6 +1128,7 @@ ${createStars(item.level)}
 
 }
 
+
 // --------------------------
 // 前へ・次へ
 // --------------------------
@@ -573,18 +1136,30 @@ ${createStars(item.level)}
 if(work){
 
     const moveArea =
-        document.getElementById("moveArea");
+        document.getElementById(
+            "moveArea"
+        );
+
 
     const index =
-        works.findIndex(item => item.id === work.id);
+        works.findIndex(
+            item =>
+                item.id ===
+                work.id
+        );
+
 
     const prev =
         works[index - 1];
 
+
     const next =
         works[index + 1];
 
-    moveArea.innerHTML = `
+
+    if(moveArea){
+
+        moveArea.innerHTML = `
 
 <div
 class="section"
@@ -596,7 +1171,9 @@ flex-wrap:wrap;
 gap:15px;
 ">
 
-${prev ? `
+${
+    prev
+        ? `
 
 <a
 class="button"
@@ -606,9 +1183,14 @@ href="work.html?id=${prev.id}">
 
 </a>
 
-` : "<div></div>"}
+`
+        : "<div></div>"
+}
 
-${next ? `
+
+${
+    next
+        ? `
 
 <a
 class="button"
@@ -618,13 +1200,18 @@ href="work.html?id=${next.id}">
 
 </a>
 
-` : ""}
+`
+        : ""
+}
 
 </div>
 
 `;
 
+    }
+
 }
+
 
 // --------------------------
 // タイトル変更
@@ -633,10 +1220,10 @@ href="work.html?id=${next.id}">
 if(work){
 
     document.title =
-
-`${work.title} | Project Library`;
+        `${safeString(work.title)} | Project Library`;
 
 }
+
 
 // --------------------------
 // meta description
@@ -645,26 +1232,22 @@ if(work){
 if(work){
 
     const description =
-
         document.querySelector(
-
             'meta[name="description"]'
-
         );
+
 
     if(description){
 
         description.setAttribute(
-
             "content",
-
-`${work.title}｜${work.description}`
-
+            `${safeString(work.title)}｜${safeString(work.description)}`
         );
 
     }
 
 }
+
 
 // --------------------------
 // 公開日表示（将来用）
@@ -673,25 +1256,23 @@ if(work){
 if(work){
 
     console.log(
-
-        "公開日 :", work.publishDate
-
+        "公開日 :",
+        work.publishDate
     );
 
+
     console.log(
-
-        "更新日 :", work.updateDate
-
+        "更新日 :",
+        work.updateDate
     );
 
 }
+
 
 // --------------------------
 // Version表示
 // --------------------------
 
 console.log(
-
-"Project Library work.js Version5.1"
-
+    "Project Library work.js Version 5.2"
 );
