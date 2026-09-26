@@ -355,7 +355,7 @@ JavaScript
 // ==========================
 // Project Library
 // index.html
-// Version 7.3
+// Version 7.4
 // ==========================
 
 
@@ -372,6 +372,7 @@ if(typeof works !== "undefined"){
 
     // ==========================
     // NEW作品
+    // 最新3件
     // ==========================
 
     const newWorks = works
@@ -386,18 +387,28 @@ if(typeof works !== "undefined"){
 
         )
 
-        .slice(0,4);
+        .slice(0,3);
 
 
     // ==========================
     // おすすめ作品
+    // おすすめONの中から
+    // 公開日が新しい順で3件
     // ==========================
 
     const recommendWorks = works
 
         .filter(work => work.recommend)
 
-        .slice(0,4);
+        .sort((a,b)=>
+
+            new Date(b.publishDate) -
+
+            new Date(a.publishDate)
+
+        )
+
+        .slice(0,3);
 
 
     // ==========================
@@ -442,7 +453,7 @@ if(typeof works !== "undefined"){
 // ==========================
 
 console.log(
-    "Project Library index.html Version 7.3"
+    "Project Library index.html Version 7.4"
 );
 
 </script>
