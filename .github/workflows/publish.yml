@@ -125,46 +125,66 @@ jobs:
 
           echo "アップロードファイル確認を開始します。"
 
+
           if [ -z "${{ github.event.inputs.pdfPath }}" ]; then
+
             echo "❌ PDFパスが指定されていません。"
+
             exit 1
+
           fi
+
 
           if [ -z "${{ github.event.inputs.thumbnailPath }}" ]; then
+
             echo "❌ サムネイルパスが指定されていません。"
+
             exit 1
+
           fi
 
+
           if [ -z "${{ github.event.inputs.uploadId }}" ]; then
+
             echo "❌ アップロードIDが指定されていません。"
+
             exit 1
+
           fi
 
 
           echo ""
           echo "PDF："
+
           echo "${{ github.event.inputs.pdfPath }}"
+
 
           if [ ! -f "${{ github.event.inputs.pdfPath }}" ]; then
 
             echo "❌ PDFファイルが見つかりません。"
+
             exit 1
 
           fi
+
 
           echo "✅ PDFファイルを確認しました😊"
 
 
           echo ""
           echo "サムネイル："
+
           echo "${{ github.event.inputs.thumbnailPath }}"
+
 
           if [ ! -f "${{ github.event.inputs.thumbnailPath }}" ]; then
 
             echo "❌ サムネイルファイルが見つかりません。"
+
             exit 1
 
           fi
+
 
           echo "✅ サムネイルファイルを確認しました😊"
 
@@ -179,16 +199,19 @@ jobs:
 
           METADATA_PATH=".project-library-upload/metadata/${{ github.event.inputs.uploadId }}.json"
 
+
           echo "作品情報を確認します。"
 
           echo ""
           echo "Metadata："
+
           echo "$METADATA_PATH"
 
 
           if [ ! -f "$METADATA_PATH" ]; then
 
             echo "❌ metadataファイルが見つかりません。"
+
             exit 1
 
           fi
@@ -196,6 +219,7 @@ jobs:
 
           echo ""
           echo "metadata内容："
+
           cat "$METADATA_PATH"
 
 
@@ -215,8 +239,11 @@ jobs:
 
           echo "正式フォルダを確認します。"
 
+
           mkdir -p assets/pdf
+
           mkdir -p assets/images/thumbnail
+
 
           echo "✅ 正式フォルダを準備しました😊"
 
@@ -239,11 +266,13 @@ jobs:
           echo "PDFを正式フォルダへ移動します。"
 
           echo "元："
+
           echo "$PDF_PATH"
 
           echo ""
 
           echo "先："
+
           echo "$FINAL_PDF_PATH"
 
 
@@ -259,6 +288,7 @@ jobs:
 
             echo ""
             echo "❌ PDFの配置に失敗しました。"
+
             exit 1
 
           fi
@@ -282,11 +312,13 @@ jobs:
           echo "サムネイルを正式フォルダへ移動します。"
 
           echo "元："
+
           echo "$THUMBNAIL_PATH"
 
           echo ""
 
           echo "先："
+
           echo "$FINAL_THUMBNAIL_PATH"
 
 
@@ -302,6 +334,7 @@ jobs:
 
             echo ""
             echo "❌ サムネイルの配置に失敗しました。"
+
             exit 1
 
           fi
@@ -316,12 +349,17 @@ jobs:
         run: |
 
           PDF_PATH="${{ github.event.inputs.pdfPath }}"
+
           THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
 
+
           PDF_FILENAME=$(basename "$PDF_PATH")
+
           THUMBNAIL_FILENAME=$(basename "$THUMBNAIL_PATH")
 
+
           FINAL_PDF_PATH="assets/pdf/$PDF_FILENAME"
+
           FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$THUMBNAIL_FILENAME"
 
 
@@ -329,21 +367,27 @@ jobs:
           echo "正式配置ファイル確認"
           echo "======================================"
 
+
           echo ""
+
           echo "PDF："
+
           echo "$FINAL_PDF_PATH"
 
           ls -lh "$FINAL_PDF_PATH"
 
 
           echo ""
+
           echo "サムネイル："
+
           echo "$FINAL_THUMBNAIL_PATH"
 
           ls -lh "$FINAL_THUMBNAIL_PATH"
 
 
           echo ""
+
           echo "======================================"
           echo "✅ 正式配置ファイルを確認しました😊"
           echo "======================================"
@@ -382,11 +426,14 @@ jobs:
 
 
           console.log("Metadata：");
+
           console.log(metadataPath);
 
           console.log("");
 
+
           console.log("works.js：");
+
           console.log(worksPath);
 
 
@@ -415,7 +462,11 @@ jobs:
 
 
           console.log("");
-          console.log("作品情報を読み込みました😊");
+
+          console.log(
+            "作品情報を読み込みました😊"
+          );
+
 
           console.log(
             `タイトル：${metadata.title}`
@@ -502,6 +553,7 @@ jobs:
 
 
           console.log("");
+
           console.log(
             "works配列データを解析します。"
           );
@@ -556,98 +608,27 @@ jobs:
           // JSON文字列にも対応
           // ----------------------------------
 
- function toArray(value) {
+          function toArray(value) {
 
-  // ------------------------------
-  // すでに配列ならそのまま
-  // ------------------------------
+            // ------------------------------
+            // すでに配列ならそのまま
+            // ------------------------------
 
-  if (Array.isArray(value)) {
+            if (Array.isArray(value)) {
 
-    return value
-      .map(
-        item =>
-          String(item).trim()
-      )
-      .filter(Boolean);
+              return value
+                .map(
+                  item =>
+                    String(item).trim()
+                )
+                .filter(Boolean);
 
-  }
-
-
-  // ------------------------------
-  // 空なら空配列
-  // ------------------------------
-
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
-
-    return [];
-
-  }
+            }
 
 
-  // ------------------------------
-  // JSON文字列なら配列へ変換
-  //
-  // 例：
-  // '["幼児向け"]'
-  // '["ぬりえ","車"]'
-  // ------------------------------
-
-  const text =
-    String(value).trim();
-
-
-  if (
-    text.startsWith("[") &&
-    text.endsWith("]")
-  ){
-
-    try {
-
-      const parsed =
-        JSON.parse(text);
-
-
-      if(Array.isArray(parsed)){
-
-        return parsed
-          .map(
-            item =>
-              String(item).trim()
-          )
-          .filter(Boolean);
-
-      }
-
-    } catch(error) {
-
-      console.log(
-        "JSON配列として解析できなかったため、通常の文字列として処理します。"
-      );
-
-    }
-
-  }
-
-
-  // ------------------------------
-  // 通常の文字列
-  // ------------------------------
-
-  return text
-    .split(/[、,]/)
-    .map(
-      item =>
-        item.trim()
-    )
-    .filter(Boolean);
-
-}
-
+            // ------------------------------
+            // 空なら空配列
+            // ------------------------------
 
             if (
               value === undefined ||
@@ -660,17 +641,17 @@ jobs:
             }
 
 
+            // ------------------------------
+            // JSON文字列なら配列へ変換
+            //
+            // 例：
+            // '["幼児向け"]'
+            // '["ぬりえ","車"]'
+            // ------------------------------
+
             const text =
               String(value).trim();
 
-
-            // ------------------------------
-            // JSON配列文字列を解析
-            // 例：
-            // ["幼児向け"]
-            // ["ぬりえ","車"]
-            // []
-            // ------------------------------
 
             if (
               text.startsWith("[") &&
@@ -683,7 +664,9 @@ jobs:
                   JSON.parse(text);
 
 
-                if(Array.isArray(parsed)){
+                if (
+                  Array.isArray(parsed)
+                ){
 
                   return parsed
                     .map(
@@ -694,10 +677,10 @@ jobs:
 
                 }
 
-              } catch(error){
+              } catch(error) {
 
                 console.log(
-                  "JSON配列として解析できませんでした。通常処理を続行します。"
+                  "JSON配列として解析できなかったため、通常の文字列として処理します。"
                 );
 
               }
@@ -728,6 +711,7 @@ jobs:
             const number =
               Number(value);
 
+
             if (
               Number.isFinite(number)
             ) {
@@ -735,6 +719,7 @@ jobs:
               return number;
 
             }
+
 
             return defaultValue;
 
@@ -755,7 +740,7 @@ jobs:
             !id;
 
 
-          if(isNewWork){
+          if (isNewWork) {
 
             const numericIds =
               works
@@ -784,17 +769,20 @@ jobs:
 
 
             console.log("");
+
             console.log(
               "新規作品としてIDを自動採番します😊"
             );
+
 
             console.log(
               `新しいID：${id}`
             );
 
-          }else{
+          } else {
 
             console.log("");
+
             console.log(
               `既存作品ID：${id}`
             );
@@ -875,22 +863,29 @@ jobs:
 
 
           console.log("");
-          console.log("データ正規化結果：");
+
+          console.log(
+            "データ正規化結果："
+          );
+
 
           console.log(
             "category:",
             JSON.stringify(category)
           );
 
+
           console.log(
             "fixedTags:",
             JSON.stringify(fixedTags)
           );
 
+
           console.log(
             "freeTags:",
             JSON.stringify(freeTags)
           );
+
 
           console.log(
             "series:",
@@ -905,88 +900,68 @@ jobs:
           const newWork = {
 
             id:
-
               id,
 
             workNo:
-
               workNo,
 
             title:
-
               metadata.title || "",
 
             category:
-
               category,
 
             fixedTags:
-
               fixedTags,
 
             freeTags:
-
               freeTags,
 
             series:
-
               series,
 
             level:
-
               toNumber(
                 metadata.level,
                 1
               ),
 
             age:
-
               metadata.age || "",
 
             size:
-
               metadata.size || "",
 
             tools:
-
               toArray(
                 metadata.tools
               ),
 
             description:
-
               metadata.description || "",
 
             thumbnail:
-
               thumbnailPath,
 
             pdf:
-
               pdfPath,
 
             isNew:
-
               metadata.isNew !== false,
 
             recommend:
-
               metadata.recommend === true,
 
             publishDate:
-
               metadata.publishDate || "",
 
             updateDate:
-
               metadata.updateDate || "",
 
             etsy:
-
               metadata.etsy || "",
 
             related:
-
               Array.isArray(
                 metadata.related
               )
@@ -994,15 +969,12 @@ jobs:
                 : [],
 
             viewCount:
-
               0,
 
             downloadCount:
-
               0,
 
             favorite:
-
               false
 
           };
@@ -1033,7 +1005,7 @@ jobs:
             works[existingIndex] =
               newWork;
 
-          }else{
+          } else {
 
             console.log("");
 
@@ -1112,30 +1084,38 @@ jobs:
 
 
           console.log("");
+
           console.log(
             "🎉 works.jsを更新しました！"
           );
+
 
           console.log(
             `作品数：${works.length}件`
           );
 
+
           console.log(
             `追加/更新ID：${id}`
           );
+
 
           console.log(
             `workNo：${workNo}`
           );
 
+
           console.log(
             `タイトル：${metadata.title}`
           );
 
+
           console.log("");
+
           console.log(
             "======================================"
           );
+
 
           NODE
 
@@ -1152,22 +1132,28 @@ jobs:
           echo "works.js確認"
           echo "======================================"
 
+
           grep -n \
             'title' \
             assets/data/works.js \
             | tail -10
 
+
           echo ""
+
 
           grep -n \
             'workNo' \
             assets/data/works.js \
             | tail -10
 
+
           echo ""
 
           echo "======================================"
+
           echo "✅ works.jsの更新を確認しました😊"
+
           echo "======================================"
 
 
@@ -1193,6 +1179,7 @@ jobs:
           if [ -e "$METADATA_PATH" ]; then
 
             echo "❌ metadataが残っています。"
+
             exit 1
 
           fi
@@ -1210,6 +1197,7 @@ jobs:
         run: |
 
           PDF_PATH="${{ github.event.inputs.pdfPath }}"
+
           THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
 
 
@@ -1217,6 +1205,7 @@ jobs:
 
 
           rm -f "$PDF_PATH"
+
           rm -f "$THUMBNAIL_PATH"
 
 
@@ -1226,6 +1215,7 @@ jobs:
           if [ -e "$PDF_PATH" ]; then
 
             echo "❌ PDF一時ファイルが残っています。"
+
             exit 1
 
           fi
@@ -1234,6 +1224,7 @@ jobs:
           if [ -e "$THUMBNAIL_PATH" ]; then
 
             echo "❌ サムネイル一時ファイルが残っています。"
+
             exit 1
 
           fi
@@ -1267,7 +1258,9 @@ jobs:
           echo "Git変更内容"
           echo "======================================"
 
+
           git status --short
+
 
           echo "======================================"
 
@@ -1281,14 +1274,18 @@ jobs:
         run: |
 
           git add assets/pdf
+
           git add assets/images/thumbnail
+
           git add assets/data/works.js
+
           git add .project-library-upload
 
 
           if git diff --cached --quiet; then
 
             echo "❌ 保存する変更がありません。"
+
             exit 1
 
           fi
@@ -1302,13 +1299,23 @@ jobs:
 
 
           echo ""
+
           echo "======================================"
+
           echo "🎉 Project Library Version 10.3"
+
           echo "======================================"
+
           echo "PDF：保存完了"
+
           echo "サムネイル：保存完了"
+
           echo "works.js：更新完了"
+
           echo "metadata：削除完了"
+
           echo "======================================"
+
           echo "正式公開ファイルの保存に成功しました！"
+
           echo "======================================"
