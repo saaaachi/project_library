@@ -102,6 +102,36 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 4,
+        "workNo": "PL-000004",
+        "title": "テスト3",
+        "category": [
+            "幼児向け",
+            "子ども向け"
+        ],
+        "fixedTags": [],
+        "freeTags": [
+            "消防車"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "",
+        "thumbnail": "assets/images/thumbnail/テスト3_1790411514154.jpg",
+        "pdf": "assets/pdf/テスト3_1790411514154.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-26",
+        "updateDate": "2026-09-26",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
