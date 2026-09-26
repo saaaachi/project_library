@@ -65,6 +65,23 @@ document.addEventListener(
 
 
         /* ==================================
+           iPhone入力時の自動ズーム対策
+           ================================== */
+
+        document
+            .querySelectorAll(
+                "input, select, textarea"
+            )
+            .forEach(
+                function(element){
+
+                    element.style.fontSize =
+                        "16px";
+
+                }
+            );
+            
+        /* ==================================
            カテゴリ
            ================================== */
 
