@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 13.0
+   Version 13.1
    ====================================== */
 
 
@@ -220,7 +220,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 13.0
+           Version 13.1
            ================================== */
 
         const workList =
@@ -270,6 +270,39 @@ document.addEventListener(
                     /'/g,
                     "&#039;"
                 );
+
+        }
+
+
+        /* ==================================
+           配列化ヘルパー
+           ================================== */
+
+        function toArray(
+            value
+        ){
+
+            if(
+                Array.isArray(value)
+            ){
+
+                return value;
+
+            }
+
+
+            if(
+                value === null ||
+                value === undefined ||
+                value === ""
+            ){
+
+                return [];
+
+            }
+
+
+            return [value];
 
         }
 
@@ -468,9 +501,8 @@ document.addEventListener(
             workList.forEach(
                 function(work){
 
-                    (
-                        work.fixedTags ||
-                        []
+                    toArray(
+                        work.fixedTags
                     )
                     .forEach(
                         function(tag){
@@ -617,9 +649,8 @@ document.addEventListener(
             workList.forEach(
                 function(work){
 
-                    (
-                        work.freeTags ||
-                        []
+                    toArray(
+                        work.freeTags
                     )
                     .forEach(
                         function(tag){
@@ -749,16 +780,29 @@ document.addEventListener(
             workList.forEach(
                 function(work){
 
-                    (
-                        work.series ||
-                        []
+                    /*
+                     * series が
+                     * 配列でも文字列でも
+                     * 正常に扱えるようにする。
+                     */
+
+                    toArray(
+                        work.series
                     )
                     .forEach(
                         function(series){
 
-                            set.add(
-                                series
-                            );
+                            if(
+                                series !== null &&
+                                series !== undefined &&
+                                String(series).trim() !== ""
+                            ){
+
+                                set.add(
+                                    series
+                                );
+
+                            }
 
                         }
                     );
@@ -1052,11 +1096,6 @@ document.addEventListener(
             context.save();
 
 
-            /*
-             * 元画像を見やすくするため、
-             * かなり薄い透かしにする。
-             */
-
             context.globalAlpha =
                 0.13;
 
@@ -1076,11 +1115,6 @@ document.addEventListener(
             context.textBaseline =
                 "middle";
 
-
-            /*
-             * 斜め方向に回転して、
-             * ページ全体へ繰り返し配置する。
-             */
 
             const diagonal =
                 Math.sqrt(
@@ -1143,11 +1177,6 @@ document.addEventListener(
             }
 
 
-            /*
-             * ブランド名もページ全体に
-             * 薄く入れる。
-             */
-
             context.globalAlpha =
                 0.10;
 
@@ -1172,7 +1201,7 @@ document.addEventListener(
                     diagonal;
 
                 y +=
-                    secondSpacingY
+                        secondSpacingY
             ){
 
                 for(
@@ -1204,7 +1233,7 @@ document.addEventListener(
 
         /* ==================================
            PDF → サムネイル
-           Version 13.0
+           Version 13.1
            ================================== */
 
         pdfFileInput?.addEventListener(
@@ -1261,10 +1290,6 @@ document.addEventListener(
 
                 }
 
-
-                /*
-                 * PDF.jsを読み込む
-                 */
 
                 try{
 
@@ -1346,10 +1371,6 @@ document.addEventListener(
                     }
 
 
-                    /*
-                     * サムネイル幅
-                     */
-
                     const thumbnailWidth =
                         500;
 
@@ -1377,10 +1398,6 @@ document.addEventListener(
                         );
 
 
-                    /*
-                     * PDFページを描画
-                     */
-
                     await page.render({
 
                         canvasContext:
@@ -1392,21 +1409,12 @@ document.addEventListener(
                     }).promise;
 
 
-                    /*
-                     * PDF画像の上に
-                     * 全体透かしを描画
-                     */
-
                     drawWatermark(
                         context,
                         canvas.width,
                         canvas.height
                     );
 
-
-                    /*
-                     * JPEG化
-                     */
 
                     generatedThumbnailBlob =
                         await new Promise(
@@ -1558,33 +1566,21 @@ document.addEventListener(
 
 
                     selectedFixedTags =
-                        Array.isArray(
+                        toArray(
                             data.fixedTags
-                        )
-                            ? [
-                                ...data.fixedTags
-                            ]
-                            : [];
+                        );
 
 
                     selectedFreeTags =
-                        Array.isArray(
+                        toArray(
                             data.freeTags
-                        )
-                            ? [
-                                ...data.freeTags
-                            ]
-                            : [];
+                        );
 
 
                     selectedSeries =
-                        Array.isArray(
+                        toArray(
                             data.series
-                        )
-                            ? [
-                                ...data.series
-                            ]
-                            : [];
+                        );
 
 
                     renderFixedTags();
@@ -1917,7 +1913,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 13.0
+           作品検索 Version 13.1
            ================================== */
 
         function searchWorkByNumber(){
@@ -2091,33 +2087,26 @@ document.addEventListener(
 
 
             selectedFixedTags =
-                Array.isArray(
+                toArray(
                     work.fixedTags
-                )
-                    ? [
-                        ...work.fixedTags
-                    ]
-                    : [];
+                );
 
 
             selectedFreeTags =
-                Array.isArray(
+                toArray(
                     work.freeTags
-                )
-                    ? [
-                        ...work.freeTags
-                    ]
-                    : [];
+                );
 
+
+            /*
+             * series が文字列でも配列でも
+             * 正常に編集できるようにする。
+             */
 
             selectedSeries =
-                Array.isArray(
+                toArray(
                     work.series
-                )
-                    ? [
-                        ...work.series
-                    ]
-                    : [];
+                );
 
 
             editIdInput.value =
@@ -2144,7 +2133,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 13.0
+           Version 13.1
            ================================== */
 
         async function deleteWork(
@@ -2737,6 +2726,15 @@ document.addEventListener(
         renderSeries();
 
         clearSearchResult();
+
+
+        /* ==================================
+           Version表示
+           ================================== */
+
+        console.log(
+            "Project Library admin.js Version13.1"
+        );
 
     }
 );
