@@ -76,7 +76,7 @@ jobs:
 
           echo "======================================"
           echo "Project Library Publish"
-          echo "Version 10.2"
+          echo "Version 10.3"
           echo "======================================"
 
           echo "Title:"
@@ -351,7 +351,7 @@ jobs:
 
       # --------------------------------------
       # works.js更新
-      # Version 10.2
+      # Version 10.3
       # --------------------------------------
 
       - name: Update works.js
@@ -363,7 +363,7 @@ jobs:
 
           echo "======================================"
           echo "works.js自動更新"
-          echo "Version 10.2"
+          echo "Version 10.3"
           echo "======================================"
 
 
@@ -552,15 +552,23 @@ jobs:
 
           // ----------------------------------
           // データ変換用関数
+          // Version 10.3
+          // JSON文字列にも対応
           // ----------------------------------
 
           function toArray(value) {
 
             if (Array.isArray(value)) {
 
-              return value;
+              return value
+                .map(
+                  item =>
+                    String(item).trim()
+                )
+                .filter(Boolean);
 
             }
+
 
             if (
               value === undefined ||
@@ -572,7 +580,57 @@ jobs:
 
             }
 
-            return String(value)
+
+            const text =
+              String(value).trim();
+
+
+            // ------------------------------
+            // JSON配列文字列を解析
+            // 例：
+            // ["幼児向け"]
+            // ["ぬりえ","車"]
+            // []
+            // ------------------------------
+
+            if (
+              text.startsWith("[") &&
+              text.endsWith("]")
+            ){
+
+              try {
+
+                const parsed =
+                  JSON.parse(text);
+
+
+                if(Array.isArray(parsed)){
+
+                  return parsed
+                    .map(
+                      item =>
+                        String(item).trim()
+                    )
+                    .filter(Boolean);
+
+                }
+
+              } catch(error){
+
+                console.log(
+                  "JSON配列として解析できませんでした。通常処理を続行します。"
+                );
+
+              }
+
+            }
+
+
+            // ------------------------------
+            // 通常の文字列
+            // ------------------------------
+
+            return text
               .split(/[、,]/)
               .map(
                 item =>
@@ -606,8 +664,6 @@ jobs:
 
           // ----------------------------------
           // ID決定
-          // Version 10.2
-          // 新規投稿なら自動採番
           // ----------------------------------
 
           let id =
@@ -712,13 +768,55 @@ jobs:
 
 
           // ----------------------------------
-          // seriesを配列へ統一
+          // 配列データを正規化
           // ----------------------------------
+
+          const category =
+            toArray(
+              metadata.category
+            );
+
+
+          const fixedTags =
+            toArray(
+              metadata.fixedTags
+            );
+
+
+          const freeTags =
+            toArray(
+              metadata.freeTags
+            );
+
 
           const series =
             toArray(
               metadata.series
             );
+
+
+          console.log("");
+          console.log("データ正規化結果：");
+
+          console.log(
+            "category:",
+            JSON.stringify(category)
+          );
+
+          console.log(
+            "fixedTags:",
+            JSON.stringify(fixedTags)
+          );
+
+          console.log(
+            "freeTags:",
+            JSON.stringify(freeTags)
+          );
+
+          console.log(
+            "series:",
+            JSON.stringify(series)
+          );
 
 
           // ----------------------------------
@@ -741,21 +839,15 @@ jobs:
 
             category:
 
-              toArray(
-                metadata.category
-              ),
+              category,
 
             fixedTags:
 
-              toArray(
-                metadata.fixedTags
-              ),
+              fixedTags,
 
             freeTags:
 
-              toArray(
-                metadata.freeTags
-              ),
+              freeTags,
 
             series:
 
@@ -921,7 +1013,7 @@ jobs:
             "// ==========================\n" +
             "// Project Library\n" +
             "// works.js\n" +
-            "// Version 10.2\n" +
+            "// Version 10.3\n" +
             "// ==========================\n\n" +
             "const works = " +
             JSON.stringify(
@@ -1068,7 +1160,7 @@ jobs:
           fi
 
 
-          echo "✅ 一時ファイルを削除しました😊"
+          echo "✅ 一時ファイル削除完了😊"
 
 
       # --------------------------------------
@@ -1132,7 +1224,7 @@ jobs:
 
           echo ""
           echo "======================================"
-          echo "🎉 Project Library Version 10.2"
+          echo "🎉 Project Library Version 10.3"
           echo "======================================"
           echo "PDF：保存完了"
           echo "サムネイル：保存完了"
