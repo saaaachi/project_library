@@ -76,7 +76,7 @@ jobs:
 
           echo "======================================"
           echo "Project Library Publish"
-          echo "Version 10.1"
+          echo "Version 10.2"
           echo "======================================"
 
           echo "Title:"
@@ -351,6 +351,7 @@ jobs:
 
       # --------------------------------------
       # works.js更新
+      # Version 10.2
       # --------------------------------------
 
       - name: Update works.js
@@ -362,7 +363,7 @@ jobs:
 
           echo "======================================"
           echo "works.js自動更新"
-          echo "Version 10.1"
+          echo "Version 10.2"
           echo "======================================"
 
 
@@ -491,11 +492,6 @@ jobs:
               .trim();
 
 
-          // ----------------------------------
-          // Version 10.1
-          // 末尾の ]; を除去
-          // ----------------------------------
-
           arrayText =
             arrayText
               .replace(
@@ -512,7 +508,7 @@ jobs:
 
 
           // ----------------------------------
-          // 既存works配列をJavaScriptとして取得
+          // 既存works配列取得
           // ----------------------------------
 
           let works;
@@ -561,7 +557,9 @@ jobs:
           function toArray(value) {
 
             if (Array.isArray(value)) {
+
               return value;
+
             }
 
             if (
@@ -569,12 +567,17 @@ jobs:
               value === null ||
               value === ""
             ) {
+
               return [];
+
             }
 
             return String(value)
               .split(/[、,]/)
-              .map(item => item.trim())
+              .map(
+                item =>
+                  item.trim()
+              )
               .filter(Boolean);
 
           }
@@ -591,7 +594,9 @@ jobs:
             if (
               Number.isFinite(number)
             ) {
+
               return number;
+
             }
 
             return defaultValue;
@@ -601,21 +606,63 @@ jobs:
 
           // ----------------------------------
           // ID決定
+          // Version 10.2
+          // 新規投稿なら自動採番
           // ----------------------------------
 
-          const id =
+          let id =
             toNumber(
               metadata.workId
             );
 
 
-          if (!id) {
+          const isNewWork =
+            !id;
 
-            console.error(
-              "❌ workIdが正しくありません。"
+
+          if(isNewWork){
+
+            const numericIds =
+              works
+                .map(
+                  work =>
+                    Number(work.id)
+                )
+                .filter(
+                  value =>
+                    Number.isFinite(value)
+                    &&
+                    value > 0
+                );
+
+
+            const maxId =
+              numericIds.length
+                ? Math.max(
+                    ...numericIds
+                  )
+                : 0;
+
+
+            id =
+              maxId + 1;
+
+
+            console.log("");
+            console.log(
+              "新規作品としてIDを自動採番します😊"
             );
 
-            process.exit(1);
+            console.log(
+              `新しいID：${id}`
+            );
+
+          }else{
+
+            console.log("");
+            console.log(
+              `既存作品ID：${id}`
+            );
 
           }
 
@@ -635,7 +682,7 @@ jobs:
           ) {
 
             workNo =
-              `PL-${String(id).padStart(6, "0")}`;
+              `PL-${String(id).padStart(6,"0")}`;
 
           }
 
@@ -665,78 +712,110 @@ jobs:
 
 
           // ----------------------------------
+          // seriesを配列へ統一
+          // ----------------------------------
+
+          const series =
+            toArray(
+              metadata.series
+            );
+
+
+          // ----------------------------------
           // works.js用データ作成
           // ----------------------------------
 
           const newWork = {
 
-            id: id,
+            id:
 
-            workNo: workNo,
+              id,
+
+            workNo:
+
+              workNo,
 
             title:
+
               metadata.title || "",
 
             category:
+
               toArray(
                 metadata.category
               ),
 
             fixedTags:
+
               toArray(
                 metadata.fixedTags
               ),
 
             freeTags:
+
               toArray(
                 metadata.freeTags
               ),
 
             series:
-              metadata.series || "",
+
+              series,
 
             level:
+
               toNumber(
                 metadata.level,
                 1
               ),
 
             age:
+
               metadata.age || "",
 
             size:
+
               metadata.size || "",
 
             tools:
+
               toArray(
                 metadata.tools
               ),
 
             description:
+
               metadata.description || "",
 
             thumbnail:
+
               thumbnailPath,
 
             pdf:
+
               pdfPath,
 
             isNew:
+
               metadata.isNew !== false,
 
             recommend:
+
               metadata.recommend === true,
 
             publishDate:
+
               metadata.publishDate || "",
 
             updateDate:
+
               metadata.updateDate || "",
 
             etsy:
+
               metadata.etsy || "",
 
             related:
+
               Array.isArray(
                 metadata.related
               )
@@ -744,12 +823,15 @@ jobs:
                 : [],
 
             viewCount:
+
               0,
 
             downloadCount:
+
               0,
 
             favorite:
+
               false
 
           };
@@ -766,22 +848,28 @@ jobs:
             );
 
 
-          if (existingIndex !== -1) {
+          if (
+            existingIndex !== -1
+          ){
 
             console.log("");
+
             console.log(
               `既存作品 id:${id} を更新します。`
             );
 
+
             works[existingIndex] =
               newWork;
 
-          } else {
+          }else{
 
             console.log("");
+
             console.log(
               `新しい作品 id:${id} を追加します。`
             );
+
 
             works.push(
               newWork
@@ -808,7 +896,7 @@ jobs:
           if (
             ids.length !==
             uniqueIds.size
-          ) {
+          ){
 
             console.error(
               "❌ ID重複が発生しています。"
@@ -833,7 +921,7 @@ jobs:
             "// ==========================\n" +
             "// Project Library\n" +
             "// works.js\n" +
-            "// Version 10.1\n" +
+            "// Version 10.2\n" +
             "// ==========================\n\n" +
             "const works = " +
             JSON.stringify(
@@ -1044,7 +1132,7 @@ jobs:
 
           echo ""
           echo "======================================"
-          echo "🎉 Project Library Version 10.1"
+          echo "🎉 Project Library Version 10.2"
           echo "======================================"
           echo "PDF：保存完了"
           echo "サムネイル：保存完了"
