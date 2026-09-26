@@ -556,18 +556,97 @@ jobs:
           // JSON文字列にも対応
           // ----------------------------------
 
-          function toArray(value) {
+ function toArray(value) {
 
-            if (Array.isArray(value)) {
+  // ------------------------------
+  // すでに配列ならそのまま
+  // ------------------------------
 
-              return value
-                .map(
-                  item =>
-                    String(item).trim()
-                )
-                .filter(Boolean);
+  if (Array.isArray(value)) {
 
-            }
+    return value
+      .map(
+        item =>
+          String(item).trim()
+      )
+      .filter(Boolean);
+
+  }
+
+
+  // ------------------------------
+  // 空なら空配列
+  // ------------------------------
+
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+
+    return [];
+
+  }
+
+
+  // ------------------------------
+  // JSON文字列なら配列へ変換
+  //
+  // 例：
+  // '["幼児向け"]'
+  // '["ぬりえ","車"]'
+  // ------------------------------
+
+  const text =
+    String(value).trim();
+
+
+  if (
+    text.startsWith("[") &&
+    text.endsWith("]")
+  ){
+
+    try {
+
+      const parsed =
+        JSON.parse(text);
+
+
+      if(Array.isArray(parsed)){
+
+        return parsed
+          .map(
+            item =>
+              String(item).trim()
+          )
+          .filter(Boolean);
+
+      }
+
+    } catch(error) {
+
+      console.log(
+        "JSON配列として解析できなかったため、通常の文字列として処理します。"
+      );
+
+    }
+
+  }
+
+
+  // ------------------------------
+  // 通常の文字列
+  // ------------------------------
+
+  return text
+    .split(/[、,]/)
+    .map(
+      item =>
+        item.trim()
+    )
+    .filter(Boolean);
+
+}
 
 
             if (
