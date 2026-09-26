@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // works.js
-// Version 10.1
+// Version 10.2
 // ==========================
 
 const works = [
@@ -34,6 +34,39 @@ const works = [
         "recommend": true,
         "publishDate": "2026-07-12",
         "updateDate": "2026-07-12",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
+    },
+    {
+        "id": 2,
+        "workNo": "PL-000002",
+        "title": "テスト",
+        "category": [
+            "[\"幼児向け\"]"
+        ],
+        "fixedTags": [
+            "[]"
+        ],
+        "freeTags": [
+            "[]"
+        ],
+        "series": [
+            "[]"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "",
+        "thumbnail": "assets/images/thumbnail/テスト_1790400734348.jpg",
+        "pdf": "assets/pdf/テスト_1790400734348.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-26",
+        "updateDate": "2026-09-26",
         "etsy": "",
         "related": [],
         "viewCount": 0,
