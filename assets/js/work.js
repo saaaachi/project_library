@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // work.js
-// Version 5.2
+// Version 5.3
 // ==========================
 
 
@@ -159,6 +159,67 @@ function createRecommendBadge(work){
 </span>
 
 `;
+
+}
+
+
+// --------------------------
+// 広告枠生成
+// --------------------------
+
+function createWorkAd100(){
+
+    return `
+
+<div class="work-ad-100">
+
+<ins
+class="adsbygoogle"
+style="display:inline-block;width:728px;height:100px"
+data-ad-client="ca-pub-1299640300068792"
+data-ad-slot="5209302442">
+</ins>
+
+</div>
+
+`;
+
+}
+
+
+// --------------------------
+// 広告実行
+// --------------------------
+
+function activateWorkAds(){
+
+    const ads =
+        document.querySelectorAll(
+            ".work-ad-100 .adsbygoogle"
+        );
+
+
+    ads.forEach(
+        ad => {
+
+            try{
+
+                (
+                    window.adsbygoogle =
+                    window.adsbygoogle || []
+                ).push({});
+
+            }catch(error){
+
+                console.error(
+                    "AdSense error:",
+                    error
+                );
+
+            }
+
+        }
+    );
 
 }
 
@@ -360,6 +421,13 @@ ${createStars(work.level)}
 </p>
 
 
+<!-- ==========================
+     タイトル下広告
+     ========================== -->
+
+${createWorkAd100()}
+
+
 <div class="card-tags">
 
 ${categories.map(category => `
@@ -492,14 +560,15 @@ margin:8px 0 0;
 </div>
 
 
-<script
-async
-src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
-crossorigin="anonymous">
-</script>
+<!-- ==========================
+     既存レスポンシブ広告
+     ========================== -->
 
-
-<!-- プリント横長レスポンシブ -->
+<div
+style="
+width:100%;
+margin:20px 0;
+">
 
 <ins
 class="adsbygoogle"
@@ -510,12 +579,7 @@ data-ad-format="auto"
 data-full-width-responsive="true">
 </ins>
 
-
-<script>
-
-(adsbygoogle = window.adsbygoogle || []).push({});
-
-</script>
+</div>
 
 
 <!-- ==========================
@@ -546,6 +610,13 @@ iPhoneでは「ファイルに保存」を選択できます。
 </p>
 
 
+<!-- ==========================
+     ダウンロード下広告
+     ========================== -->
+
+${createWorkAd100()}
+
+
 <div class="section">
 
 <h3>
@@ -574,6 +645,34 @@ iPhoneでは「ファイルに保存」を選択できます。
 </section>
 
 `;
+
+
+// --------------------------
+// 広告を実行
+// --------------------------
+
+activateWorkAds();
+
+
+// --------------------------
+// 既存レスポンシブ広告を実行
+// --------------------------
+
+try{
+
+    (
+        window.adsbygoogle =
+        window.adsbygoogle || []
+    ).push({});
+
+}catch(error){
+
+    console.error(
+        "Responsive AdSense error:",
+        error
+    );
+
+}
 
 
 // --------------------------
@@ -621,10 +720,6 @@ pdfDownloadButton?.addEventListener(
 
         try{
 
-            /*
-             * PDFを取得
-             */
-
             const response =
                 await fetch(
                     work.pdf
@@ -644,10 +739,6 @@ pdfDownloadButton?.addEventListener(
                 await response.blob();
 
 
-            /*
-             * PDFファイルを作成
-             */
-
             const fileName =
                 createDownloadFileName(
                     work.title
@@ -664,11 +755,6 @@ pdfDownloadButton?.addEventListener(
                     }
                 );
 
-
-            /*
-             * iPhone / Safariなど、
-             * ファイル共有に対応している場合
-             */
 
             if(
                 navigator.share &&
@@ -700,11 +786,6 @@ pdfDownloadButton?.addEventListener(
                 }
 
             }else{
-
-                /*
-                 * 非対応ブラウザ用
-                 * 通常のダウンロードへ
-                 */
 
                 const url =
                     URL.createObjectURL(
@@ -766,12 +847,6 @@ pdfDownloadButton?.addEventListener(
             );
 
 
-            /*
-             * ユーザーが共有画面を
-             * 閉じただけの場合は
-             * エラー表示しない。
-             */
-
             if(
                 error.name ===
                 "AbortError"
@@ -791,11 +866,6 @@ pdfDownloadButton?.addEventListener(
                     error
                 );
 
-
-                /*
-                 * 最終フォールバックとして
-                 * PDFを新しいタブで開く
-                 */
 
                 const link =
                     document.createElement(
@@ -869,11 +939,6 @@ if(work){
             work.series
         );
 
-
-    /*
-     * シリーズ未設定なら
-     * 何も表示しない。
-     */
 
     if(
         seriesArea &&
@@ -1274,5 +1339,5 @@ if(work){
 // --------------------------
 
 console.log(
-    "Project Library work.js Version 5.2"
+    "Project Library work.js Version 5.3"
 );
