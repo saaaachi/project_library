@@ -222,6 +222,37 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 12,
+        "workNo": "PL-000012",
+        "title": "テストb",
+        "category": [
+            "大人向け"
+        ],
+        "fixedTags": [
+            "テスト"
+        ],
+        "freeTags": [
+            "テスト"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "",
+        "thumbnail": "assets/images/thumbnail/テストb_1790489768451.jpg",
+        "pdf": "assets/pdf/テストb_1790489768451.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-09-27",
+        "updateDate": "2026-09-27",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
