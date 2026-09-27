@@ -99,6 +99,36 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 5,
+        "workNo": "PL-000005",
+        "title": "テスト2",
+        "category": [
+            "幼児向け",
+            "子ども向け"
+        ],
+        "fixedTags": [],
+        "freeTags": [
+            "消防車"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "テスト",
+        "thumbnail": "assets/images/thumbnail/テスト2_1790471242496.jpg",
+        "pdf": "assets/pdf/テスト2_1790471242496.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-27",
+        "updateDate": "2026-09-27",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
