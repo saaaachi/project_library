@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 14.0
+   Version 14.1
    ====================================== */
 
 
@@ -52,6 +52,7 @@ document.addEventListener(
             document.getElementById(
                 "editId"
             );
+
 
         /* ==================================
            おすすめ設定
@@ -247,7 +248,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 14.0
+           Version 14.1
            ================================== */
 
         const workList =
@@ -330,6 +331,91 @@ document.addEventListener(
 
 
             return [value];
+
+        }
+
+
+        /* ==================================
+           新規入力を配列化
+           Version 14.1
+           ================================== */
+
+        function parseNewItems(
+            value
+        ){
+
+            if(
+                value === null ||
+                value === undefined
+            ){
+
+                return [];
+
+            }
+
+
+            return String(
+                value
+            )
+            .split(
+                /[,、]/
+            )
+            .map(
+                function(item){
+
+                    return item.trim();
+
+                }
+            )
+            .filter(
+                function(item){
+
+                    return item !== "";
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           配列を重複なしで結合
+           Version 14.1
+           ================================== */
+
+        function mergeUnique(
+            existing,
+            additional
+        ){
+
+            return Array.from(
+                new Set(
+                    [
+                        ...toArray(
+                            existing
+                        ),
+                        ...toArray(
+                            additional
+                        )
+                    ]
+                    .map(
+                        function(item){
+
+                            return String(
+                                item
+                            ).trim();
+
+                        }
+                    )
+                    .filter(
+                        function(item){
+
+                            return item !== "";
+
+                        }
+                    )
+                )
+            );
 
         }
 
@@ -618,23 +704,6 @@ document.addEventListener(
                                     );
 
                             renderFixedTags();
-
-                            renderSelectedChoices(
-                                fixedTagSelected,
-                                selectedFixedTags,
-                                function(removeItem){
-
-                                    selectedFixedTags =
-                                        selectedFixedTags
-                                            .filter(
-                                                tag =>
-                                                    tag !== removeItem
-                                            );
-
-                                    renderFixedTags();
-
-                                }
-                            );
 
                         }
                     );
@@ -1222,7 +1291,7 @@ document.addEventListener(
                     diagonal;
 
                 y +=
-                        secondSpacingY
+                    secondSpacingY
             ){
 
                 for(
@@ -1254,7 +1323,7 @@ document.addEventListener(
 
         /* ==================================
            PDF → サムネイル
-           Version 14.0
+           Version 14.1
            ================================== */
 
         pdfFileInput?.addEventListener(
@@ -1946,7 +2015,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 14.0
+           作品検索 Version 14.1
            ================================== */
 
         function searchWorkByNumber(){
@@ -2173,7 +2242,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 14.0
+           Version 14.1
            ================================== */
 
         async function deleteWork(
@@ -2396,6 +2465,7 @@ document.addEventListener(
 
         /* ==================================
            公開
+           Version 14.1
            ================================== */
 
         const publishButton =
@@ -2470,6 +2540,54 @@ document.addEventListener(
 
                 try{
 
+                    /* ==================================
+                       新規タグ・シリーズを取得
+                       Version 14.1
+                       ================================== */
+
+                    const newFixedTags =
+                        parseNewItems(
+                            newFixedTag?.value
+                        );
+
+
+                    const newFreeTags =
+                        parseNewItems(
+                            newFreeTag?.value
+                        );
+
+
+                    const newSeriesItems =
+                        parseNewItems(
+                            newSeries?.value
+                        );
+
+
+                    /* ==================================
+                       既存選択 + 新規入力を統合
+                       ================================== */
+
+                    selectedFixedTags =
+                        mergeUnique(
+                            selectedFixedTags,
+                            newFixedTags
+                        );
+
+
+                    selectedFreeTags =
+                        mergeUnique(
+                            selectedFreeTags,
+                            newFreeTags
+                        );
+
+
+                    selectedSeries =
+                        mergeUnique(
+                            selectedSeries,
+                            newSeriesItems
+                        );
+
+
                     const formData =
                         new FormData();
 
@@ -2494,6 +2612,8 @@ document.addEventListener(
                     );
 
 
+                    /* 新規固定タグを含めて送信 */
+
                     formData.append(
                         "fixedTags",
                         JSON.stringify(
@@ -2502,6 +2622,8 @@ document.addEventListener(
                     );
 
 
+                    /* 新規自由タグを含めて送信 */
+
                     formData.append(
                         "freeTags",
                         JSON.stringify(
@@ -2509,6 +2631,8 @@ document.addEventListener(
                         )
                     );
 
+
+                    /* 新規シリーズを含めて送信 */
 
                     formData.append(
                         "series",
@@ -2530,7 +2654,9 @@ document.addEventListener(
                     );
 
 
-                    /* おすすめ設定をAPIへ送る */
+                    /* ==================================
+                       おすすめ設定をAPIへ送る
+                       ================================== */
 
                     formData.append(
                         "recommend",
@@ -2579,6 +2705,10 @@ document.addEventListener(
                     }
 
 
+                    /* ==================================
+                       API送信
+                       ================================== */
+
                     const response =
                         await fetch(
                             API_URL,
@@ -2607,6 +2737,10 @@ document.addEventListener(
 
                     }
 
+
+                    /* ==================================
+                       前回データ保存
+                       ================================== */
 
                     localStorage.setItem(
                         "projectLibraryLastWork",
@@ -2646,8 +2780,13 @@ document.addEventListener(
                     );
 
 
+                    /* ==================================
+                       完了
+                       ================================== */
+
                     alert(
-                        "🚀 公開リクエストを送信しました！\n\nGitHub Actionsが実行されます😊"
+                        "🚀 公開リクエストを送信しました！\n\n" +
+                        "GitHub Actionsが実行されます😊"
                     );
 
 
@@ -2789,7 +2928,7 @@ document.addEventListener(
            ================================== */
 
         console.log(
-            "Project Library admin.js Version14.0"
+            "Project Library admin.js Version14.1"
         );
 
     }
