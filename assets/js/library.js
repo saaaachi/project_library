@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // library.js
-// Version 5.0
+// Version 5.1
 // ==========================
 
 
@@ -48,7 +48,7 @@ const level =
 
 function createStars(level){
 
-    switch(level){
+    switch(Number(level)){
 
         case 1:
             return "★☆☆";
@@ -457,6 +457,12 @@ ${tag} (${tagCount})
 
 function pushAds(){
 
+    if(!cardArea){
+
+        return;
+
+    }
+
     const ads =
         cardArea.querySelectorAll(
             ".library-inline-ad .adsbygoogle"
@@ -472,7 +478,8 @@ function pushAds(){
                 )
             ){
 
-                (adsbygoogle =
+                (
+                    window.adsbygoogle =
                     window.adsbygoogle || []
                 ).push({});
 
@@ -498,6 +505,14 @@ function pushAds(){
 
 function loadWorks(){
 
+    // library.html以外などで
+    // カード表示エリアが存在しない場合は終了
+    if(!cardArea){
+
+        return;
+
+    }
+
     createBreadcrumb();
 
     let result = [...works];
@@ -509,11 +524,16 @@ function loadWorks(){
 
     if(category){
 
-        result = result.filter(work =>
+        result = result.filter(work => {
 
-            work.category.includes(category)
+            const categories =
+                Array.isArray(work.category)
+                    ? work.category
+                    : [];
 
-        );
+            return categories.includes(category);
+
+        });
 
     }
 
@@ -524,15 +544,24 @@ function loadWorks(){
 
     if(tag){
 
-        result = result.filter(work =>
+        result = result.filter(work => {
 
-            work.fixedTags.includes(tag)
+            const fixedTags =
+                Array.isArray(work.fixedTags)
+                    ? work.fixedTags
+                    : [];
 
-            ||
+            const freeTags =
+                Array.isArray(work.freeTags)
+                    ? work.freeTags
+                    : [];
 
-            work.freeTags.includes(tag)
+            return(
+                fixedTags.includes(tag) ||
+                freeTags.includes(tag)
+            );
 
-        );
+        });
 
     }
 
@@ -548,23 +577,37 @@ function loadWorks(){
 
         result = result.filter(work => {
 
+            const title =
+                String(work.title || "")
+                    .toLowerCase();
+
+            const description =
+                String(work.description || "")
+                    .toLowerCase();
+
+            const fixedTags =
+                Array.isArray(work.fixedTags)
+                    ? work.fixedTags
+                    : [];
+
+            const freeTags =
+                Array.isArray(work.freeTags)
+                    ? work.freeTags
+                    : [];
+
             return(
 
-                work.title
-                    .toLowerCase()
-                    .includes(word)
+                title.includes(word)
 
                 ||
 
-                work.description
-                    .toLowerCase()
-                    .includes(word)
+                description.includes(word)
 
                 ||
 
-                work.fixedTags.some(item =>
+                fixedTags.some(item =>
 
-                    item
+                    String(item)
                         .toLowerCase()
                         .includes(word)
 
@@ -572,9 +615,9 @@ function loadWorks(){
 
                 ||
 
-                work.freeTags.some(item =>
+                freeTags.some(item =>
 
-                    item
+                    String(item)
                         .toLowerCase()
                         .includes(word)
 
@@ -595,7 +638,7 @@ function loadWorks(){
 
         result = result.filter(work =>
 
-            work.level === Number(level)
+            Number(work.level) === Number(level)
 
         );
 
@@ -610,48 +653,100 @@ function loadWorks(){
 
         switch(sortSelect.value){
 
+            // --------------------------
+            // 古い順
+            // --------------------------
+
             case "old":
 
-                result.sort((a,b) =>
+                result.sort((a,b) => {
 
-                    new Date(a.publishDate) -
-                    new Date(b.publishDate)
+                    const dateA =
+                        new Date(a.publishDate);
 
-                );
+                    const dateB =
+                        new Date(b.publishDate);
+
+                    const dateDifference =
+                        dateA - dateB;
+
+                    if(dateDifference !== 0){
+
+                        return dateDifference;
+
+                    }
+
+                    return(
+                        Number(a.id) -
+                        Number(b.id)
+                    );
+
+                });
 
                 break;
 
+
+            // --------------------------
+            // 難易度が低い順
+            // --------------------------
 
             case "easy":
 
                 result.sort((a,b) =>
 
-                    a.level - b.level
+                    Number(a.level) -
+                    Number(b.level)
 
                 );
 
                 break;
 
+
+            // --------------------------
+            // 難易度が高い順
+            // --------------------------
 
             case "hard":
 
                 result.sort((a,b) =>
 
-                    b.level - a.level
+                    Number(b.level) -
+                    Number(a.level)
 
                 );
 
                 break;
 
 
+            // --------------------------
+            // 新しい順
+            // --------------------------
+
             default:
 
-                result.sort((a,b) =>
+                result.sort((a,b) => {
 
-                    new Date(b.publishDate) -
-                    new Date(a.publishDate)
+                    const dateA =
+                        new Date(a.publishDate);
 
-                );
+                    const dateB =
+                        new Date(b.publishDate);
+
+                    const dateDifference =
+                        dateB - dateA;
+
+                    if(dateDifference !== 0){
+
+                        return dateDifference;
+
+                    }
+
+                    return(
+                        Number(b.id) -
+                        Number(a.id)
+                    );
+
+                });
 
                 break;
 
@@ -755,7 +850,11 @@ function loadWorks(){
 // 初回表示
 // --------------------------
 
-loadWorks();
+if(cardArea){
+
+    loadWorks();
+
+}
 
 
 // --------------------------
@@ -785,6 +884,6 @@ if(sortSelect){
 
 console.log(
 
-    "Project Library library.js Version5.0"
+    "Project Library library.js Version 5.1"
 
 );
