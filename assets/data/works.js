@@ -184,6 +184,37 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 8,
+        "workNo": "PL-000008",
+        "title": "テスト6",
+        "category": [
+            "大人向け"
+        ],
+        "fixedTags": [
+            "テスト"
+        ],
+        "freeTags": [
+            "テスト"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "",
+        "thumbnail": "assets/images/thumbnail/テスト6_1790472546527.jpg",
+        "pdf": "assets/pdf/テスト6_1790472546527.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-27",
+        "updateDate": "2026-09-27",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
