@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // work.js
-// Version 5.3
+// Version 5.4
 // ==========================
 
 
@@ -164,7 +164,7 @@ function createRecommendBadge(work){
 
 
 // --------------------------
-// 広告枠生成
+// 728 × 100 広告枠生成
 // --------------------------
 
 function createWorkAd100(){
@@ -188,7 +188,7 @@ data-ad-slot="5209302442">
 
 
 // --------------------------
-// 広告実行
+// 728 × 100 広告実行
 // --------------------------
 
 function activateWorkAds(){
@@ -423,6 +423,7 @@ ${createStars(work.level)}
 
 <!-- ==========================
      タイトル下広告
+     728 × 100
      ========================== -->
 
 ${createWorkAd100()}
@@ -561,28 +562,6 @@ margin:8px 0 0;
 
 
 <!-- ==========================
-     既存レスポンシブ広告
-     ========================== -->
-
-<div
-style="
-width:100%;
-margin:20px 0;
-">
-
-<ins
-class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-1299640300068792"
-data-ad-slot="6020574861"
-data-ad-format="auto"
-data-full-width-responsive="true">
-</ins>
-
-</div>
-
-
-<!-- ==========================
      PDFダウンロード
      ========================== -->
 
@@ -612,6 +591,7 @@ iPhoneでは「ファイルに保存」を選択できます。
 
 <!-- ==========================
      ダウンロード下広告
+     728 × 100
      ========================== -->
 
 ${createWorkAd100()}
@@ -648,31 +628,10 @@ ${createWorkAd100()}
 
 
 // --------------------------
-// 広告を実行
+// 728 × 100 広告を実行
 // --------------------------
 
 activateWorkAds();
-
-
-// --------------------------
-// 既存レスポンシブ広告を実行
-// --------------------------
-
-try{
-
-    (
-        window.adsbygoogle =
-        window.adsbygoogle || []
-    ).push({});
-
-}catch(error){
-
-    console.error(
-        "Responsive AdSense error:",
-        error
-    );
-
-}
 
 
 // --------------------------
@@ -1339,5 +1298,5 @@ if(work){
 // --------------------------
 
 console.log(
-    "Project Library work.js Version 5.3"
+    "Project Library work.js Version 5.4"
 );
