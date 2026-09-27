@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 13.1
+   Version 14.0
    ====================================== */
 
 
@@ -53,6 +53,15 @@ document.addEventListener(
                 "editId"
             );
 
+        /* ==================================
+           おすすめ設定
+           ================================== */
+
+        const recommendInput =
+            document.getElementById(
+                "recommend"
+            );
+
 
         /* ==================================
            前回データ
@@ -80,7 +89,8 @@ document.addEventListener(
 
                 }
             );
-            
+
+
         /* ==================================
            カテゴリ
            ================================== */
@@ -237,7 +247,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 13.1
+           Version 14.0
            ================================== */
 
         const workList =
@@ -797,12 +807,6 @@ document.addEventListener(
             workList.forEach(
                 function(work){
 
-                    /*
-                     * series が
-                     * 配列でも文字列でも
-                     * 正常に扱えるようにする。
-                     */
-
                     toArray(
                         work.series
                     )
@@ -1250,7 +1254,7 @@ document.addEventListener(
 
         /* ==================================
            PDF → サムネイル
-           Version 13.1
+           Version 14.0
            ================================== */
 
         pdfFileInput?.addEventListener(
@@ -1600,6 +1604,18 @@ document.addEventListener(
                         );
 
 
+                    /* おすすめ設定も引き継ぐ */
+
+                    if(
+                        recommendInput
+                    ){
+
+                        recommendInput.checked =
+                            data.recommend === true;
+
+                    }
+
+
                     renderFixedTags();
 
                     renderFreeTags();
@@ -1930,7 +1946,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 13.1
+           作品検索 Version 14.0
            ================================== */
 
         function searchWorkByNumber(){
@@ -2115,15 +2131,22 @@ document.addEventListener(
                 );
 
 
-            /*
-             * series が文字列でも配列でも
-             * 正常に編集できるようにする。
-             */
-
             selectedSeries =
                 toArray(
                     work.series
                 );
+
+
+            /* おすすめ状態を編集画面へ反映 */
+
+            if(
+                recommendInput
+            ){
+
+                recommendInput.checked =
+                    work.recommend === true;
+
+            }
 
 
             editIdInput.value =
@@ -2150,7 +2173,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 13.1
+           Version 14.0
            ================================== */
 
         async function deleteWork(
@@ -2507,6 +2530,16 @@ document.addEventListener(
                     );
 
 
+                    /* おすすめ設定をAPIへ送る */
+
+                    formData.append(
+                        "recommend",
+                        recommendInput?.checked
+                            ? "true"
+                            : "false"
+                    );
+
+
                     formData.append(
                         "workId",
                         editId
@@ -2604,7 +2637,10 @@ document.addEventListener(
 
                             size:
                                 sizeInput
-                                    .value
+                                    .value,
+
+                            recommend:
+                                recommendInput?.checked === true
 
                         })
                     );
@@ -2711,7 +2747,10 @@ document.addEventListener(
                         difficultyInput.value,
 
                     size:
-                        sizeInput.value
+                        sizeInput.value,
+
+                    recommend:
+                        recommendInput?.checked === true
 
                 };
 
@@ -2750,7 +2789,7 @@ document.addEventListener(
            ================================== */
 
         console.log(
-            "Project Library admin.js Version13.1"
+            "Project Library admin.js Version14.0"
         );
 
     }
