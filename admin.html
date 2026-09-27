@@ -59,7 +59,7 @@ function logout(){
 <style>
 
 /* ======================================
-   管理画面 Version 12.0
+   管理画面 Version 12.1
    ====================================== */
 
 
@@ -252,6 +252,7 @@ function logout(){
     padding:15px;
 
     border:1px solid #ddd;
+
     border-radius:10px;
 
     background:#fff;
@@ -1249,6 +1250,51 @@ function logout(){
         >
 
     </div>
+
+</div>
+
+
+<!-- ======================================
+     おすすめ設定
+     ====================================== -->
+
+<div class="admin-form-item">
+
+    <label>
+        おすすめ設定
+    </label>
+
+
+    <label
+        style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+            cursor:pointer;
+        "
+    >
+
+        <input
+            type="checkbox"
+            id="recommend"
+            name="recommend"
+        >
+
+
+        <span>
+            ⭐ おすすめにする
+        </span>
+
+    </label>
+
+
+    <p class="admin-help-text">
+
+        チェックした作品は、
+        トップページの「おすすめ作品」に表示されます。
+        最新のおすすめ作品から最大3件まで表示されます。
+
+    </p>
 
 </div>
 
