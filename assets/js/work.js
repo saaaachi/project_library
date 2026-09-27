@@ -1,39 +1,18 @@
 // ==========================
 // Project Library
 // work.js
-// Version 5.4
+// Version 5.5
 // ==========================
 
 
-// --------------------------
-// URL取得
-// --------------------------
-
-const params =
-    new URLSearchParams(location.search);
-
-const id =
-    Number(params.get("id"));
+const params = new URLSearchParams(location.search);
+const id = Number(params.get("id"));
+const area = document.getElementById("workArea");
+const work = works.find(item => item.id === id);
 
 
 // --------------------------
-// 表示エリア
-// --------------------------
-
-const area =
-    document.getElementById("workArea");
-
-
-// --------------------------
-// データ取得
-// --------------------------
-
-const work =
-    works.find(item => item.id === id);
-
-
-// --------------------------
-// 安全な文字列化
+// 安全な文字列
 // --------------------------
 
 function safeString(value){
@@ -60,15 +39,15 @@ function toArray(value){
 
     if(Array.isArray(value)){
 
-        return value.filter(
-            item =>
-                item !== undefined &&
-                item !== null &&
-                String(item).trim() !== ""
+        return value.filter(item =>
+
+            item !== undefined &&
+            item !== null &&
+            String(item).trim() !== ""
+
         );
 
     }
-
 
     if(
         value === undefined ||
@@ -79,7 +58,6 @@ function toArray(value){
         return [];
 
     }
-
 
     return [value];
 
@@ -112,7 +90,7 @@ function createStars(level){
 
 
 // --------------------------
-// NEW表示
+// NEWバッジ
 // --------------------------
 
 function createNewBadge(work){
@@ -123,22 +101,17 @@ function createNewBadge(work){
 
     }
 
-
     return `
-
 <span class="badge badge-new">
-
-NEW
-
+    NEW
 </span>
-
 `;
 
 }
 
 
 // --------------------------
-// おすすめ表示
+// おすすめバッジ
 // --------------------------
 
 function createRecommendBadge(work){
@@ -149,28 +122,22 @@ function createRecommendBadge(work){
 
     }
 
-
     return `
-
 <span class="badge badge-recommend">
-
-おすすめ
-
+    おすすめ
 </span>
-
 `;
 
 }
 
 
 // --------------------------
-// 728 × 100 広告枠生成
+// 728×100広告
 // --------------------------
 
 function createWorkAd100(){
 
     return `
-
 <div class="work-ad-100">
 
 <ins
@@ -181,14 +148,13 @@ data-ad-slot="5209302442">
 </ins>
 
 </div>
-
 `;
 
 }
 
 
 // --------------------------
-// 728 × 100 広告実行
+// AdSense広告を実行
 // --------------------------
 
 function activateWorkAds(){
@@ -198,99 +164,80 @@ function activateWorkAds(){
             ".work-ad-100 .adsbygoogle"
         );
 
+    ads.forEach(ad => {
 
-    ads.forEach(
-        ad => {
+        try{
 
-            try{
+            (
+                window.adsbygoogle =
+                window.adsbygoogle || []
+            ).push({});
 
-                (
-                    window.adsbygoogle =
-                    window.adsbygoogle || []
-                ).push({});
+        }catch(error){
 
-            }catch(error){
-
-                console.error(
-                    "AdSense error:",
-                    error
-                );
-
-            }
+            console.error(
+                "AdSense error:",
+                error
+            );
 
         }
-    );
+
+    });
 
 }
 
 
 // --------------------------
-// パンくず生成
+// パンくず
 // --------------------------
 
 function createBreadcrumb(work){
 
     const categories =
-        toArray(
-            work.category
-        );
-
+        toArray(work.category);
 
     let html = `
 
 <div class="breadcrumb">
 
 <a href="index.html">
-
 ホーム
-
 </a>
 
 ＞
 
 <a href="library.html">
-
 作品一覧
-
 </a>
 
 `;
 
+    categories.forEach(category => {
 
-    categories.forEach(
-        category => {
-
-            html += `
+        html += `
 
 ＞
 
 <a
 href="library.html?category=${encodeURIComponent(category)}">
-
 ${category}
-
 </a>
 
 `;
 
-        }
-    );
-
+    });
 
     html += `
 
 ＞
 
 <span class="current">
-
 ${safeString(work.title)}
-
 </span>
 
 </div>
 
 `;
-
 
     return html;
 
@@ -298,23 +245,26 @@ ${safeString(work.title)}
 
 
 // --------------------------
-// ダウンロード用ファイル名
+// PDFファイル名
 // --------------------------
 
 function createDownloadFileName(title){
 
     const safeTitle =
+
         safeString(title)
+
             .replace(
                 /[\\/:*?"<>|]/g,
                 ""
             )
+
             .trim()
+
             .replace(
                 /\s+/g,
                 "_"
             );
-
 
     return (
         safeTitle ||
@@ -325,8 +275,21 @@ function createDownloadFileName(title){
 
 
 // --------------------------
-// 見つからない場合
+// モバイル端末判定
 // --------------------------
+
+function isMobileDevice(){
+
+    return /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+    );
+
+}
+
+
+// =====================================================
+// 作品表示
+// =====================================================
 
 if(!work){
 
@@ -335,23 +298,17 @@ if(!work){
 <section class="container">
 
 <h2>
-
 作品が見つかりませんでした。
-
 </h2>
 
 <p>
-
 URLをご確認ください。
-
 </p>
 
 <a
 class="button"
 href="library.html">
-
 作品一覧へ戻る
-
 </a>
 
 </section>
@@ -360,71 +317,42 @@ href="library.html">
 
 }else{
 
+    const categories =
+        toArray(work.category);
 
-// --------------------------
-// データを正規化
-// --------------------------
+    const fixedTags =
+        toArray(work.fixedTags);
 
-const categories =
-    toArray(
-        work.category
-    );
+    const freeTags =
+        toArray(work.freeTags);
 
+    const tools =
+        toArray(work.tools);
 
-const fixedTags =
-    toArray(
-        work.fixedTags
-    );
-
-
-const freeTags =
-    toArray(
-        work.freeTags
-    );
+    const series =
+        toArray(work.series);
 
 
-const tools =
-    toArray(
-        work.tools
-    );
-
-
-const series =
-    toArray(
-        work.series
-    );
-
-
-// --------------------------
-// メイン表示
-// --------------------------
-
-area.innerHTML = `
+    area.innerHTML = `
 
 <section class="container">
 
 ${createBreadcrumb(work)}
 
 ${createNewBadge(work)}
+
 ${createRecommendBadge(work)}
 
 <h1 class="section-title">
-
 ${safeString(work.title)}
-
 </h1>
 
 <p class="level">
-
 ${createStars(work.level)}
-
 </p>
 
 
-<!-- ==========================
-     タイトル下広告
-     728 × 100
-     ========================== -->
+<!-- タイトル下広告 -->
 
 ${createWorkAd100()}
 
@@ -436,9 +364,7 @@ ${categories.map(category => `
 <a
 class="tag"
 href="library.html?category=${encodeURIComponent(category)}">
-
 ${category}
-
 </a>
 
 `).join("")}
@@ -459,10 +385,7 @@ alt="${safeString(work.title)}">
 
 <div class="info-item">
 
-<b>対象年齢</b>
-
-<br>
-
+<b>対象年齢</b><br>
 ${safeString(work.age)}
 
 </div>
@@ -470,10 +393,7 @@ ${safeString(work.age)}
 
 <div class="info-item">
 
-<b>印刷サイズ</b>
-
-<br>
-
+<b>印刷サイズ</b><br>
 ${safeString(work.size)}
 
 </div>
@@ -481,10 +401,7 @@ ${safeString(work.size)}
 
 <div class="info-item">
 
-<b>必要な道具</b>
-
-<br>
-
+<b>必要な道具</b><br>
 ${tools.join("・")}
 
 </div>
@@ -500,60 +417,47 @@ ${safeString(work.description)}
 
 
 <h3>
-
 タグ
-
 </h3>
 
 
 <div class="card-tags">
 
-${
-    fixedTags.map(
-        tag => `
+${fixedTags.map(tag => `
 
 <a
 class="tag"
 href="library.html?tag=${encodeURIComponent(tag)}">
-
 ${tag}
-
 </a>
 
-`
-    ).join("")
-}
+`).join("")}
 
-${
-    freeTags.map(
-        tag => `
+
+${freeTags.map(tag => `
 
 <a
 class="tag"
 href="library.html?tag=${encodeURIComponent(tag)}">
-
 ${tag}
-
 </a>
 
-`
-    ).join("")
-}
+`).join("")}
+
 
 ${
     fixedTags.length === 0 &&
     freeTags.length === 0
         ? `
+
 <p
 style="
 color:#888;
 font-size:14px;
-margin:8px 0 0;
-">
-
+margin:8px 0 0;">
 タグはありません。
-
 </p>
+
 `
         : ""
 }
@@ -561,9 +465,7 @@ margin:8px 0 0;
 </div>
 
 
-<!-- ==========================
-     PDFダウンロード
-     ========================== -->
+<!-- PDFダウンロード -->
 
 <button
 type="button"
@@ -581,18 +483,14 @@ id="pdfDownloadHelp"
 style="
 font-size:13px;
 color:#777;
-margin-top:8px;
-">
+margin-top:8px;">
 
 iPhoneでは「ファイルに保存」を選択できます。
 
 </p>
 
 
-<!-- ==========================
-     ダウンロード下広告
-     728 × 100
-     ========================== -->
+<!-- ダウンロード下広告 -->
 
 ${createWorkAd100()}
 
@@ -600,14 +498,13 @@ ${createWorkAd100()}
 <div class="section">
 
 <h3>
-
 ご利用について
-
 </h3>
 
 <p>
 
 個人・教育・施設利用は無料です。<br>
+
 再配布・販売・データの転載は禁止しています。
 
 </p>
@@ -621,269 +518,274 @@ ${createWorkAd100()}
 
 <div id="moveArea"></div>
 
-
 </section>
 
 `;
 
 
-// --------------------------
-// 728 × 100 広告を実行
-// --------------------------
+    // --------------------------
+    // 広告実行
+    // --------------------------
 
-activateWorkAds();
-
-
-// --------------------------
-// PDFダウンロード処理
-// --------------------------
-
-const pdfDownloadButton =
-    document.getElementById(
-        "pdfDownloadButton"
-    );
+    activateWorkAds();
 
 
-const pdfDownloadHelp =
-    document.getElementById(
-        "pdfDownloadHelp"
-    );
+    // --------------------------
+    // PDFダウンロード
+    // --------------------------
+
+    const pdfDownloadButton =
+        document.getElementById(
+            "pdfDownloadButton"
+        );
+
+    const pdfDownloadHelp =
+        document.getElementById(
+            "pdfDownloadHelp"
+        );
 
 
-pdfDownloadButton?.addEventListener(
-    "click",
-    async function(){
+    pdfDownloadButton?.addEventListener(
 
-        if(!work.pdf){
+        "click",
 
-            alert(
-                "PDFファイルが見つかりません。"
-            );
+        async function(){
 
-            return;
+            if(!work.pdf){
 
-        }
-
-
-        const originalText =
-            pdfDownloadButton.textContent;
-
-
-        pdfDownloadButton.disabled =
-            true;
-
-
-        pdfDownloadButton.textContent =
-            "📄 PDFを準備中…";
-
-
-        try{
-
-            const response =
-                await fetch(
-                    work.pdf
+                alert(
+                    "PDFファイルが見つかりません。"
                 );
 
-
-            if(!response.ok){
-
-                throw new Error(
-                    "PDFを取得できませんでした。"
-                );
+                return;
 
             }
 
 
-            const blob =
-                await response.blob();
+            const originalText =
+                pdfDownloadButton.textContent;
 
 
-            const fileName =
-                createDownloadFileName(
-                    work.title
-                );
-
-
-            const pdfFile =
-                new File(
-                    [blob],
-                    fileName,
-                    {
-                        type:
-                            "application/pdf"
-                    }
-                );
-
-
-            if(
-                navigator.share &&
-                navigator.canShare &&
-                navigator.canShare({
-                    files:
-                        [pdfFile]
-                })
-            ){
-
-                await navigator.share({
-
-                    files:
-                        [pdfFile],
-
-                    title:
-                        fileName,
-
-                    text:
-                        `${safeString(work.title)}`
-                });
-
-
-                if(pdfDownloadHelp){
-
-                    pdfDownloadHelp.textContent =
-                        "PDFの共有・保存画面を開きました😊";
-
-                }
-
-            }else{
-
-                const url =
-                    URL.createObjectURL(
-                        blob
-                    );
-
-
-                const link =
-                    document.createElement(
-                        "a"
-                    );
-
-
-                link.href =
-                    url;
-
-
-                link.download =
-                    fileName;
-
-
-                document.body.appendChild(
-                    link
-                );
-
-
-                link.click();
-
-
-                link.remove();
-
-
-                setTimeout(
-                    function(){
-
-                        URL.revokeObjectURL(
-                            url
-                        );
-
-                    },
-                    1000
-                );
-
-
-                if(pdfDownloadHelp){
-
-                    pdfDownloadHelp.textContent =
-                        "PDFのダウンロードを開始しました😊";
-
-                }
-
-            }
-
-
-        }catch(error){
-
-            console.error(
-                error
-            );
-
-
-            if(
-                error.name ===
-                "AbortError"
-            ){
-
-                if(pdfDownloadHelp){
-
-                    pdfDownloadHelp.textContent =
-                        "PDFの保存をキャンセルしました。";
-
-                }
-
-            }else{
-
-                console.error(
-                    "PDF download error:",
-                    error
-                );
-
-
-                const link =
-                    document.createElement(
-                        "a"
-                    );
-
-
-                link.href =
-                    work.pdf;
-
-
-                link.target =
-                    "_blank";
-
-
-                link.rel =
-                    "noopener";
-
-
-                document.body.appendChild(
-                    link
-                );
-
-
-                link.click();
-
-
-                link.remove();
-
-
-                if(pdfDownloadHelp){
-
-                    pdfDownloadHelp.textContent =
-                        "PDFを開きました。画面の共有ボタンから保存できます。";
-
-                }
-
-            }
-
-        }finally{
-
-            pdfDownloadButton.disabled =
-                false;
-
+            pdfDownloadButton.disabled = true;
 
             pdfDownloadButton.textContent =
-                originalText;
+                "📄 PDFを準備中…";
+
+
+            try{
+
+                const response =
+                    await fetch(work.pdf);
+
+
+                if(!response.ok){
+
+                    throw new Error(
+                        "PDFを取得できませんでした。"
+                    );
+
+                }
+
+
+                const blob =
+                    await response.blob();
+
+
+                const fileName =
+                    createDownloadFileName(
+                        work.title
+                    );
+
+
+                const pdfFile =
+                    new File(
+                        [blob],
+                        fileName,
+                        {
+                            type:
+                                "application/pdf"
+                        }
+                    );
+
+
+                // =================================================
+                // スマートフォン・タブレット
+                // =================================================
+
+                if(
+
+                    isMobileDevice() &&
+
+                    navigator.share &&
+
+                    navigator.canShare &&
+
+                    navigator.canShare({
+                        files: [pdfFile]
+                    })
+
+                ){
+
+                    await navigator.share({
+
+                        files: [pdfFile],
+
+                        title: fileName,
+
+                        text:
+                            `${safeString(work.title)}`
+
+                    });
+
+
+                    if(pdfDownloadHelp){
+
+                        pdfDownloadHelp.textContent =
+                            "PDFの共有・保存画面を開きました😊";
+
+                    }
+
+                }
+
+
+                // =================================================
+                // PC
+                // =================================================
+
+                else{
+
+                    const url =
+                        URL.createObjectURL(
+                            blob
+                        );
+
+
+                    const link =
+                        document.createElement(
+                            "a"
+                        );
+
+
+                    link.href = url;
+
+                    link.download =
+                        fileName;
+
+
+                    document.body.appendChild(
+                        link
+                    );
+
+
+                    link.click();
+
+
+                    link.remove();
+
+
+                    setTimeout(
+                        function(){
+
+                            URL.revokeObjectURL(
+                                url
+                            );
+
+                        },
+                        1000
+                    );
+
+
+                    if(pdfDownloadHelp){
+
+                        pdfDownloadHelp.textContent =
+                            "PDFのダウンロードを開始しました😊";
+
+                    }
+
+                }
+
+
+            }catch(error){
+
+                console.error(error);
+
+
+                if(
+                    error.name ===
+                    "AbortError"
+                ){
+
+                    if(pdfDownloadHelp){
+
+                        pdfDownloadHelp.textContent =
+                            "PDFの保存をキャンセルしました。";
+
+                    }
+
+                }else{
+
+                    console.error(
+                        "PDF download error:",
+                        error
+                    );
+
+
+                    const link =
+                        document.createElement(
+                            "a"
+                        );
+
+
+                    link.href =
+                        work.pdf;
+
+                    link.target =
+                        "_blank";
+
+                    link.rel =
+                        "noopener";
+
+
+                    document.body.appendChild(
+                        link
+                    );
+
+
+                    link.click();
+
+
+                    link.remove();
+
+
+                    if(pdfDownloadHelp){
+
+                        pdfDownloadHelp.textContent =
+                            "PDFを開きました。画面の共有ボタンから保存できます。";
+
+                    }
+
+                }
+
+            }finally{
+
+                pdfDownloadButton.disabled =
+                    false;
+
+                pdfDownloadButton.textContent =
+                    originalText;
+
+            }
 
         }
 
-    }
-);
+    );
 
 }
 
 
-// --------------------------
-// シリーズ作品
-// --------------------------
+// =====================================================
+// 同じシリーズ
+// =====================================================
 
 if(work){
 
@@ -892,11 +794,8 @@ if(work){
             "seriesArea"
         );
 
-
     const currentSeries =
-        toArray(
-            work.series
-        );
+        toArray(work.series);
 
 
     if(
@@ -905,34 +804,26 @@ if(work){
     ){
 
         const seriesWorks =
-            works.filter(
-                item => {
+            works.filter(item => {
 
-                    if(
-                        item.id ===
-                        work.id
-                    ){
+                if(item.id === work.id){
 
-                        return false;
-
-                    }
-
-
-                    const itemSeries =
-                        toArray(
-                            item.series
-                        );
-
-
-                    return itemSeries.some(
-                        series =>
-                            currentSeries.includes(
-                                series
-                            )
-                    );
+                    return false;
 
                 }
-            );
+
+                const itemSeries =
+                    toArray(item.series);
+
+
+                return itemSeries.some(
+                    series =>
+                        currentSeries.includes(
+                            series
+                        )
+                );
+
+            });
 
 
         if(seriesWorks.length){
@@ -940,9 +831,7 @@ if(work){
             seriesArea.innerHTML = `
 
 <h2 class="section-title">
-
 📚 同じシリーズ
-
 </h2>
 
 <div class="card-grid">
@@ -964,15 +853,11 @@ ${createNewBadge(item)}
 ${createRecommendBadge(item)}
 
 <h3>
-
 ${safeString(item.title)}
-
 </h3>
 
 <p>
-
 ${createStars(item.level)}
-
 </p>
 
 </div>
@@ -992,9 +877,9 @@ ${createStars(item.level)}
 }
 
 
-// --------------------------
+// =====================================================
 // 関連作品
-// --------------------------
+// =====================================================
 
 if(work){
 
@@ -1005,94 +890,77 @@ if(work){
 
 
     const currentCategories =
-        toArray(
-            work.category
-        );
+        toArray(work.category);
 
 
     const currentFixedTags =
-        toArray(
-            work.fixedTags
-        );
+        toArray(work.fixedTags);
 
 
     const currentFreeTags =
-        toArray(
-            work.freeTags
-        );
+        toArray(work.freeTags);
 
 
     const relatedWorks =
-        works.filter(
-            item => {
+        works.filter(item => {
 
-                if(
-                    item.id ===
-                    work.id
-                ){
+            if(item.id === work.id){
 
-                    return false;
-
-                }
-
-
-                const itemCategories =
-                    toArray(
-                        item.category
-                    );
-
-
-                const itemFixedTags =
-                    toArray(
-                        item.fixedTags
-                    );
-
-
-                const itemFreeTags =
-                    toArray(
-                        item.freeTags
-                    );
-
-
-                const sameCategory =
-                    itemCategories.some(
-                        category =>
-                            currentCategories.includes(
-                                category
-                            )
-                    );
-
-
-                const sameFixedTag =
-                    itemFixedTags.some(
-                        tag =>
-                            currentFixedTags.includes(
-                                tag
-                            )
-                    );
-
-
-                const sameFreeTag =
-                    itemFreeTags.some(
-                        tag =>
-                            currentFreeTags.includes(
-                                tag
-                            )
-                    );
-
-
-                return (
-                    sameCategory ||
-                    sameFixedTag ||
-                    sameFreeTag
-                );
+                return false;
 
             }
-        )
-        .slice(
-            0,
-            4
-        );
+
+
+            const itemCategories =
+                toArray(item.category);
+
+
+            const itemFixedTags =
+                toArray(item.fixedTags);
+
+
+            const itemFreeTags =
+                toArray(item.freeTags);
+
+
+            const sameCategory =
+                itemCategories.some(
+                    category =>
+                        currentCategories.includes(
+                            category
+                        )
+                );
+
+
+            const sameFixedTag =
+                itemFixedTags.some(
+                    tag =>
+                        currentFixedTags.includes(
+                            tag
+                        )
+                );
+
+
+            const sameFreeTag =
+                itemFreeTags.some(
+                    tag =>
+                        currentFreeTags.includes(
+                            tag
+                        )
+                );
+
+
+            return(
+
+                sameCategory ||
+
+                sameFixedTag ||
+
+                sameFreeTag
+
+            );
+
+        }).slice(0,4);
 
 
     if(
@@ -1103,9 +971,7 @@ if(work){
         relatedArea.innerHTML = `
 
 <h2 class="section-title">
-
 💡 関連作品
-
 </h2>
 
 <div class="card-grid">
@@ -1127,15 +993,11 @@ ${createNewBadge(item)}
 ${createRecommendBadge(item)}
 
 <h3>
-
 ${safeString(item.title)}
-
 </h3>
 
 <p>
-
 ${createStars(item.level)}
-
 </p>
 
 </div>
@@ -1153,9 +1015,9 @@ ${createStars(item.level)}
 }
 
 
-// --------------------------
-// 前へ・次へ
-// --------------------------
+// =====================================================
+// 前後の作品
+// =====================================================
 
 if(work){
 
@@ -1168,8 +1030,7 @@ if(work){
     const index =
         works.findIndex(
             item =>
-                item.id ===
-                work.id
+                item.id === work.id
         );
 
 
@@ -1237,9 +1098,9 @@ href="work.html?id=${next.id}">
 }
 
 
-// --------------------------
-// タイトル変更
-// --------------------------
+// =====================================================
+// ページタイトル
+// =====================================================
 
 if(work){
 
@@ -1249,9 +1110,9 @@ if(work){
 }
 
 
-// --------------------------
+// =====================================================
 // meta description
-// --------------------------
+// =====================================================
 
 if(work){
 
@@ -1273,9 +1134,9 @@ if(work){
 }
 
 
-// --------------------------
-// 公開日表示（将来用）
-// --------------------------
+// =====================================================
+// 公開日・更新日
+// =====================================================
 
 if(work){
 
@@ -1298,5 +1159,5 @@ if(work){
 // --------------------------
 
 console.log(
-    "Project Library work.js Version 5.4"
+    "Project Library work.js Version 5.5"
 );
