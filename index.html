@@ -355,7 +355,7 @@ JavaScript
 // ==========================
 // Project Library
 // index.html
-// Version 7.4
+// Version 8.0
 // ==========================
 
 
@@ -371,21 +371,50 @@ if(typeof works !== "undefined"){
 
 
     // ==========================
+    // 並び順
+    // 公開日が新しい順
+    // 同日ならIDが大きい順
+    // ==========================
+
+    function sortWorksNewest(a, b){
+
+        const dateA =
+            new Date(a.publishDate);
+
+        const dateB =
+            new Date(b.publishDate);
+
+
+        const dateDifference =
+            dateB - dateA;
+
+
+        // 公開日が違う場合
+        if(dateDifference !== 0){
+
+            return dateDifference;
+
+        }
+
+
+        // 公開日が同じ場合
+        // 後から登録された作品（ID大）を上にする
+
+        return Number(b.id) - Number(a.id);
+
+    }
+
+
+    // ==========================
     // NEW作品
     // 最新3件
     // ==========================
 
     const newWorks = works
 
-        .filter(work => work.isNew)
+        .filter(work => work.isNew === true)
 
-        .sort((a,b)=>
-
-            new Date(b.publishDate) -
-
-            new Date(a.publishDate)
-
-        )
+        .sort(sortWorksNewest)
 
         .slice(0,3);
 
@@ -398,15 +427,9 @@ if(typeof works !== "undefined"){
 
     const recommendWorks = works
 
-        .filter(work => work.recommend)
+        .filter(work => work.recommend === true)
 
-        .sort((a,b)=>
-
-            new Date(b.publishDate) -
-
-            new Date(a.publishDate)
-
-        )
+        .sort(sortWorksNewest)
 
         .slice(0,3);
 
@@ -453,7 +476,7 @@ if(typeof works !== "undefined"){
 // ==========================
 
 console.log(
-    "Project Library index.html Version 7.4"
+    "Project Library index.html Version 8.0"
 );
 
 </script>
