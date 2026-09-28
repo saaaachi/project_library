@@ -41,37 +41,6 @@ const works = [
         "favorite": false
     },
     {
-        "id": 9,
-        "workNo": "PL-000009",
-        "title": "テスト7",
-        "category": [
-            "シニア・リハビリ"
-        ],
-        "fixedTags": [
-            "テスト"
-        ],
-        "freeTags": [
-            "テスト"
-        ],
-        "series": [],
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "",
-        "thumbnail": "assets/images/thumbnail/テスト7_1790473914778.jpg",
-        "pdf": "assets/pdf/テスト7_1790473914778.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-27",
-        "updateDate": "2026-09-27",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
-    },
-    {
         "id": 11,
         "workNo": "PL-000011",
         "title": "テストa",
