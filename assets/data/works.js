@@ -4,7 +4,43 @@
 // Version 10.3
 // ==========================
 
-const works = [];
+const works = [
+    {
+        "id": 1,
+        "workNo": "PL-000001",
+        "title": "ご褒美シール台紙　緊急車両",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "シール貼り",
+            "ごほうびシール"
+        ],
+        "freeTags": [
+            "緊急車両",
+            "パトカー",
+            "救急車",
+            "消防車"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "緊急車両のご褒美シールです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_緊急車両_1790603411297.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_緊急車両_1790603411297.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-28",
+        "updateDate": "2026-09-28",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
+    }
+];
 
 // --------------------------
 // 共通関数
