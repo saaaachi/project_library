@@ -39,6 +39,39 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 2,
+        "workNo": "PL-000002",
+        "title": "ご褒美シール台紙　電車",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "シール貼り",
+            "ごほうびシール"
+        ],
+        "freeTags": [
+            "電車",
+            "新幹線"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "電車・新幹線ご褒美シールです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_電車_1790603487895.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_電車_1790603487895.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-28",
+        "updateDate": "2026-09-28",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
