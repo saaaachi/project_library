@@ -6,42 +6,6 @@
 
 const works = [
     {
-        "id": 1,
-        "workNo": "PL-000001",
-        "title": "ご褒美シール台紙　緊急車両　30マス",
-        "category": [
-            "幼児向け"
-        ],
-        "fixedTags": [
-            "ご褒美シール台紙",
-            "車",
-            "シール貼り"
-        ],
-        "freeTags": [
-            "緊急車両",
-            "パトカー",
-            "消防車",
-            "救急車"
-        ],
-        "series": [],
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "緊急車両のごほうびシール台紙です。\r\nぜひご活用ください。",
-        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_緊急車両_30マス_1790583618097.jpg",
-        "pdf": "assets/pdf/ご褒美シール台紙_緊急車両_30マス_1790583618097.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-28",
-        "updateDate": "2026-09-28",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
-    },
-    {
         "id": 2,
         "workNo": "PL-000002",
         "title": "ご褒美シール台紙　電車　30マス",
