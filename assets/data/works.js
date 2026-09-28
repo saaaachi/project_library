@@ -39,39 +39,6 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
-    },
-    {
-        "id": 11,
-        "workNo": "PL-000011",
-        "title": "テストa",
-        "category": [
-            "幼児向け",
-            "子ども向け"
-        ],
-        "fixedTags": [
-            "テスト"
-        ],
-        "freeTags": [
-            "消防車",
-            "テスト"
-        ],
-        "series": [],
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "テスト",
-        "thumbnail": "assets/images/thumbnail/テストa_1790484003473.jpg",
-        "pdf": "assets/pdf/テストa_1790484003473.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-27",
-        "updateDate": "2026-09-27",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
     }
 ];
 
