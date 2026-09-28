@@ -41,33 +41,6 @@ const works = [
         "favorite": false
     },
     {
-        "id": 7,
-        "workNo": "PL-000007",
-        "title": "テスト5",
-        "category": [
-            "幼児向け"
-        ],
-        "fixedTags": [],
-        "freeTags": [],
-        "series": [],
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "",
-        "thumbnail": "assets/images/thumbnail/テスト5_1790471600567.jpg",
-        "pdf": "assets/pdf/テスト5_1790471600567.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-27",
-        "updateDate": "2026-09-27",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
-    },
-    {
         "id": 8,
         "workNo": "PL-000008",
         "title": "テスト6",
