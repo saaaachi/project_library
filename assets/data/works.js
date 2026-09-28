@@ -4,41 +4,7 @@
 // Version 10.3
 // ==========================
 
-const works = [
-    {
-        "id": 2,
-        "workNo": "PL-000002",
-        "title": "ご褒美シール台紙　電車　30マス",
-        "category": [
-            "幼児向け"
-        ],
-        "fixedTags": [
-            "ご褒美シール台紙",
-            "シール貼り",
-            "電車"
-        ],
-        "freeTags": [
-            "新幹線"
-        ],
-        "series": [],
-        "level": 1,
-        "age": "",
-        "size": "A4",
-        "tools": [],
-        "description": "電車のごほうびシール台紙です。\r\nぜひご活用ください。",
-        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_電車_30マス_1790584389499.jpg",
-        "pdf": "assets/pdf/ご褒美シール台紙_電車_30マス_1790584389499.pdf",
-        "isNew": true,
-        "recommend": false,
-        "publishDate": "2026-09-28",
-        "updateDate": "2026-09-28",
-        "etsy": "",
-        "related": [],
-        "viewCount": 0,
-        "downloadCount": 0,
-        "favorite": false
-    }
-];
+const works = [];
 
 // --------------------------
 // 共通関数
