@@ -104,6 +104,39 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 4,
+        "workNo": "PL-000004",
+        "title": "ご褒美シール台紙　宇宙　30マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "シール貼り",
+            "ごほうびシール"
+        ],
+        "freeTags": [
+            "宇宙",
+            "ロケット"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "うちゅうのご褒美シールです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_宇宙_30マス_1790648523765.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_宇宙_30マス_1790648523765.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-29",
+        "updateDate": "2026-09-29",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
