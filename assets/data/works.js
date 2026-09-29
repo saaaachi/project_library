@@ -171,6 +171,39 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 6,
+        "workNo": "PL-000006",
+        "title": "ご褒美シール台紙　スイーツ　30マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "シール貼り",
+            "ごほうびシール"
+        ],
+        "freeTags": [
+            "スイーツ",
+            "お菓子"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "スイーツのご褒美シールです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_スイーツ_30マス_1790648729225.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_スイーツ_30マス_1790648729225.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-09-29",
+        "updateDate": "2026-09-29",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
