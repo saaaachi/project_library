@@ -306,6 +306,40 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 10,
+        "workNo": "PL-000010",
+        "title": "漢字問題 4",
+        "category": [
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "漢字"
+        ],
+        "freeTags": [
+            "読み書き",
+            "国語"
+        ],
+        "series": [
+            "国語"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "日常生活でよく見る漢字を問題にしました。",
+        "thumbnail": "assets/images/thumbnail/漢字問題_4_1790739933407.jpg",
+        "pdf": "assets/pdf/漢字問題_4_1790739933407.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-09-30",
+        "updateDate": "2026-09-30",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
