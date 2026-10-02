@@ -374,6 +374,42 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 12,
+        "workNo": "PL-000012",
+        "title": "漢字問題 6級程度　①",
+        "category": [
+            "子ども向け",
+            "大人向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "漢字"
+        ],
+        "freeTags": [
+            "読み書き",
+            "国語"
+        ],
+        "series": [
+            "国語"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "6級程度の漢字を問題にしました。\r\n子供から大人までご利用ください。",
+        "thumbnail": "assets/images/thumbnail/漢字問題_6級程度_①_1790912810095.jpg",
+        "pdf": "assets/pdf/漢字問題_6級程度_①_1790912810095.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-10-02",
+        "updateDate": "2026-10-02",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
