@@ -590,6 +590,40 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 18,
+        "workNo": "PL-000018",
+        "title": "ご褒美シール台紙　スイーツ　50マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "ごほうびシール",
+            "シール貼り"
+        ],
+        "freeTags": [
+            "スイーツ",
+            "お菓子",
+            "動物"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "ごほうびシール50マスです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_スイーツ_50マス_1790986424782.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_スイーツ_50マス_1790986424782.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-03",
+        "updateDate": "2026-10-03",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
