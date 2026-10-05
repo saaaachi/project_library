@@ -624,6 +624,38 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 19,
+        "workNo": "PL-000019",
+        "title": "ご褒美シール台紙　電車　38マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "ごほうびシール",
+            "シール貼り"
+        ],
+        "freeTags": [
+            "電車"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "ごほうびシール38マスです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_電車_38マス_1791172635732.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_電車_38マス_1791172635732.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-05",
+        "updateDate": "2026-10-05",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
