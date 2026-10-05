@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // library.js
-// Version 5.1
+// Version 5.2
 // ==========================
 
 
@@ -75,7 +75,13 @@ function createBadge(work){
 
     let badge = "";
 
-    if(work.isNew){
+
+    // --------------------------
+    // NEW
+    // 公開日から30日以内だけ表示
+    // --------------------------
+
+    if(isWorkNew(work)){
 
         badge += `
         <span class="badge badge-new">
@@ -84,6 +90,11 @@ function createBadge(work){
         `;
 
     }
+
+
+    // --------------------------
+    // おすすめ
+    // --------------------------
 
     if(work.recommend){
 
@@ -884,6 +895,6 @@ if(sortSelect){
 
 console.log(
 
-    "Project Library library.js Version 5.1"
+    "Project Library library.js Version 5.2"
 
 );
