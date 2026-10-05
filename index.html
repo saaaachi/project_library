@@ -355,7 +355,7 @@ JavaScript
 // ==========================
 // Project Library
 // index.html
-// Version 8.0
+// Version 8.1
 // ==========================
 
 
@@ -407,12 +407,13 @@ if(typeof works !== "undefined"){
 
     // ==========================
     // NEW作品
+    // 公開日から30日以内
     // 最新3件
     // ==========================
 
     const newWorks = works
 
-        .filter(work => work.isNew === true)
+        .filter(work => isWorkNew(work))
 
         .sort(sortWorksNewest)
 
@@ -476,7 +477,7 @@ if(typeof works !== "undefined"){
 // ==========================
 
 console.log(
-    "Project Library index.html Version 8.0"
+    "Project Library index.html Version 8.1"
 );
 
 </script>
