@@ -656,6 +656,42 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 20,
+        "workNo": "PL-000020",
+        "title": "ご褒美シール台紙　はたらくくるま　42マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "ごほうびシール",
+            "シール貼り"
+        ],
+        "freeTags": [
+            "緊急車両",
+            "パトカー",
+            "救急車",
+            "消防車",
+            "はたらくくるま"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "ごほうびシール42マスです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_はたらくくるま_42マス_1791172706862.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_はたらくくるま_42マス_1791172706862.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-05",
+        "updateDate": "2026-10-05",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
