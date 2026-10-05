@@ -725,6 +725,38 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 22,
+        "workNo": "PL-000022",
+        "title": "ご褒美シール台紙　恐竜　40マス",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "ごほうびシール",
+            "シール貼り"
+        ],
+        "freeTags": [
+            "恐竜"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "ごほうびシール40マスです。ぜひご活用ください。",
+        "thumbnail": "assets/images/thumbnail/ご褒美シール台紙_恐竜_40マス_1791172844903.jpg",
+        "pdf": "assets/pdf/ご褒美シール台紙_恐竜_40マス_1791172844903.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-05",
+        "updateDate": "2026-10-05",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
