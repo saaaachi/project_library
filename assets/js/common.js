@@ -1,7 +1,7 @@
 // ==========================
 // Project Library
 // common.js
-// Version 6.0
+// Version 6.1
 // ==========================
 
 
@@ -41,6 +41,105 @@ async function loadComponent(id, file){
         );
 
     }
+
+}
+
+
+// =====================================================
+// NEW判定
+// 公開日から30日間だけNEWとして扱う
+// =====================================================
+
+function isWorkNew(work){
+
+    // publishDateがない作品はNEWにしない
+    if(
+        !work ||
+        !work.publishDate
+    ){
+
+        return false;
+
+    }
+
+
+    // --------------------------
+    // 公開日を取得
+    // YYYY-MM-DDを日本時間の日付として扱う
+    // --------------------------
+
+    const publishParts =
+        String(work.publishDate)
+            .split("-")
+            .map(Number);
+
+
+    if(
+        publishParts.length !== 3 ||
+        publishParts.some(
+            value => !Number.isFinite(value)
+        )
+    ){
+
+        return false;
+
+    }
+
+
+    const publishDate =
+        new Date(
+            publishParts[0],
+            publishParts[1] - 1,
+            publishParts[2]
+        );
+
+
+    // --------------------------
+    // 今日の日付を取得
+    // 時刻を0:00にそろえる
+    // --------------------------
+
+    const now =
+        new Date();
+
+    const today =
+        new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
+
+
+    // --------------------------
+    // 公開日から何日経過したか
+    // --------------------------
+
+    const diffTime =
+        today.getTime() -
+        publishDate.getTime();
+
+
+    const diffDays =
+        Math.floor(
+            diffTime /
+            (24 * 60 * 60 * 1000)
+        );
+
+
+    // --------------------------
+    // 30日間だけNEW
+    //
+    // 0日目 = 公開日
+    // 1〜29日目 = NEW
+    // 30日目 = NEWではない
+    //
+    // ※未来の日付もNEWにしない
+    // --------------------------
+
+    return(
+        diffDays >= 0 &&
+        diffDays < 30
+    );
 
 }
 
@@ -403,7 +502,7 @@ function setupDynamicSidebar(){
 
 
     console.log(
-        "Project Library 動的サイドバー Version 6.0"
+        "Project Library 動的サイドバー Version 6.1"
     );
 
 }
@@ -616,5 +715,5 @@ function setupCurrentYear(){
 // =====================================================
 
 console.log(
-    "Project Library common.js Version 6.0"
+    "Project Library common.js Version 6.1"
 );
