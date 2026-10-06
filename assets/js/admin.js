@@ -1,7 +1,7 @@
 /* ======================================
    Project Library
    admin.js
-   Version 14.1
+   Version 15.0
    ====================================== */
 
 
@@ -248,7 +248,7 @@ document.addEventListener(
 
         /* ==================================
            works確認
-           Version 14.1
+           Version 15.0
            ================================== */
 
         const workList =
@@ -337,7 +337,7 @@ document.addEventListener(
 
         /* ==================================
            新規入力を配列化
-           Version 14.1
+           Version 15.0
            ================================== */
 
         function parseNewItems(
@@ -380,7 +380,7 @@ document.addEventListener(
 
         /* ==================================
            配列を重複なしで結合
-           Version 14.1
+           Version 15.0
            ================================== */
 
         function mergeUnique(
@@ -602,17 +602,67 @@ document.addEventListener(
 
 
         /* ==================================
+           タグの公開日比較
+           ================================== */
+
+        function getWorkDateValue(
+            work
+        ){
+
+            if(
+                !work ||
+                !work.publishDate
+            ){
+
+                return 0;
+
+            }
+
+
+            const date =
+                new Date(
+                    String(
+                        work.publishDate
+                    )
+                );
+
+
+            const time =
+                date.getTime();
+
+
+            return Number.isNaN(time)
+                ? 0
+                : time;
+
+        }
+
+
+        /* ==================================
            固定タグ
            ================================== */
 
         function getAllFixedTags(){
 
-            const set =
-                new Set();
+            const tagMap =
+                new Map();
 
 
             workList.forEach(
                 function(work){
+
+                    const workDate =
+                        getWorkDateValue(
+                            work
+                        );
+
+
+                    const workId =
+                        Number(
+                            work?.id ||
+                            0
+                        );
+
 
                     toArray(
                         work.fixedTags
@@ -620,9 +670,51 @@ document.addEventListener(
                     .forEach(
                         function(tag){
 
-                            set.add(
-                                tag
-                            );
+                            const normalizedTag =
+                                String(
+                                    tag
+                                ).trim();
+
+
+                            if(
+                                !normalizedTag
+                            ){
+
+                                return;
+
+                            }
+
+
+                            const current =
+                                tagMap.get(
+                                    normalizedTag
+                                );
+
+
+                            if(
+                                !current ||
+                                workDate >
+                                    current.date ||
+                                (
+                                    workDate ===
+                                        current.date &&
+                                    workId >
+                                        current.id
+                                )
+                            ){
+
+                                tagMap.set(
+                                    normalizedTag,
+                                    {
+                                        date:
+                                            workDate,
+
+                                        id:
+                                            workId
+                                    }
+                                );
+
+                            }
 
                         }
                     );
@@ -632,8 +724,140 @@ document.addEventListener(
 
 
             return Array.from(
-                set
+                tagMap.keys()
             );
+
+        }
+
+
+        /* ==================================
+           固定タグ
+           最近10件＋検索
+           Version 15.0
+           ================================== */
+
+        function getRecentFixedTags(){
+
+            const tags =
+                getAllFixedTags();
+
+
+            return tags
+                .sort(
+                    function(a,b){
+
+                        function getLatestInfo(
+                            tag
+                        ){
+
+                            let latestDate =
+                                0;
+
+                            let latestId =
+                                0;
+
+
+                            workList.forEach(
+                                function(work){
+
+                                    const hasTag =
+                                        toArray(
+                                            work.fixedTags
+                                        )
+                                        .includes(
+                                            tag
+                                        );
+
+
+                                    if(!hasTag){
+
+                                        return;
+
+                                    }
+
+
+                                    const date =
+                                        getWorkDateValue(
+                                            work
+                                        );
+
+
+                                    const id =
+                                        Number(
+                                            work?.id ||
+                                            0
+                                        );
+
+
+                                    if(
+                                        date >
+                                            latestDate ||
+                                        (
+                                            date ===
+                                                latestDate &&
+                                            id >
+                                                latestId
+                                        )
+                                    ){
+
+                                        latestDate =
+                                            date;
+
+                                        latestId =
+                                            id;
+
+                                    }
+
+                                }
+                            );
+
+
+                            return {
+                                date:
+                                    latestDate,
+
+                                id:
+                                    latestId
+                            };
+
+                        }
+
+
+                        const infoA =
+                            getLatestInfo(
+                                a
+                            );
+
+                        const infoB =
+                            getLatestInfo(
+                                b
+                            );
+
+
+                        if(
+                            infoA.date !==
+                            infoB.date
+                        ){
+
+                            return (
+                                infoB.date -
+                                infoA.date
+                            );
+
+                        }
+
+
+                        return (
+                            infoB.id -
+                            infoA.id
+                        );
+
+                    }
+                )
+                .slice(
+                    0,
+                    10
+                );
 
         }
 
@@ -649,17 +873,32 @@ document.addEventListener(
                 .toLowerCase();
 
 
-            const candidates =
-                getAllFixedTags()
-                .filter(
-                    tag =>
-                        !keyword ||
-                        String(tag)
-                            .toLowerCase()
-                            .includes(
-                                keyword
-                            )
-                );
+            let candidates;
+
+
+            if(keyword){
+
+                /* 検索時は全固定タグから検索 */
+
+                candidates =
+                    getAllFixedTags()
+                    .filter(
+                        tag =>
+                            String(tag)
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+                    );
+
+            }else{
+
+                /* 通常時は最近使われた10件 */
+
+                candidates =
+                    getRecentFixedTags();
+
+            }
 
 
             renderChoiceResults(
@@ -769,6 +1008,144 @@ document.addEventListener(
         }
 
 
+        /* ==================================
+           自由タグ
+           最近10件を取得
+           Version 15.0
+           ================================== */
+
+        function getRecentFreeTags(){
+
+            const tags =
+                getAllFreeTags();
+
+
+            return tags
+                .sort(
+                    function(a,b){
+
+                        function getLatestInfo(
+                            tag
+                        ){
+
+                            let latestDate =
+                                0;
+
+                            let latestId =
+                                0;
+
+
+                            workList.forEach(
+                                function(work){
+
+                                    const hasTag =
+                                        toArray(
+                                            work.freeTags
+                                        )
+                                        .includes(
+                                            tag
+                                        );
+
+
+                                    if(!hasTag){
+
+                                        return;
+
+                                    }
+
+
+                                    const date =
+                                        getWorkDateValue(
+                                            work
+                                        );
+
+
+                                    const id =
+                                        Number(
+                                            work?.id ||
+                                            0
+                                        );
+
+
+                                    if(
+                                        date >
+                                            latestDate ||
+                                        (
+                                            date ===
+                                                latestDate &&
+                                            id >
+                                                latestId
+                                        )
+                                    ){
+
+                                        latestDate =
+                                            date;
+
+                                        latestId =
+                                            id;
+
+                                    }
+
+                                }
+                            );
+
+
+                            return {
+                                date:
+                                    latestDate,
+
+                                id:
+                                    latestId
+                            };
+
+                        }
+
+
+                        const infoA =
+                            getLatestInfo(
+                                a
+                            );
+
+                        const infoB =
+                            getLatestInfo(
+                                b
+                            );
+
+
+                        if(
+                            infoA.date !==
+                            infoB.date
+                        ){
+
+                            return (
+                                infoB.date -
+                                infoA.date
+                            );
+
+                        }
+
+
+                        return (
+                            infoB.id -
+                            infoA.id
+                        );
+
+                    }
+                )
+                .slice(
+                    0,
+                    10
+                );
+
+        }
+
+
+        /* ==================================
+           自由タグ
+           最近10件＋検索
+           Version 15.0
+           ================================== */
+
         function renderFreeTags(){
 
             const keyword =
@@ -780,17 +1157,32 @@ document.addEventListener(
                 .toLowerCase();
 
 
-            const candidates =
-                getAllFreeTags()
-                .filter(
-                    tag =>
-                        !keyword ||
-                        String(tag)
-                            .toLowerCase()
-                            .includes(
-                                keyword
-                            )
-                );
+            let candidates;
+
+
+            if(keyword){
+
+                /* 検索時は全自由タグから検索 */
+
+                candidates =
+                    getAllFreeTags()
+                    .filter(
+                        tag =>
+                            String(tag)
+                                .toLowerCase()
+                                .includes(
+                                    keyword
+                                )
+                    );
+
+            }else{
+
+                /* 通常時は最近使われた10件 */
+
+                candidates =
+                    getRecentFreeTags();
+
+            }
 
 
             renderChoiceResults(
@@ -1323,7 +1715,7 @@ document.addEventListener(
 
         /* ==================================
            PDF → サムネイル
-           Version 14.1
+           Version 15.0
            ================================== */
 
         pdfFileInput?.addEventListener(
@@ -2015,7 +2407,7 @@ document.addEventListener(
 
 
         /* ==================================
-           作品検索 Version 14.1
+           作品検索 Version 15.0
            ================================== */
 
         function searchWorkByNumber(){
@@ -2242,7 +2634,7 @@ document.addEventListener(
 
         /* ==================================
            削除
-           Version 14.1
+           Version 15.0
            ================================== */
 
         async function deleteWork(
@@ -2465,7 +2857,7 @@ document.addEventListener(
 
         /* ==================================
            公開
-           Version 14.1
+           Version 15.0
            ================================== */
 
         const publishButton =
@@ -2542,7 +2934,7 @@ document.addEventListener(
 
                     /* ==================================
                        新規タグ・シリーズを取得
-                       Version 14.1
+                       Version 15.0
                        ================================== */
 
                     const newFixedTags =
@@ -2928,7 +3320,7 @@ document.addEventListener(
            ================================== */
 
         console.log(
-            "Project Library admin.js Version14.1"
+            "Project Library admin.js Version15.0"
         );
 
     }
