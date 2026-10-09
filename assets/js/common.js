@@ -1,8 +1,9 @@
-// ==========================
-// Project Library
-// common.js
-// Version 6.1
-// ==========================
+
+/* ==========================
+   Project Library
+   common.js
+   Version 6.2
+   ========================== */
 
 
 // --------------------------
@@ -15,9 +16,7 @@ async function loadComponent(id, file){
         document.getElementById(id);
 
     if(!target){
-
         return;
-
     }
 
     try{
@@ -26,9 +25,7 @@ async function loadComponent(id, file){
             await fetch(file);
 
         if(!response.ok){
-
             throw new Error(file);
-
         }
 
         target.innerHTML =
@@ -52,27 +49,17 @@ async function loadComponent(id, file){
 
 function isWorkNew(work){
 
-    // publishDateがない作品はNEWにしない
     if(
         !work ||
         !work.publishDate
     ){
-
         return false;
-
     }
-
-
-    // --------------------------
-    // 公開日を取得
-    // YYYY-MM-DDを日本時間の日付として扱う
-    // --------------------------
 
     const publishParts =
         String(work.publishDate)
             .split("-")
             .map(Number);
-
 
     if(
         publishParts.length !== 3 ||
@@ -80,11 +67,8 @@ function isWorkNew(work){
             value => !Number.isFinite(value)
         )
     ){
-
         return false;
-
     }
-
 
     const publishDate =
         new Date(
@@ -92,12 +76,6 @@ function isWorkNew(work){
             publishParts[1] - 1,
             publishParts[2]
         );
-
-
-    // --------------------------
-    // 今日の日付を取得
-    // 時刻を0:00にそろえる
-    // --------------------------
 
     const now =
         new Date();
@@ -109,32 +87,15 @@ function isWorkNew(work){
             now.getDate()
         );
 
-
-    // --------------------------
-    // 公開日から何日経過したか
-    // --------------------------
-
     const diffTime =
         today.getTime() -
         publishDate.getTime();
-
 
     const diffDays =
         Math.floor(
             diffTime /
             (24 * 60 * 60 * 1000)
         );
-
-
-    // --------------------------
-    // 30日間だけNEW
-    //
-    // 0日目 = 公開日
-    // 1〜29日目 = NEW
-    // 30日目 = NEWではない
-    //
-    // ※未来の日付もNEWにしない
-    // --------------------------
 
     return(
         diffDays >= 0 &&
@@ -144,62 +105,104 @@ function isWorkNew(work){
 }
 
 
+// =====================================================
+// サイドバークリック記録
+// =====================================================
+
+function logSidebarClick(value){
+
+    if(!value){
+        return;
+    }
+
+    fetch(
+        "https://project-library-api.saaachi-app.workers.dev",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "tag_click",
+                tag: value
+            }),
+            keepalive: true
+        }
+    )
+    .then(response => {
+
+        if(!response.ok){
+            throw new Error(
+                "サイドバークリックログ送信に失敗しました。"
+            );
+        }
+
+        return response.json();
+
+    })
+    .then(data => {
+
+        console.log(
+            "サイドバークリックを記録しました。",
+            value,
+            data
+        );
+
+    })
+    .catch(error => {
+
+        console.log(
+            "サイドバークリックの記録に失敗しました。",
+            error
+        );
+
+    });
+
+}
+
+
 // --------------------------
 // 初期読み込み
 // --------------------------
 
 window.addEventListener(
-
     "DOMContentLoaded",
-
     async()=>{
-
 
         await loadComponent(
             "header",
             "components/header.html"
         );
 
-
         await loadComponent(
             "sidebar",
             "components/sidebar.html"
         );
-
 
         await loadComponent(
             "footer",
             "components/footer.html"
         );
 
-
         await loadComponent(
             "adTop",
             "components/ads/top.html"
         );
-
 
         await loadComponent(
             "adMiddle",
             "components/ads/middle.html"
         );
 
-
         await loadComponent(
             "adBottom",
             "components/ads/bottom.html"
         );
 
-
         await loadComponent(
             "adSidebar",
             "components/ads/sidebar.html"
         );
-
-
-        // --------------------------
-        // 共通機能
-        // --------------------------
 
         setupMenu();
 
@@ -210,21 +213,14 @@ window.addEventListener(
         setupDynamicSidebar();
 
     }
-
 );
 
 
 // =====================================================
 // 動的サイドバー
-// works.jsから対象者・ジャンル・人気タグを生成
 // =====================================================
 
 function setupDynamicSidebar(){
-
-
-    // --------------------------
-    // works.js確認
-    // --------------------------
 
     if(
         typeof works === "undefined" ||
@@ -241,36 +237,25 @@ function setupDynamicSidebar(){
 
 
     // --------------------------
-    // 対象者
+    // 対象者カテゴリ
     // --------------------------
 
     const categoryMenu =
         document.getElementById("categoryMenu");
 
-
-    // Project Libraryの固定カテゴリ
     const categories = [
-
         "幼児向け",
-
         "子ども向け",
-
         "大人向け",
-
         "シニア・リハビリ"
-
     ];
-
 
     if(categoryMenu){
 
         categoryMenu.innerHTML =
-
             categories.map(category=>{
 
-
                 const count =
-
                     works.filter(work=>{
 
                         return Array.isArray(work.category) &&
@@ -278,16 +263,11 @@ function setupDynamicSidebar(){
 
                     }).length;
 
-
                 return `
-
                     <a
                     href="library.html?category=${encodeURIComponent(category)}">
-
                     ${category} (${count})
-
                     </a>
-
                 `;
 
             }).join("");
@@ -303,40 +283,23 @@ function setupDynamicSidebar(){
     const genreMenu =
         document.getElementById("genreMenu");
 
-
     const genreCounts = {};
-
 
     works.forEach(work=>{
 
-
-        if(
-            !Array.isArray(work.fixedTags)
-        ){
-
+        if(!Array.isArray(work.fixedTags)){
             return;
-
         }
-
 
         work.fixedTags.forEach(tag=>{
 
-
             if(!tag){
-
                 return;
-
             }
 
-
-            if(
-                !genreCounts[tag]
-            ){
-
+            if(!genreCounts[tag]){
                 genreCounts[tag] = 0;
-
             }
-
 
             genreCounts[tag]++;
 
@@ -344,13 +307,10 @@ function setupDynamicSidebar(){
 
     });
 
-
     if(genreMenu){
 
         const genres =
-
             Object.entries(genreCounts)
-
                 .sort((a,b)=>{
 
                     return a[0].localeCompare(
@@ -360,30 +320,24 @@ function setupDynamicSidebar(){
 
                 });
 
-
         if(genres.length === 0){
 
-            genreMenu.innerHTML =
-
-                `<p class="menu-empty">
+            genreMenu.innerHTML = `
+                <p class="menu-empty">
                 作品がまだありません
-                </p>`;
+                </p>
+            `;
 
         }else{
 
             genreMenu.innerHTML =
-
                 genres.map(([tag,count])=>{
 
                     return `
-
                         <a
                         href="library.html?tag=${encodeURIComponent(tag)}">
-
                         ${tag} (${count})
-
                         </a>
-
                     `;
 
                 }).join("");
@@ -401,40 +355,23 @@ function setupDynamicSidebar(){
     const popularTagMenu =
         document.getElementById("popularTagMenu");
 
-
     const freeTagCounts = {};
-
 
     works.forEach(work=>{
 
-
-        if(
-            !Array.isArray(work.freeTags)
-        ){
-
+        if(!Array.isArray(work.freeTags)){
             return;
-
         }
-
 
         work.freeTags.forEach(tag=>{
 
-
             if(!tag){
-
                 return;
-
             }
 
-
-            if(
-                !freeTagCounts[tag]
-            ){
-
+            if(!freeTagCounts[tag]){
                 freeTagCounts[tag] = 0;
-
             }
-
 
             freeTagCounts[tag]++;
 
@@ -442,56 +379,42 @@ function setupDynamicSidebar(){
 
     });
 
-
     if(popularTagMenu){
 
         const popularTags =
-
             Object.entries(freeTagCounts)
-
                 .sort((a,b)=>{
 
-                    // 使用数の多い順
                     if(b[1] !== a[1]){
-
                         return b[1] - a[1];
-
                     }
 
-                    // 同数なら五十音順
                     return a[0].localeCompare(
                         b[0],
                         "ja"
                     );
 
                 })
-
                 .slice(0,4);
-
 
         if(popularTags.length === 0){
 
-            popularTagMenu.innerHTML =
-
-                `<p class="menu-empty">
+            popularTagMenu.innerHTML = `
+                <p class="menu-empty">
                 作品がまだありません
-                </p>`;
+                </p>
+            `;
 
         }else{
 
             popularTagMenu.innerHTML =
-
                 popularTags.map(([tag,count])=>{
 
                     return `
-
                         <a
                         href="library.html?tag=${encodeURIComponent(tag)}">
-
                         ${tag} (${count})
-
                         </a>
-
                     `;
 
                 }).join("");
@@ -501,8 +424,96 @@ function setupDynamicSidebar(){
     }
 
 
+    // =================================================
+    // サイドバーのクリックイベント
+    // =================================================
+
+    const sidebarMenus = [
+        {
+            element: categoryMenu,
+            type: "category"
+        },
+        {
+            element: genreMenu,
+            type: "tag"
+        },
+        {
+            element: popularTagMenu,
+            type: "tag"
+        }
+    ];
+
+    sidebarMenus.forEach(menu=>{
+
+        if(!menu.element){
+            return;
+        }
+
+        menu.element.addEventListener(
+            "click",
+            event=>{
+
+                const link =
+                    event.target.closest("a");
+
+                if(
+                    !link ||
+                    !menu.element.contains(link)
+                ){
+                    return;
+                }
+
+                try{
+
+                    const url =
+                        new URL(
+                            link.href,
+                            location.href
+                        );
+
+                    if(menu.type === "category"){
+
+                        const category =
+                            url.searchParams.get("category");
+
+                        if(category){
+
+                            logSidebarClick(
+                                "カテゴリ: " + category
+                            );
+
+                        }
+
+                    }else{
+
+                        const tag =
+                            url.searchParams.get("tag");
+
+                        if(tag){
+
+                            logSidebarClick(tag);
+
+                        }
+
+                    }
+
+                }catch(error){
+
+                    console.error(
+                        "サイドバーのクリック情報を取得できませんでした。",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+    });
+
+
     console.log(
-        "Project Library 動的サイドバー Version 6.1"
+        "Project Library 動的サイドバー Version 6.2"
     );
 
 }
@@ -517,14 +528,11 @@ function setupMenu(){
     const menuButton =
         document.getElementById("menuButton");
 
-
     const sidebar =
         document.querySelector(".sidebar");
 
-
     const closeMenu =
         document.getElementById("closeMenu");
-
 
     if(menuButton && sidebar){
 
@@ -535,7 +543,6 @@ function setupMenu(){
         };
 
     }
-
 
     if(closeMenu && sidebar){
 
@@ -559,31 +566,20 @@ function setupSearch(){
     const searchInput =
         document.getElementById("searchInput");
 
-
     if(!searchInput){
-
         return;
-
     }
 
-
     searchInput.addEventListener(
-
         "keydown",
-
         event=>{
 
-
             if(event.key !== "Enter"){
-
                 return;
-
             }
-
 
             const keyword =
                 searchInput.value.trim();
-
 
             if(keyword === ""){
 
@@ -594,12 +590,10 @@ function setupSearch(){
 
             }
 
-
             location.href =
                 `library.html?search=${encodeURIComponent(keyword)}`;
 
         }
-
     );
 
 }
@@ -610,31 +604,21 @@ function setupSearch(){
 // =====================================================
 
 document.addEventListener(
-
     "keydown",
-
     event=>{
 
-
         if(event.key !== "Escape"){
-
             return;
-
         }
-
 
         const sidebar =
             document.querySelector(".sidebar");
 
-
         if(sidebar){
-
             sidebar.classList.remove("open");
-
         }
 
     }
-
 );
 
 
@@ -643,50 +627,32 @@ document.addEventListener(
 // =====================================================
 
 document.addEventListener(
-
     "click",
-
     event=>{
-
 
         const sidebar =
             document.querySelector(".sidebar");
 
-
         const menuButton =
             document.getElementById("menuButton");
 
-
         if(
-
             !sidebar ||
-
             !sidebar.classList.contains("open")
-
         ){
-
             return;
-
         }
-
 
         if(
-
             sidebar.contains(event.target) ||
-
             menuButton?.contains(event.target)
-
         ){
-
             return;
-
         }
-
 
         sidebar.classList.remove("open");
 
     }
-
 );
 
 
@@ -698,7 +664,6 @@ function setupCurrentYear(){
 
     const year =
         document.getElementById("currentYear");
-
 
     if(year){
 
@@ -715,5 +680,5 @@ function setupCurrentYear(){
 // =====================================================
 
 console.log(
-    "Project Library common.js Version 6.1"
+    "Project Library common.js Version 6.2"
 );
