@@ -789,6 +789,41 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 24,
+        "workNo": "PL-000024",
+        "title": "計算ドリル　1日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題1日目です。\r\nたし算のみの問題です。徐々に難易度があがり、16日目からひき算も追加します。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_1日目_1791517704263.jpg",
+        "pdf": "assets/pdf/計算ドリル_1日目_1791517704263.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-10-09",
+        "updateDate": "2026-10-09",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
