@@ -1139,6 +1139,41 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 34,
+        "workNo": "PL-000034",
+        "title": "計算ドリル　11日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題11日目です。\r\nたし算のみの問題です。\r\n16日目以降にひき算もあります。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_11日目_1791814156038.jpg",
+        "pdf": "assets/pdf/計算ドリル_11日目_1791814156038.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-12",
+        "updateDate": "2026-10-12",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
