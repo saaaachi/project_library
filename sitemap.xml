@@ -1,15 +1,9 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- トップページ -->
   <url>
     <loc>https://saaaachi.github.io/project_library/</loc>
   </url>
-
-  <!-- 作品一覧ページ -->
   <url>
     <loc>https://saaaachi.github.io/project_library/library.html</loc>
   </url>
-
 </urlset>
