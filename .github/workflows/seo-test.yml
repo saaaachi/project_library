@@ -2,7 +2,7 @@
 # ======================================
 # Project Library
 # SEO Generator Test Workflow
-# Version 1.0
+# Version 1.1
 # ======================================
 
 name: Project Library SEO Test
@@ -36,50 +36,115 @@ jobs:
           node-version: "22"
 
       # ----------------------------------
-      # SEO生成プログラム実行
+      # JavaScript構文確認
       # ----------------------------------
 
-      - name: Generate sitemap
+      - name: Check JavaScript syntax
+        run: node --check tools/generate-seo.js
+
+      # ----------------------------------
+      # SEOファイル生成
+      # ----------------------------------
+
+      - name: Generate SEO files
         run: node tools/generate-seo.js
 
       # ----------------------------------
-      # 生成結果の確認
+      # 生成結果の検証
       # ----------------------------------
 
-      - name: Check generated sitemap
+      - name: Validate generated files
         shell: bash
         run: |
-          test -s sitemap.xml
+          python3 - <<'PY'
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
 
-          echo "===== Sitemap URL Count ====="
-          grep -c '<loc>' sitemap.xml
+          pages = sorted(
+              Path("works").glob("*.html")
+          )
 
-          echo "===== Sitemap Preview ====="
-          head -n 20 sitemap.xml
+          assert len(pages) == 38, (
+              f"作品HTML数が想定と違います: {len(pages)}"
+          )
 
-          echo "===== Git Changes ====="
-          git status --short
+          for page in pages:
+              content = page.read_text(
+                  encoding="utf-8"
+              )
+
+              for marker in [
+                  "<title>",
+                  'rel="canonical"',
+                  'property="og:image"',
+                  "<h1",
+                  'href="../assets/pdf/'
+              ]:
+                  assert marker in content, (
+                      f"{page} に {marker} がありません"
+                  )
+
+          tree = ET.parse("sitemap.xml")
+          root = tree.getroot()
+
+          namespace = {
+              "s": "http://www.sitemaps.org/schemas/sitemap/0.9"
+          }
+
+          urls = [
+              element.text
+              for element in root.findall(
+                  ".//s:loc",
+                  namespace
+              )
+          ]
+
+          assert len(urls) == 40, (
+              f"URL数が想定と違います: {len(urls)}"
+          )
+
+          assert len(urls) == len(set(urls)), (
+              "サイトマップに重複URLがあります"
+          )
+
+          for page in pages:
+              expected = (
+                  "https://saaaachi.github.io/"
+                  "project_library/works/"
+                  + page.name
+              )
+
+              assert expected in urls, (
+                  f"サイトマップに {expected} がありません"
+              )
+
+          print("作品HTML：38件 OK")
+          print("サイトマップ：40件 OK")
+          print("SEO基本タグ：OK")
+          print("重複URL：なし")
+          print("SEOテスト成功！")
+          PY
 
       # ----------------------------------
-      # テスト結果を保存
+      # テスト成果物の保存
       # ----------------------------------
 
-      - name: Upload generated sitemap
+      - name: Upload SEO test files
         uses: actions/upload-artifact@v4
         with:
-          name: project-library-sitemap-test
-          path: sitemap.xml
+          name: project-library-seo-test
+          path: |
+            works/
+            sitemap.xml
           retention-days: 7
 
 # ======================================
-# 注意
-# ======================================
+# テスト専用
 #
-# このワークフローはテスト専用。
-#
-# ・mainへpushしない
-# ・既存のsitemap.xmlを公開更新しない
-# ・publish.ymlを変更しない
-# ・delete.ymlを変更しない
-#
+# ・本番公開しない
+# ・mainへ自動pushしない
+# ・投稿機能は変更しない
+# ・削除機能は変更しない
 # ======================================
