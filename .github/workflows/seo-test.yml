@@ -1,0 +1,85 @@
+
+# ======================================
+# Project Library
+# SEO Generator Test Workflow
+# Version 1.0
+# ======================================
+
+name: Project Library SEO Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-seo:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ----------------------------------
+      # リポジトリ取得
+      # ----------------------------------
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------
+      # Node.js設定
+      # ----------------------------------
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # ----------------------------------
+      # SEO生成プログラム実行
+      # ----------------------------------
+
+      - name: Generate sitemap
+        run: node tools/generate-seo.js
+
+      # ----------------------------------
+      # 生成結果の確認
+      # ----------------------------------
+
+      - name: Check generated sitemap
+        shell: bash
+        run: |
+          test -s sitemap.xml
+
+          echo "===== Sitemap URL Count ====="
+          grep -c '<loc>' sitemap.xml
+
+          echo "===== Sitemap Preview ====="
+          head -n 20 sitemap.xml
+
+          echo "===== Git Changes ====="
+          git status --short
+
+      # ----------------------------------
+      # テスト結果を保存
+      # ----------------------------------
+
+      - name: Upload generated sitemap
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-library-sitemap-test
+          path: sitemap.xml
+          retention-days: 7
+
+# ======================================
+# 注意
+# ======================================
+#
+# このワークフローはテスト専用。
+#
+# ・mainへpushしない
+# ・既存のsitemap.xmlを公開更新しない
+# ・publish.ymlを変更しない
+# ・delete.ymlを変更しない
+#
+# ======================================
