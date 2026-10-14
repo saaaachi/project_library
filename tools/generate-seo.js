@@ -2,24 +2,21 @@
 /* ======================================
    Project Library
    SEO Generator
-   Version 1.1
+   Version 1.2
    ======================================
 
-   機能：
-   ・works.js読み込み
    ・作品別HTML生成
-   ・SEO title / description
-   ・canonical / OGP
+   ・SEO情報自動設定
+   ・既存work.js v5.7連携
    ・sitemap.xml生成
    ・削除作品のHTML整理
 
-   注意：
-   生成HTMLは現在テスト段階。
-   本番サイトへの公開は
-   GitHub Actions連携後に行う。
-
    実行：
    node tools/generate-seo.js
+
+   注意：
+   GitHub Actionsテスト中は
+   本番サイトに自動公開しない。
 
    ====================================== */
 
@@ -207,7 +204,7 @@ function loadWorks(){
 }
 
 // --------------------------------------
-// 作品データの検証
+// 作品データ検証
 // --------------------------------------
 
 function validateWorks(works){
@@ -298,7 +295,7 @@ function createDescription(work){
         work.category
     ).join("・");
 
-    const combined = [
+    return [
         title,
         description,
         categories
@@ -307,14 +304,13 @@ function createDescription(work){
         "無料PDFプリントを公開しています。"
     ]
         .filter(Boolean)
-        .join("｜");
-
-    return combined.slice(0,160);
+        .join("｜")
+        .slice(0,160);
 
 }
 
 // --------------------------------------
-// 安全なサイト内パス
+// サイト内パス
 // --------------------------------------
 
 function encodeAssetPath(value){
@@ -327,7 +323,35 @@ function encodeAssetPath(value){
 }
 
 // --------------------------------------
-// タグ表示
+// カテゴリリンク
+// --------------------------------------
+
+function createCategories(categories){
+
+    return toArray(categories)
+        .map(category => {
+
+            const text = escapeHtml(category);
+
+            const query =
+                encodeURIComponent(
+                    String(category)
+                );
+
+            return `
+<a
+class="tag"
+href="../library.html?category=${query}">
+${text}
+</a>`;
+
+        })
+        .join("\n");
+
+}
+
+// --------------------------------------
+// タグリンク
 // --------------------------------------
 
 function createTags(tags){
@@ -345,7 +369,8 @@ function createTags(tags){
             return `
 <a
 class="tag"
-href="../library.html?tag=${query}">
+href="../library.html?tag=${query}"
+data-project-library-tag="${text}">
 ${text}
 </a>`;
 
@@ -355,32 +380,85 @@ ${text}
 }
 
 // --------------------------------------
-// カテゴリ表示
+// バッジ
 // --------------------------------------
 
-function createCategories(categories){
+function createBadges(work){
 
-    return toArray(categories)
-        .map(category => {
+    let html = "";
 
-            const text = escapeHtml(
-                category
-            );
+    if(work.isNew){
+        html += `
+<span class="badge badge-new">
+NEW
+</span>`;
+    }
 
-            const query =
-                encodeURIComponent(
-                    String(category)
-                );
+    if(work.recommend){
+        html += `
+<span class="badge badge-recommend">
+おすすめ
+</span>`;
+    }
 
-            return `
-<a
-class="tag"
-href="../library.html?category=${query}">
-${text}
-</a>`;
+    return html;
 
-        })
-        .join("\n");
+}
+
+// --------------------------------------
+// 広告HTML
+// --------------------------------------
+
+function createWorkAd100(){
+
+    return `
+<div class="work-ad-100">
+<ins
+class="adsbygoogle"
+style="display:inline-block;width:728px;height:100px"
+data-ad-client="ca-pub-1299640300068792"
+data-ad-slot="5209302442">
+</ins>
+</div>`;
+
+}
+
+// --------------------------------------
+// 広告CSS
+// --------------------------------------
+
+function createAdStyle(){
+
+    return `
+<style>
+.work-ad-100{
+    width:100%;
+    min-height:100px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    margin:20px 0;
+}
+.work-ad-100 .adsbygoogle{
+    display:inline-block;
+    width:728px;
+    height:100px;
+    max-width:100%;
+}
+@media screen and (max-width:767px){
+    .work-ad-100{
+        width:100%;
+        min-height:100px;
+        overflow:hidden;
+    }
+    .work-ad-100 .adsbygoogle{
+        width:100% !important;
+        max-width:100% !important;
+        height:100px !important;
+    }
+}
+</style>`;
 
 }
 
@@ -408,11 +486,6 @@ function createWorkHtml(work){
     const thumbnailPath =
         encodeAssetPath(
             work.thumbnail
-        );
-
-    const pdfPath =
-        encodeAssetPath(
-            work.pdf
         );
 
     const thumbnailUrl =
@@ -510,13 +583,27 @@ rel="stylesheet"
 href="../assets/css/style.css"
 >
 
+${createAdStyle()}
+
+<script
+async
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
+crossorigin="anonymous">
+</script>
+
 </head>
 
 <body>
 
+<header id="header"></header>
+
 <div class="container">
 
+<aside id="sidebar"></aside>
+
 <main>
+
+<div id="workArea">
 
 <section class="container">
 
@@ -532,6 +619,8 @@ ${escapeHtml(title)}
 
 </div>
 
+${createBadges(work)}
+
 <h1 class="section-title">
 ${escapeHtml(title)}
 </h1>
@@ -539,6 +628,9 @@ ${escapeHtml(title)}
 <p class="level">
 ${stars}
 </p>
+
+<!-- タイトル下広告 -->
+${createWorkAd100()}
 
 <div class="card-tags">
 ${categories}
@@ -556,18 +648,18 @@ alt="${escapeHtml(title)}"
 <div class="info-box">
 
 <div class="info-item">
-<b>対象年齢</b>
-<p>${escapeHtml(work.age ?? "")}</p>
+<b>対象年齢</b><br>
+${escapeHtml(work.age ?? "")}
 </div>
 
 <div class="info-item">
-<b>印刷サイズ</b>
-<p>${escapeHtml(work.size ?? "")}</p>
+<b>印刷サイズ</b><br>
+${escapeHtml(work.size ?? "")}
 </div>
 
 <div class="info-item">
-<b>必要な道具</b>
-<p>${tools}</p>
+<b>必要な道具</b><br>
+${tools}
 </div>
 
 </div>
@@ -583,66 +675,56 @@ style="white-space:pre-wrap;"
 ${tags || "<p>タグはありません。</p>"}
 </div>
 
-<div class="section">
+<!-- PDFダウンロード -->
 
-<a
-class="button"
-href="../${escapeHtml(pdfPath)}"
-target="_blank"
-rel="noopener"
->
-📄 PDFを開く
-</a>
+<button
+type="button"
+class="button download-button"
+id="pdfDownloadButton"
+aria-label="${escapeHtml(title)}のPDFをダウンロード">
+📄 PDFをダウンロード
+</button>
 
-<p style="font-size:13px;color:#777;">
-PDFを開いて保存できます。
+<p
+id="pdfDownloadHelp"
+style="font-size:13px;color:#777;margin-top:8px;">
+iPhoneでは「ファイルに保存」を選択できます。
 </p>
 
-</div>
+<!-- ダウンロード下広告 -->
+${createWorkAd100()}
 
 <div class="section">
 
 <h3>ご利用について</h3>
 
 <p>
-個人・教育・施設利用は無料です。
-再配布・販売は禁止しています。
+個人・教育・施設利用は無料です。<br>
+再配布・販売・データの転載は禁止しています。
 </p>
 
 </div>
 
-<div class="section">
-
-<a
-class="button"
-href="../work.html?id=${id}"
->
-通常の作品ページを開く
-</a>
-
-<p style="font-size:13px;color:#777;">
-現在のダウンロード機能や
-関連作品表示を利用できます。
-</p>
-
-</div>
-
-<div class="section">
-
-<a href="../library.html">
-作品一覧へ戻る
-</a>
-
-</div>
+<div id="seriesArea"></div>
+<div id="relatedArea"></div>
+<div id="moveArea"></div>
 
 </section>
+
+</div>
 
 </main>
 
 </div>
 
+<footer id="footer"></footer>
+
+<script src="../assets/data/works.js"></script>
+<script src="../assets/js/common.js"></script>
+<script src="../assets/js/work.js"></script>
+
 <!-- 更新日：${updateDate} -->
-<!-- SEO Generator Version 1.1 -->
+<!-- SEO Generator Version 1.2 -->
 
 </body>
 </html>
@@ -687,7 +769,7 @@ function generateWorkPages(works){
     }
 
     // ----------------------------------
-    // 削除済み作品のHTML整理
+    // 削除済み作品HTML整理
     // ----------------------------------
 
     const files = fs.readdirSync(
@@ -696,7 +778,6 @@ function generateWorkPages(works){
 
     for(const filename of files){
 
-        // 数字.html形式だけ管理対象
         if(!/^\d+\.html$/.test(filename)){
             continue;
         }
@@ -705,12 +786,12 @@ function generateWorkPages(works){
             continue;
         }
 
-        const filePath = path.join(
-            OUTPUT_DIR,
-            filename
+        fs.unlinkSync(
+            path.join(
+                OUTPUT_DIR,
+                filename
+            )
         );
-
-        fs.unlinkSync(filePath);
 
         console.log(
             `削除済みSEOページ整理：${filename}`
@@ -806,7 +887,7 @@ function main(){
 
     console.log("==============================");
     console.log("Project Library SEO Generator");
-    console.log("Version 1.1");
+    console.log("Version 1.2");
     console.log("==============================");
 
     const works = loadWorks();
