@@ -2,13 +2,127 @@
 /* ==========================
    Project Library
    common.js
-   Version 6.2
+   Version 6.3
+   ==========================
+
+   ・通常ページ対応
+   ・SEO作品ページ対応
+   ・共通パーツ読み込み
+   ・動的サイドバー
+   ・タグクリック記録
+   ・検索・メニュー
+   ・NEW判定
+   ・年号自動更新
+
    ========================== */
 
 
-// --------------------------
+// =====================================================
+// ページの場所を判定
+// =====================================================
+
+const commonIsSeoPage =
+    /\/works\/\d+\.html$/.test(
+        location.pathname
+    );
+
+const commonRoot =
+    commonIsSeoPage ? "../" : "";
+
+
+// =====================================================
+// サイト内URL生成
+// =====================================================
+
+function commonPageUrl(file){
+
+    return commonRoot + file;
+
+}
+
+
+// =====================================================
+// 共通パーツ内の相対URLを補正
+// =====================================================
+
+function fixComponentLinks(target){
+
+    if(!commonIsSeoPage){
+        return;
+    }
+
+    // ----------------------------------
+    // サイト内リンク
+    // ----------------------------------
+
+    target.querySelectorAll(
+        "a[href]"
+    ).forEach(link => {
+
+        const href =
+            link.getAttribute("href");
+
+        if(!href){
+            return;
+        }
+
+        // 外部URL、ページ内リンク、
+        // 絶対パスなどは変更しない
+
+        if(
+            href.startsWith("#") ||
+            href.startsWith("/") ||
+            href.startsWith("../") ||
+            /^[a-z][a-z0-9+.-]*:/i.test(href)
+        ){
+            return;
+        }
+
+        link.setAttribute(
+            "href",
+            commonRoot + href
+        );
+
+    });
+
+
+    // ----------------------------------
+    // 画像パス
+    // ----------------------------------
+
+    target.querySelectorAll(
+        "img[src]"
+    ).forEach(img => {
+
+        const src =
+            img.getAttribute("src");
+
+        if(!src){
+            return;
+        }
+
+        if(
+            src.startsWith("/") ||
+            src.startsWith("../") ||
+            src.startsWith("data:") ||
+            /^[a-z][a-z0-9+.-]*:/i.test(src)
+        ){
+            return;
+        }
+
+        img.setAttribute(
+            "src",
+            commonRoot + src
+        );
+
+    });
+
+}
+
+
+// =====================================================
 // 共通パーツ読み込み
-// --------------------------
+// =====================================================
 
 async function loadComponent(id, file){
 
@@ -19,22 +133,32 @@ async function loadComponent(id, file){
         return;
     }
 
+    const componentPath =
+        commonPageUrl(file);
+
     try{
 
         const response =
-            await fetch(file);
+            await fetch(componentPath);
 
         if(!response.ok){
-            throw new Error(file);
+            throw new Error(
+                componentPath
+            );
         }
 
         target.innerHTML =
             await response.text();
 
+        // SEOページのリンク・画像を補正
+        fixComponentLinks(target);
+
     }catch(error){
 
         console.error(
-            file + " の読み込みに失敗しました"
+            componentPath +
+            " の読み込みに失敗しました",
+            error
         );
 
     }
@@ -44,7 +168,7 @@ async function loadComponent(id, file){
 
 // =====================================================
 // NEW判定
-// 公開日から30日間だけNEWとして扱う
+// 公開日から30日間
 // =====================================================
 
 function isWorkNew(work){
@@ -161,13 +285,13 @@ function logSidebarClick(value){
 }
 
 
-// --------------------------
+// =====================================================
 // 初期読み込み
-// --------------------------
+// =====================================================
 
 window.addEventListener(
     "DOMContentLoaded",
-    async()=>{
+    async () => {
 
         await loadComponent(
             "header",
@@ -236,12 +360,14 @@ function setupDynamicSidebar(){
     }
 
 
-    // --------------------------
+    // ----------------------------------
     // 対象者カテゴリ
-    // --------------------------
+    // ----------------------------------
 
     const categoryMenu =
-        document.getElementById("categoryMenu");
+        document.getElementById(
+            "categoryMenu"
+        );
 
     const categories = [
         "幼児向け",
@@ -253,45 +379,56 @@ function setupDynamicSidebar(){
     if(categoryMenu){
 
         categoryMenu.innerHTML =
-            categories.map(category=>{
+            categories.map(category => {
 
                 const count =
-                    works.filter(work=>{
+                    works.filter(work => {
 
-                        return Array.isArray(work.category) &&
-                            work.category.includes(category);
+                        return (
+                            Array.isArray(
+                                work.category
+                            ) &&
+                            work.category.includes(
+                                category
+                            )
+                        );
 
                     }).length;
 
                 return `
-                    <a
-                    href="library.html?category=${encodeURIComponent(category)}">
-                    ${category} (${count})
-                    </a>
-                `;
+<a
+href="${commonPageUrl("library.html")}?category=${encodeURIComponent(category)}">
+${category} (${count})
+</a>`;
 
             }).join("");
 
     }
 
 
-    // --------------------------
+    // ----------------------------------
     // ジャンル
     // fixedTagsから自動取得
-    // --------------------------
+    // ----------------------------------
 
     const genreMenu =
-        document.getElementById("genreMenu");
+        document.getElementById(
+            "genreMenu"
+        );
 
     const genreCounts = {};
 
-    works.forEach(work=>{
+    works.forEach(work => {
 
-        if(!Array.isArray(work.fixedTags)){
+        if(
+            !Array.isArray(
+                work.fixedTags
+            )
+        ){
             return;
         }
 
-        work.fixedTags.forEach(tag=>{
+        work.fixedTags.forEach(tag => {
 
             if(!tag){
                 return;
@@ -310,35 +447,34 @@ function setupDynamicSidebar(){
     if(genreMenu){
 
         const genres =
-            Object.entries(genreCounts)
-                .sort((a,b)=>{
+            Object.entries(
+                genreCounts
+            ).sort((a,b) => {
 
-                    return a[0].localeCompare(
-                        b[0],
-                        "ja"
-                    );
+                return a[0].localeCompare(
+                    b[0],
+                    "ja"
+                );
 
-                });
+            });
 
         if(genres.length === 0){
 
             genreMenu.innerHTML = `
-                <p class="menu-empty">
-                作品がまだありません
-                </p>
-            `;
+<p class="menu-empty">
+作品がまだありません
+</p>`;
 
         }else{
 
             genreMenu.innerHTML =
-                genres.map(([tag,count])=>{
+                genres.map(([tag,count]) => {
 
                     return `
-                        <a
-                        href="library.html?tag=${encodeURIComponent(tag)}">
-                        ${tag} (${count})
-                        </a>
-                    `;
+<a
+href="${commonPageUrl("library.html")}?tag=${encodeURIComponent(tag)}">
+${tag} (${count})
+</a>`;
 
                 }).join("");
 
@@ -347,23 +483,29 @@ function setupDynamicSidebar(){
     }
 
 
-    // --------------------------
+    // ----------------------------------
     // 人気タグ
     // freeTagsの使用数から上位4つ
-    // --------------------------
+    // ----------------------------------
 
     const popularTagMenu =
-        document.getElementById("popularTagMenu");
+        document.getElementById(
+            "popularTagMenu"
+        );
 
     const freeTagCounts = {};
 
-    works.forEach(work=>{
+    works.forEach(work => {
 
-        if(!Array.isArray(work.freeTags)){
+        if(
+            !Array.isArray(
+                work.freeTags
+            )
+        ){
             return;
         }
 
-        work.freeTags.forEach(tag=>{
+        work.freeTags.forEach(tag => {
 
             if(!tag){
                 return;
@@ -382,40 +524,40 @@ function setupDynamicSidebar(){
     if(popularTagMenu){
 
         const popularTags =
-            Object.entries(freeTagCounts)
-                .sort((a,b)=>{
+            Object.entries(
+                freeTagCounts
+            )
+            .sort((a,b) => {
 
-                    if(b[1] !== a[1]){
-                        return b[1] - a[1];
-                    }
+                if(b[1] !== a[1]){
+                    return b[1] - a[1];
+                }
 
-                    return a[0].localeCompare(
-                        b[0],
-                        "ja"
-                    );
+                return a[0].localeCompare(
+                    b[0],
+                    "ja"
+                );
 
-                })
-                .slice(0,4);
+            })
+            .slice(0,4);
 
         if(popularTags.length === 0){
 
             popularTagMenu.innerHTML = `
-                <p class="menu-empty">
-                作品がまだありません
-                </p>
-            `;
+<p class="menu-empty">
+作品がまだありません
+</p>`;
 
         }else{
 
             popularTagMenu.innerHTML =
-                popularTags.map(([tag,count])=>{
+                popularTags.map(([tag,count]) => {
 
                     return `
-                        <a
-                        href="library.html?tag=${encodeURIComponent(tag)}">
-                        ${tag} (${count})
-                        </a>
-                    `;
+<a
+href="${commonPageUrl("library.html")}?tag=${encodeURIComponent(tag)}">
+${tag} (${count})
+</a>`;
 
                 }).join("");
 
@@ -425,7 +567,7 @@ function setupDynamicSidebar(){
 
 
     // =================================================
-    // サイドバーのクリックイベント
+    // サイドバークリックイベント
     // =================================================
 
     const sidebarMenus = [
@@ -443,7 +585,7 @@ function setupDynamicSidebar(){
         }
     ];
 
-    sidebarMenus.forEach(menu=>{
+    sidebarMenus.forEach(menu => {
 
         if(!menu.element){
             return;
@@ -451,14 +593,18 @@ function setupDynamicSidebar(){
 
         menu.element.addEventListener(
             "click",
-            event=>{
+            event => {
 
                 const link =
-                    event.target.closest("a");
+                    event.target.closest(
+                        "a"
+                    );
 
                 if(
                     !link ||
-                    !menu.element.contains(link)
+                    !menu.element.contains(
+                        link
+                    )
                 ){
                     return;
                 }
@@ -471,15 +617,21 @@ function setupDynamicSidebar(){
                             location.href
                         );
 
-                    if(menu.type === "category"){
+                    if(
+                        menu.type ===
+                        "category"
+                    ){
 
                         const category =
-                            url.searchParams.get("category");
+                            url.searchParams.get(
+                                "category"
+                            );
 
                         if(category){
 
                             logSidebarClick(
-                                "カテゴリ: " + category
+                                "カテゴリ: " +
+                                category
                             );
 
                         }
@@ -487,11 +639,15 @@ function setupDynamicSidebar(){
                     }else{
 
                         const tag =
-                            url.searchParams.get("tag");
+                            url.searchParams.get(
+                                "tag"
+                            );
 
                         if(tag){
 
-                            logSidebarClick(tag);
+                            logSidebarClick(
+                                tag
+                            );
 
                         }
 
@@ -513,7 +669,7 @@ function setupDynamicSidebar(){
 
 
     console.log(
-        "Project Library 動的サイドバー Version 6.2"
+        "Project Library 動的サイドバー Version 6.3"
     );
 
 }
@@ -526,19 +682,27 @@ function setupDynamicSidebar(){
 function setupMenu(){
 
     const menuButton =
-        document.getElementById("menuButton");
+        document.getElementById(
+            "menuButton"
+        );
 
     const sidebar =
-        document.querySelector(".sidebar");
+        document.querySelector(
+            ".sidebar"
+        );
 
     const closeMenu =
-        document.getElementById("closeMenu");
+        document.getElementById(
+            "closeMenu"
+        );
 
     if(menuButton && sidebar){
 
-        menuButton.onclick = ()=>{
+        menuButton.onclick = () => {
 
-            sidebar.classList.add("open");
+            sidebar.classList.add(
+                "open"
+            );
 
         };
 
@@ -546,9 +710,11 @@ function setupMenu(){
 
     if(closeMenu && sidebar){
 
-        closeMenu.onclick = ()=>{
+        closeMenu.onclick = () => {
 
-            sidebar.classList.remove("open");
+            sidebar.classList.remove(
+                "open"
+            );
 
         };
 
@@ -564,7 +730,9 @@ function setupMenu(){
 function setupSearch(){
 
     const searchInput =
-        document.getElementById("searchInput");
+        document.getElementById(
+            "searchInput"
+        );
 
     if(!searchInput){
         return;
@@ -572,7 +740,7 @@ function setupSearch(){
 
     searchInput.addEventListener(
         "keydown",
-        event=>{
+        event => {
 
             if(event.key !== "Enter"){
                 return;
@@ -584,14 +752,22 @@ function setupSearch(){
             if(keyword === ""){
 
                 location.href =
-                    "library.html";
+                    commonPageUrl(
+                        "library.html"
+                    );
 
                 return;
 
             }
 
             location.href =
-                `library.html?search=${encodeURIComponent(keyword)}`;
+                commonPageUrl(
+                    "library.html"
+                ) +
+                "?search=" +
+                encodeURIComponent(
+                    keyword
+                );
 
         }
     );
@@ -605,17 +781,23 @@ function setupSearch(){
 
 document.addEventListener(
     "keydown",
-    event=>{
+    event => {
 
         if(event.key !== "Escape"){
             return;
         }
 
         const sidebar =
-            document.querySelector(".sidebar");
+            document.querySelector(
+                ".sidebar"
+            );
 
         if(sidebar){
-            sidebar.classList.remove("open");
+
+            sidebar.classList.remove(
+                "open"
+            );
+
         }
 
     }
@@ -628,29 +810,41 @@ document.addEventListener(
 
 document.addEventListener(
     "click",
-    event=>{
+    event => {
 
         const sidebar =
-            document.querySelector(".sidebar");
+            document.querySelector(
+                ".sidebar"
+            );
 
         const menuButton =
-            document.getElementById("menuButton");
+            document.getElementById(
+                "menuButton"
+            );
 
         if(
             !sidebar ||
-            !sidebar.classList.contains("open")
+            !sidebar.classList.contains(
+                "open"
+            )
         ){
             return;
         }
 
         if(
-            sidebar.contains(event.target) ||
-            menuButton?.contains(event.target)
+            sidebar.contains(
+                event.target
+            ) ||
+            menuButton?.contains(
+                event.target
+            )
         ){
             return;
         }
 
-        sidebar.classList.remove("open");
+        sidebar.classList.remove(
+            "open"
+        );
 
     }
 );
@@ -663,7 +857,9 @@ document.addEventListener(
 function setupCurrentYear(){
 
     const year =
-        document.getElementById("currentYear");
+        document.getElementById(
+            "currentYear"
+        );
 
     if(year){
 
@@ -680,5 +876,5 @@ function setupCurrentYear(){
 // =====================================================
 
 console.log(
-    "Project Library common.js Version 6.2"
+    "Project Library common.js Version 6.3"
 );
