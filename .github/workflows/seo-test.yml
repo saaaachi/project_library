@@ -2,7 +2,7 @@
 # ======================================
 # Project Library
 # SEO Generator Test Workflow
-# Version 1.1
+# Version 1.2
 # ======================================
 
 name: Project Library SEO Test
@@ -40,7 +40,9 @@ jobs:
       # ----------------------------------
 
       - name: Check JavaScript syntax
-        run: node --check tools/generate-seo.js
+        run: |
+          node --check tools/generate-seo.js
+          node --check assets/js/work.js
 
       # ----------------------------------
       # SEOファイル生成
@@ -50,85 +52,145 @@ jobs:
         run: node tools/generate-seo.js
 
       # ----------------------------------
-      # 生成結果の検証
+      # HTML・サイトマップ検証
       # ----------------------------------
 
-      - name: Validate generated files
+      - name: Validate SEO files
         shell: bash
         run: |
           python3 - <<'PY'
-          import os
           import re
           import xml.etree.ElementTree as ET
           from pathlib import Path
 
+          root = Path(".")
           pages = sorted(
-              Path("works").glob("*.html")
+              (root / "works").glob("*.html")
           )
 
-          assert len(pages) == 38, (
-              f"作品HTML数が想定と違います: {len(pages)}"
+          assert pages, (
+              "SEO作品HTMLが生成されていません"
           )
+
+          required_files = [
+              "assets/data/works.js",
+              "assets/js/common.js",
+              "assets/js/work.js",
+              "assets/css/style.css"
+          ]
+
+          for file in required_files:
+              assert (root / file).is_file(), (
+                  f"必要なファイルがありません: {file}"
+              )
+
+          required_html = [
+              'rel="canonical"',
+              'property="og:title"',
+              'property="og:description"',
+              'property="og:image"',
+              '<h1',
+              'id="workArea"',
+              'id="pdfDownloadButton"',
+              'id="pdfDownloadHelp"',
+              'id="seriesArea"',
+              'id="relatedArea"',
+              'id="moveArea"',
+              'id="header"',
+              'id="sidebar"',
+              'id="footer"',
+              'data-project-library-tag=',
+              '../assets/data/works.js',
+              '../assets/js/common.js',
+              '../assets/js/work.js'
+          ]
 
           for page in pages:
               content = page.read_text(
                   encoding="utf-8"
               )
 
-              for marker in [
-                  "<title>",
-                  'rel="canonical"',
-                  'property="og:image"',
-                  "<h1",
-                  'href="../assets/pdf/'
-              ]:
+              for marker in required_html:
                   assert marker in content, (
-                      f"{page} に {marker} がありません"
+                      f"{page}: {marker} がありません"
                   )
 
-          tree = ET.parse("sitemap.xml")
-          root = tree.getroot()
+              assert content.count(
+                  'class="work-ad-100"'
+              ) == 2, (
+                  f"{page}: 広告枠が2つではありません"
+              )
+
+              assert content.count(
+                  'id="pdfDownloadButton"'
+              ) == 1, (
+                  f"{page}: PDFボタンが重複しています"
+              )
+
+              assert content.count(
+                  "<h1"
+              ) == 1, (
+                  f"{page}: h1が重複しています"
+              )
+
+          tree = ET.parse(
+              root / "sitemap.xml"
+          )
 
           namespace = {
-              "s": "http://www.sitemaps.org/schemas/sitemap/0.9"
+              "s":
+              "http://www.sitemaps.org/schemas/sitemap/0.9"
           }
 
           urls = [
               element.text
-              for element in root.findall(
+              for element in tree.findall(
                   ".//s:loc",
                   namespace
               )
           ]
 
-          assert len(urls) == 40, (
-              f"URL数が想定と違います: {len(urls)}"
+          expected_count = len(pages) + 2
+
+          assert len(urls) == expected_count, (
+              f"URL数が不一致: {len(urls)}"
+              f" / 期待値: {expected_count}"
           )
 
           assert len(urls) == len(set(urls)), (
-              "サイトマップに重複URLがあります"
+              "サイトマップにURL重複があります"
           )
 
           for page in pages:
-              expected = (
+              expected_url = (
                   "https://saaaachi.github.io/"
                   "project_library/works/"
                   + page.name
               )
 
-              assert expected in urls, (
-                  f"サイトマップに {expected} がありません"
+              assert expected_url in urls, (
+                  f"サイトマップに未登録: {page.name}"
               )
 
-          print("作品HTML：38件 OK")
-          print("サイトマップ：40件 OK")
-          print("SEO基本タグ：OK")
-          print("重複URL：なし")
+          print("==============================")
+          print("Project Library SEO Test")
+          print("Version 1.2")
+          print("==============================")
+          print(f"作品HTML: {len(pages)}件 OK")
+          print(f"サイトマップ: {len(urls)}件 OK")
+          print("SEO基本タグ: OK")
+          print("JavaScript読み込み: OK")
+          print("PDFボタン: OK")
+          print("広告枠: OK")
+          print("シリーズ・関連作品領域: OK")
+          print("共通レイアウト領域: OK")
+          print("URL重複: なし")
+          print("==============================")
           print("SEOテスト成功！")
           PY
 
       # ----------------------------------
-      # テスト成果物の保存
+      # テスト成果物を保存
       # ----------------------------------
 
       - name: Upload SEO test files
@@ -145,6 +207,6 @@ jobs:
 #
 # ・本番公開しない
 # ・mainへ自動pushしない
-# ・投稿機能は変更しない
-# ・削除機能は変更しない
+# ・publish.ymlは変更しない
+# ・delete.ymlは変更しない
 # ======================================
