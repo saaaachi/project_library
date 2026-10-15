@@ -2,7 +2,7 @@
 # ======================================
 # Project Library
 # SEO Generator Test Workflow
-# Version 1.2
+# Version 1.3
 # ======================================
 
 name: Project Library SEO Test
@@ -42,17 +42,101 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check tools/generate-seo.js
+          node --check tools/build-pages.js
           node --check assets/js/work.js
+          node --check assets/js/common.js
 
       # ----------------------------------
-      # SEOファイル生成
+      # 大カテゴリ・小カテゴリ必須検証
       # ----------------------------------
 
-      - name: Generate SEO files
-        run: node tools/generate-seo.js
+      - name: Validate required categories
+        shell: bash
+        run: |
+          node <<'JS'
+          const fs = require("fs");
+          const vm = require("vm");
+
+          const source = fs.readFileSync(
+            "assets/data/works.js",
+            "utf8"
+          );
+
+          const startMarker = "const works = ";
+          const endMarker =
+            "// --------------------------\n// 共通関数";
+
+          const start = source.indexOf(startMarker);
+          const end = source.indexOf(endMarker);
+
+          if (
+            start === -1 ||
+            end === -1 ||
+            end <= start
+          ) {
+            throw new Error(
+              "作品データの構造を確認できません"
+            );
+          }
+
+          const expression = source
+            .slice(start + startMarker.length, end)
+            .trim()
+            .replace(/;\s*$/, "");
+
+          const works = vm.runInNewContext(
+            expression,
+            Object.create(null),
+            { timeout: 5000 }
+          );
+
+          if (!Array.isArray(works)) {
+            throw new Error("作品データが配列ではありません");
+          }
+
+          if (works.length === 0) {
+            throw new Error("登録作品がありません");
+          }
+
+          function hasValue(value) {
+            const items = Array.isArray(value)
+              ? value
+              : [value];
+
+            return items.some(item =>
+              typeof item === "string" &&
+              item.trim().length > 0
+            );
+          }
+
+          for (const work of works) {
+            if (!hasValue(work.category)) {
+              throw new Error(
+                `作品${work.id}: 大カテゴリがありません`
+              );
+            }
+
+            if (!hasValue(work.fixedTags)) {
+              throw new Error(
+                `作品${work.id}: 小カテゴリがありません`
+              );
+            }
+          }
+
+          console.log(
+            `大カテゴリ・小カテゴリ: ${works.length}件 OK`
+          );
+          JS
 
       # ----------------------------------
-      # HTML・サイトマップ検証
+      # SEOページ・公開用フォルダ生成
+      # ----------------------------------
+
+      - name: Build SEO preview site
+        run: node tools/build-pages.js
+
+      # ----------------------------------
+      # HTML・サイトマップ・公開物検証
       # ----------------------------------
 
       - name: Validate SEO files
@@ -63,7 +147,7 @@ jobs:
           import xml.etree.ElementTree as ET
           from pathlib import Path
 
-          root = Path(".")
+          root = Path("dist")
           pages = sorted(
               (root / "works").glob("*.html")
           )
@@ -73,15 +157,30 @@ jobs:
           )
 
           required_files = [
+              "index.html",
+              "library.html",
+              "work.html",
               "assets/data/works.js",
               "assets/js/common.js",
               "assets/js/work.js",
-              "assets/css/style.css"
+              "assets/css/style.css",
+              "sitemap.xml",
+              "robots.txt",
+              "_headers"
           ]
 
           for file in required_files:
               assert (root / file).is_file(), (
-                  f"必要なファイルがありません: {file}"
+                  f"公開用ファイルがありません: {file}"
+              )
+
+          for directory in [
+              "assets/pdf",
+              "assets/images/thumbnail",
+              "components"
+          ]:
+              assert (root / directory).is_dir(), (
+                  f"公開用フォルダがありません: {directory}"
               )
 
           required_html = [
@@ -127,10 +226,19 @@ jobs:
                   f"{page}: PDFボタンが重複しています"
               )
 
-              assert content.count(
-                  "<h1"
-              ) == 1, (
+              assert len(re.findall(
+                  r"<h1(?:\s|>)",
+                  content
+              )) == 1, (
                   f"{page}: h1が重複しています"
+              )
+
+              assert (
+                  'https://saaaachi.github.io/'
+                  'project_library/works/'
+                  + page.name
+              ) in content, (
+                  f"{page}: 本番canonicalがありません"
               )
 
           tree = ET.parse(
@@ -172,9 +280,35 @@ jobs:
                   f"サイトマップに未登録: {page.name}"
               )
 
+          robots = (
+              root / "robots.txt"
+          ).read_text(encoding="utf-8")
+
+          headers = (
+              root / "_headers"
+          ).read_text(encoding="utf-8")
+
+          assert "Disallow: /" in robots, (
+              "テストサイトのrobots設定がありません"
+          )
+
+          assert "noindex" in headers.lower(), (
+              "テストサイトのnoindex設定がありません"
+          )
+
+          for forbidden in [
+              ".github",
+              "tools",
+              "admin.html",
+              "admin-login.html"
+          ]:
+              assert not (root / forbidden).exists(), (
+                  f"公開対象に管理用ファイルがあります: {forbidden}"
+              )
+
           print("==============================")
           print("Project Library SEO Test")
-          print("Version 1.2")
+          print("Version 1.3")
           print("==============================")
           print(f"作品HTML: {len(pages)}件 OK")
           print(f"サイトマップ: {len(urls)}件 OK")
@@ -184,6 +318,9 @@ jobs:
           print("広告枠: OK")
           print("シリーズ・関連作品領域: OK")
           print("共通レイアウト領域: OK")
+          print("公開用フォルダ: OK")
+          print("管理用ファイル除外: OK")
+          print("テストサイトnoindex: OK")
           print("URL重複: なし")
           print("==============================")
           print("SEOテスト成功！")
@@ -198,8 +335,8 @@ jobs:
         with:
           name: project-library-seo-test
           path: |
-            works/
-            sitemap.xml
+            dist/works/
+            dist/sitemap.xml
           retention-days: 7
 
 # ======================================
@@ -209,4 +346,6 @@ jobs:
 # ・mainへ自動pushしない
 # ・publish.ymlは変更しない
 # ・delete.ymlは変更しない
+# ・大カテゴリ・小カテゴリ必須
+# ・自由タグは任意
 # ======================================
