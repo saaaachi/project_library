@@ -1,351 +1,940 @@
+/* ======================================
+   Project Library
+   SEO Generator
+   Version 1.2
+   ======================================
 
-# ======================================
-# Project Library
-# SEO Generator Test Workflow
-# Version 1.3
-# ======================================
+   ・作品別HTML生成
+   ・SEO情報自動設定
+   ・既存work.js v5.7連携
+   ・sitemap.xml生成
+   ・削除作品のHTML整理
 
-name: Project Library SEO Test
+   実行：
+   node tools/generate-seo.js
 
-on:
-  workflow_dispatch:
+   注意：
+   GitHub Actionsテスト中は
+   本番サイトに自動公開しない。
 
-permissions:
-  contents: read
+   ====================================== */
 
-jobs:
-  test-seo:
-    runs-on: ubuntu-latest
+"use strict";
 
-    steps:
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
 
-      # ----------------------------------
-      # リポジトリ取得
-      # ----------------------------------
+// --------------------------------------
+// 基本設定
+// --------------------------------------
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+const ROOT = path.resolve(__dirname, "..");
 
-      # ----------------------------------
-      # Node.js設定
-      # ----------------------------------
+const SITE_URL =
+    "https://saaaachi.github.io/project_library/";
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+const WORKS_PATH = path.join(
+    ROOT,
+    "assets",
+    "data",
+    "works.js"
+);
 
-      # ----------------------------------
-      # JavaScript構文確認
-      # ----------------------------------
+const OUTPUT_DIR = path.join(
+    ROOT,
+    "works"
+);
 
-      - name: Check JavaScript syntax
-        run: |
-          node --check tools/generate-seo.js
-          node --check tools/build-pages.js
-          node --check assets/js/work.js
-          node --check assets/js/common.js
+const SITEMAP_PATH = path.join(
+    ROOT,
+    "sitemap.xml"
+);
 
-      # ----------------------------------
-      # 大カテゴリ・小カテゴリ必須検証
-      # ----------------------------------
+// --------------------------------------
+// HTML特殊文字
+// --------------------------------------
 
-      - name: Validate required categories
-        shell: bash
-        run: |
-          node <<'JS'
-          const fs = require("fs");
-          const vm = require("vm");
+function escapeHtml(value){
 
-          const source = fs.readFileSync(
-            "assets/data/works.js",
-            "utf8"
-          );
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
-          const startMarker = "const works = ";
-          const endMarker =
-            "// --------------------------\n// 共通関数";
+}
 
-          const start = source.indexOf(startMarker);
-          const end = source.indexOf(endMarker);
+// --------------------------------------
+// XML特殊文字
+// --------------------------------------
 
-          if (
-            start === -1 ||
-            end === -1 ||
-            end <= start
-          ) {
+function escapeXml(value){
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+
+}
+
+// --------------------------------------
+// 配列化
+// --------------------------------------
+
+function toArray(value){
+
+    if(Array.isArray(value)){
+        return value.filter(item =>
+            item !== null &&
+            item !== undefined &&
+            String(item).trim() !== ""
+        );
+    }
+
+    if(
+        value === null ||
+        value === undefined ||
+        value === ""
+    ){
+        return [];
+    }
+
+    return [value];
+
+}
+
+// --------------------------------------
+// 日付確認
+// --------------------------------------
+
+function validDate(value){
+
+    if(typeof value !== "string"){
+        return "";
+    }
+
+    const date = value.trim();
+
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){
+        return "";
+    }
+
+    const parsed = new Date(
+        date + "T00:00:00Z"
+    );
+
+    if(
+        Number.isNaN(parsed.getTime()) ||
+        parsed.toISOString().slice(0,10) !== date
+    ){
+        return "";
+    }
+
+    return date;
+
+}
+
+// --------------------------------------
+// works.js読み込み
+// --------------------------------------
+
+function loadWorks(){
+
+    if(!fs.existsSync(WORKS_PATH)){
+        throw new Error(
+            "works.jsが見つかりません。"
+        );
+    }
+
+    const source = fs.readFileSync(
+        WORKS_PATH,
+        "utf8"
+    );
+
+    const startMarker = "const works = ";
+
+    const endMarker =
+        "// --------------------------\n// 共通関数";
+
+    const start = source.indexOf(
+        startMarker
+    );
+
+    const end = source.indexOf(
+        endMarker
+    );
+
+    if(
+        start === -1 ||
+        end === -1 ||
+        end <= start
+    ){
+        throw new Error(
+            "works.jsの配列構造を確認できません。"
+        );
+    }
+
+    const expression = source
+        .slice(
+            start + startMarker.length,
+            end
+        )
+        .trim()
+        .replace(/;\s*$/, "");
+
+    const result = vm.runInNewContext(
+        expression,
+        Object.create(null),
+        { timeout: 5000 }
+    );
+
+    if(!Array.isArray(result)){
+        throw new Error(
+            "作品データが配列ではありません。"
+        );
+    }
+
+    return result;
+
+}
+
+// --------------------------------------
+// 作品データ検証
+// --------------------------------------
+
+function validateWorks(works){
+
+    const ids = new Set();
+
+    for(const work of works){
+
+        const id = work.id;
+
+        if(
+            !Number.isSafeInteger(id) ||
+            id <= 0
+        ){
             throw new Error(
-              "作品データの構造を確認できません"
+                `不正な作品ID：${id}`
             );
-          }
+        }
 
-          const expression = source
-            .slice(start + startMarker.length, end)
-            .trim()
-            .replace(/;\s*$/, "");
-
-          const works = vm.runInNewContext(
-            expression,
-            Object.create(null),
-            { timeout: 5000 }
-          );
-
-          if (!Array.isArray(works)) {
-            throw new Error("作品データが配列ではありません");
-          }
-
-          if (works.length === 0) {
-            throw new Error("登録作品がありません");
-          }
-
-          function hasValue(value) {
-            const items = Array.isArray(value)
-              ? value
-              : [value];
-
-            return items.some(item =>
-              typeof item === "string" &&
-              item.trim().length > 0
+        if(ids.has(id)){
+            throw new Error(
+                `作品IDが重複しています：${id}`
             );
-          }
+        }
 
-          for (const work of works) {
-            if (!hasValue(work.category)) {
-              throw new Error(
-                `作品${work.id}: 大カテゴリがありません`
-              );
+        ids.add(id);
+
+        for(const field of [
+            "thumbnail",
+            "pdf"
+        ]){
+
+            const value = work[field];
+
+            const prefix =
+                field === "pdf"
+                    ? "assets/pdf/"
+                    : "assets/images/thumbnail/";
+
+            if(
+                typeof value !== "string" ||
+                !value.startsWith(prefix) ||
+                value.includes("..") ||
+                value.includes("\\") ||
+                /[?#]/.test(value)
+            ){
+                throw new Error(
+                    `作品${id}の${field}パスが不正です。`
+                );
             }
 
-            if (!hasValue(work.fixedTags)) {
-              throw new Error(
-                `作品${work.id}: 小カテゴリがありません`
-              );
-            }
-          }
+        }
 
-          console.log(
-            `大カテゴリ・小カテゴリ: ${works.length}件 OK`
-          );
-          JS
+    }
 
-      # ----------------------------------
-      # SEOページ・公開用フォルダ生成
-      # ----------------------------------
+}
 
-      - name: Build SEO preview site
-        run: node tools/build-pages.js
+// --------------------------------------
+// URL生成
+// --------------------------------------
 
-      # ----------------------------------
-      # HTML・サイトマップ・公開物検証
-      # ----------------------------------
+function getWorkUrl(id){
 
-      - name: Validate SEO files
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          import re
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
+    return SITE_URL +
+        "works/" +
+        id +
+        ".html";
 
-          root = Path("dist")
-          pages = sorted(
-              (root / "works").glob("*.html")
-          )
+}
 
-          assert pages, (
-              "SEO作品HTMLが生成されていません"
-          )
+// --------------------------------------
+// SEO説明文
+// --------------------------------------
 
-          required_files = [
-              "index.html",
-              "library.html",
-              "work.html",
-              "assets/data/works.js",
-              "assets/js/common.js",
-              "assets/js/work.js",
-              "assets/css/style.css",
-              "sitemap.xml",
-              "robots.txt",
-              "_headers"
-          ]
+function createDescription(work){
 
-          for file in required_files:
-              assert (root / file).is_file(), (
-                  f"公開用ファイルがありません: {file}"
-              )
+    const title = String(
+        work.title ?? ""
+    ).trim();
 
-          for directory in [
-              "assets/pdf",
-              "assets/images/thumbnail",
-              "components"
-          ]:
-              assert (root / directory).is_dir(), (
-                  f"公開用フォルダがありません: {directory}"
-              )
+    const description = String(
+        work.description ?? ""
+    )
+        .replace(/\s+/g, " ")
+        .trim();
 
-          required_html = [
-              'rel="canonical"',
-              'property="og:title"',
-              'property="og:description"',
-              'property="og:image"',
-              '<h1',
-              'id="workArea"',
-              'id="pdfDownloadButton"',
-              'id="pdfDownloadHelp"',
-              'id="seriesArea"',
-              'id="relatedArea"',
-              'id="moveArea"',
-              'id="header"',
-              'id="sidebar"',
-              'id="footer"',
-              'data-project-library-tag=',
-              '../assets/data/works.js',
-              '../assets/js/common.js',
-              '../assets/js/work.js'
-          ]
+    const categories = toArray(
+        work.category
+    ).join("・");
 
-          for page in pages:
-              content = page.read_text(
-                  encoding="utf-8"
-              )
+    return [
+        title,
+        description,
+        categories
+            ? `対象：${categories}`
+            : "",
+        "無料PDFプリントを公開しています。"
+    ]
+        .filter(Boolean)
+        .join("｜")
+        .slice(0,160);
 
-              for marker in required_html:
-                  assert marker in content, (
-                      f"{page}: {marker} がありません"
-                  )
+}
 
-              assert content.count(
-                  'class="work-ad-100"'
-              ) == 2, (
-                  f"{page}: 広告枠が2つではありません"
-              )
+// --------------------------------------
+// サイト内パス
+// --------------------------------------
 
-              assert content.count(
-                  'id="pdfDownloadButton"'
-              ) == 1, (
-                  f"{page}: PDFボタンが重複しています"
-              )
+function encodeAssetPath(value){
 
-              assert len(re.findall(
-                  r"<h1(?:\s|>)",
-                  content
-              )) == 1, (
-                  f"{page}: h1が重複しています"
-              )
+    return String(value)
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
 
-              assert (
-                  'https://saaaachi.github.io/'
-                  'project_library/works/'
-                  + page.name
-              ) in content, (
-                  f"{page}: 本番canonicalがありません"
-              )
+}
 
-          tree = ET.parse(
-              root / "sitemap.xml"
-          )
+// --------------------------------------
+// カテゴリリンク
+// --------------------------------------
 
-          namespace = {
-              "s":
-              "http://www.sitemaps.org/schemas/sitemap/0.9"
-          }
+function createCategories(categories){
 
-          urls = [
-              element.text
-              for element in tree.findall(
-                  ".//s:loc",
-                  namespace
-              )
-          ]
+    return toArray(categories)
+        .map(category => {
 
-          expected_count = len(pages) + 2
+            const text = escapeHtml(category);
 
-          assert len(urls) == expected_count, (
-              f"URL数が不一致: {len(urls)}"
-              f" / 期待値: {expected_count}"
-          )
+            const query =
+                encodeURIComponent(
+                    String(category)
+                );
 
-          assert len(urls) == len(set(urls)), (
-              "サイトマップにURL重複があります"
-          )
+            return `
+<a
+class="tag"
+href="../library.html?category=${query}">
+${text}
+</a>`;
 
-          for page in pages:
-              expected_url = (
-                  "https://saaaachi.github.io/"
-                  "project_library/works/"
-                  + page.name
-              )
+        })
+        .join("\n");
 
-              assert expected_url in urls, (
-                  f"サイトマップに未登録: {page.name}"
-              )
+}
 
-          robots = (
-              root / "robots.txt"
-          ).read_text(encoding="utf-8")
+// --------------------------------------
+// タグリンク
+// --------------------------------------
 
-          headers = (
-              root / "_headers"
-          ).read_text(encoding="utf-8")
+function createTags(tags){
 
-          assert "Disallow: /" in robots, (
-              "テストサイトのrobots設定がありません"
-          )
+    return toArray(tags)
+        .map(tag => {
 
-          assert "noindex" in headers.lower(), (
-              "テストサイトのnoindex設定がありません"
-          )
+            const text = escapeHtml(tag);
 
-          for forbidden in [
-              ".github",
-              "tools",
-              "admin.html",
-              "admin-login.html"
-          ]:
-              assert not (root / forbidden).exists(), (
-                  f"公開対象に管理用ファイルがあります: {forbidden}"
-              )
+            const query =
+                encodeURIComponent(
+                    String(tag)
+                );
 
-          print("==============================")
-          print("Project Library SEO Test")
-          print("Version 1.3")
-          print("==============================")
-          print(f"作品HTML: {len(pages)}件 OK")
-          print(f"サイトマップ: {len(urls)}件 OK")
-          print("SEO基本タグ: OK")
-          print("JavaScript読み込み: OK")
-          print("PDFボタン: OK")
-          print("広告枠: OK")
-          print("シリーズ・関連作品領域: OK")
-          print("共通レイアウト領域: OK")
-          print("公開用フォルダ: OK")
-          print("管理用ファイル除外: OK")
-          print("テストサイトnoindex: OK")
-          print("URL重複: なし")
-          print("==============================")
-          print("SEOテスト成功！")
-          PY
+            return `
+<a
+class="tag"
+href="../library.html?tag=${query}"
+data-project-library-tag="${text}">
+${text}
+</a>`;
 
-      # ----------------------------------
-      # テスト成果物を保存
-      # ----------------------------------
+        })
+        .join("\n");
 
-      - name: Upload SEO test files
-        uses: actions/upload-artifact@v4
-        with:
-          name: project-library-seo-test
-          path: |
-            dist/works/
-            dist/sitemap.xml
-          retention-days: 7
+}
 
-# ======================================
-# テスト専用
-#
-# ・本番公開しない
-# ・mainへ自動pushしない
-# ・publish.ymlは変更しない
-# ・delete.ymlは変更しない
-# ・大カテゴリ・小カテゴリ必須
-# ・自由タグは任意
-# ======================================
+// --------------------------------------
+// バッジ
+// --------------------------------------
+
+function createBadges(work){
+
+    let html = "";
+
+    if(work.isNew){
+        html += `
+<span class="badge badge-new">
+NEW
+</span>`;
+    }
+
+    if(work.recommend){
+        html += `
+<span class="badge badge-recommend">
+おすすめ
+</span>`;
+    }
+
+    return html;
+
+}
+
+// --------------------------------------
+// 広告HTML
+// --------------------------------------
+
+function createWorkAd100(){
+
+    return `
+<div class="work-ad-100">
+<ins
+class="adsbygoogle"
+style="display:inline-block;width:728px;height:100px"
+data-ad-client="ca-pub-1299640300068792"
+data-ad-slot="5209302442">
+</ins>
+</div>`;
+
+}
+
+// --------------------------------------
+// 広告CSS
+// --------------------------------------
+
+function createAdStyle(){
+
+    return `
+<style>
+.work-ad-100{
+    width:100%;
+    min-height:100px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    margin:20px 0;
+}
+.work-ad-100 .adsbygoogle{
+    display:inline-block;
+    width:728px;
+    height:100px;
+    max-width:100%;
+}
+@media screen and (max-width:767px){
+    .work-ad-100{
+        width:100%;
+        min-height:100px;
+        overflow:hidden;
+    }
+    .work-ad-100 .adsbygoogle{
+        width:100% !important;
+        max-width:100% !important;
+        height:100px !important;
+    }
+}
+</style>`;
+
+}
+
+// --------------------------------------
+// 作品HTML生成
+// --------------------------------------
+
+function createWorkHtml(work){
+
+    const id = work.id;
+
+    const title = String(
+        work.title ?? ""
+    ).trim();
+
+    const pageTitle =
+        `${title} | Project Library`;
+
+    const description =
+        createDescription(work);
+
+    const canonical =
+        getWorkUrl(id);
+
+    const thumbnailPath =
+        encodeAssetPath(
+            work.thumbnail
+        );
+
+    const thumbnailUrl =
+        SITE_URL + thumbnailPath;
+
+    const categories =
+        createCategories(
+            work.category
+        );
+
+    const tags =
+        createTags([
+            ...toArray(work.fixedTags),
+            ...toArray(work.freeTags)
+        ]);
+
+    const tools =
+        toArray(work.tools)
+            .map(escapeHtml)
+            .join("・");
+
+    const stars = {
+        1: "★☆☆",
+        2: "★★☆",
+        3: "★★★"
+    }[Number(work.level)] || "";
+
+    const contentDescription =
+        escapeHtml(
+            work.description ?? ""
+        );
+
+    const updateDate =
+        validDate(work.updateDate) ||
+        validDate(work.publishDate);
+
+    return `<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
+
+<title>${escapeHtml(pageTitle)}</title>
+
+<meta
+name="description"
+content="${escapeHtml(description)}"
+>
+
+<link
+rel="canonical"
+href="${escapeHtml(canonical)}"
+>
+
+<meta property="og:type" content="article">
+
+<meta
+property="og:title"
+content="${escapeHtml(pageTitle)}"
+>
+
+<meta
+property="og:description"
+content="${escapeHtml(description)}"
+>
+
+<meta
+property="og:image"
+content="${escapeHtml(thumbnailUrl)}"
+>
+
+<meta
+property="og:url"
+content="${escapeHtml(canonical)}"
+>
+
+<meta
+property="og:site_name"
+content="Project Library"
+>
+
+<meta
+name="twitter:card"
+content="summary_large_image"
+>
+
+<link
+rel="stylesheet"
+href="../assets/css/style.css"
+>
+
+${createAdStyle()}
+
+<script
+async
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792"
+crossorigin="anonymous">
+</script>
+
+</head>
+
+<body>
+
+<header id="header"></header>
+
+<div class="container">
+
+<aside id="sidebar"></aside>
+
+<main>
+
+<div id="workArea">
+
+<section class="container">
+
+<div class="breadcrumb">
+
+<a href="../index.html">ホーム</a>
+ ＞
+<a href="../library.html">作品一覧</a>
+ ＞
+<span class="current">
+${escapeHtml(title)}
+</span>
+
+</div>
+
+${createBadges(work)}
+
+<h1 class="section-title">
+${escapeHtml(title)}
+</h1>
+
+<p class="level">
+${stars}
+</p>
+
+<!-- タイトル下広告 -->
+${createWorkAd100()}
+
+<div class="card-tags">
+${categories}
+</div>
+
+<div class="work-image">
+
+<img
+src="../${escapeHtml(thumbnailPath)}"
+alt="${escapeHtml(title)}"
+>
+
+</div>
+
+<div class="info-box">
+
+<div class="info-item">
+<b>対象年齢</b><br>
+${escapeHtml(work.age ?? "")}
+</div>
+
+<div class="info-item">
+<b>印刷サイズ</b><br>
+${escapeHtml(work.size ?? "")}
+</div>
+
+<div class="info-item">
+<b>必要な道具</b><br>
+${tools}
+</div>
+
+</div>
+
+<div
+class="work-description"
+style="white-space:pre-wrap;"
+>${contentDescription}</div>
+
+<h3>タグ</h3>
+
+<div class="card-tags">
+${tags || "<p>タグはありません。</p>"}
+</div>
+
+<!-- PDFダウンロード -->
+
+<button
+type="button"
+class="button download-button"
+id="pdfDownloadButton"
+aria-label="${escapeHtml(title)}のPDFをダウンロード">
+📄 PDFをダウンロード
+</button>
+
+<p
+id="pdfDownloadHelp"
+style="font-size:13px;color:#777;margin-top:8px;">
+iPhoneでは「ファイルに保存」を選択できます。
+</p>
+
+<!-- ダウンロード下広告 -->
+${createWorkAd100()}
+
+<div class="section">
+
+<h3>ご利用について</h3>
+
+<p>
+個人・教育・施設利用は無料です。<br>
+再配布・販売・データの転載は禁止しています。
+</p>
+
+</div>
+
+<div id="seriesArea"></div>
+<div id="relatedArea"></div>
+<div id="moveArea"></div>
+
+</section>
+
+</div>
+
+</main>
+
+</div>
+
+<footer id="footer"></footer>
+
+<script src="../assets/data/works.js"></script>
+<script src="../assets/js/common.js"></script>
+<script src="../assets/js/work.js"></script>
+
+<!-- 更新日：${updateDate} -->
+<!-- SEO Generator Version 1.2 -->
+
+</body>
+</html>
+`;
+
+}
+
+// --------------------------------------
+// 作品HTML書き込み
+// --------------------------------------
+
+function generateWorkPages(works){
+
+    fs.mkdirSync(
+        OUTPUT_DIR,
+        { recursive: true }
+    );
+
+    const activeFiles = new Set();
+
+    for(const work of works){
+
+        const filename =
+            `${work.id}.html`;
+
+        const filePath = path.join(
+            OUTPUT_DIR,
+            filename
+        );
+
+        const html =
+            createWorkHtml(work);
+
+        fs.writeFileSync(
+            filePath,
+            html,
+            "utf8"
+        );
+
+        activeFiles.add(filename);
+
+    }
+
+    // ----------------------------------
+    // 削除済み作品HTML整理
+    // ----------------------------------
+
+    const files = fs.readdirSync(
+        OUTPUT_DIR
+    );
+
+    for(const filename of files){
+
+        if(!/^\d+\.html$/.test(filename)){
+            continue;
+        }
+
+        if(activeFiles.has(filename)){
+            continue;
+        }
+
+        fs.unlinkSync(
+            path.join(
+                OUTPUT_DIR,
+                filename
+            )
+        );
+
+        console.log(
+            `削除済みSEOページ整理：${filename}`
+        );
+
+    }
+
+    return activeFiles.size;
+
+}
+
+// --------------------------------------
+// sitemap URL要素
+// --------------------------------------
+
+function createUrlEntry(url,lastmod=""){
+
+    const lines = [
+        "  <url>",
+        `    <loc>${escapeXml(url)}</loc>`
+    ];
+
+    if(lastmod){
+
+        lines.push(
+            `    <lastmod>${escapeXml(lastmod)}</lastmod>`
+        );
+
+    }
+
+    lines.push("  </url>");
+
+    return lines.join("\n");
+
+}
+
+// --------------------------------------
+// sitemap生成
+// --------------------------------------
+
+function generateSitemap(works){
+
+    const entries = [];
+
+    entries.push(
+        createUrlEntry(SITE_URL)
+    );
+
+    entries.push(
+        createUrlEntry(
+            SITE_URL + "library.html"
+        )
+    );
+
+    for(const work of works){
+
+        const lastmod =
+            validDate(work.updateDate) ||
+            validDate(work.publishDate);
+
+        entries.push(
+            createUrlEntry(
+                getWorkUrl(work.id),
+                lastmod
+            )
+        );
+
+    }
+
+    const xml = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ...entries,
+        "</urlset>",
+        ""
+    ].join("\n");
+
+    fs.writeFileSync(
+        SITEMAP_PATH,
+        xml,
+        "utf8"
+    );
+
+    return entries.length;
+
+}
+
+// --------------------------------------
+// メイン処理
+// --------------------------------------
+
+function main(){
+
+    console.log("==============================");
+    console.log("Project Library SEO Generator");
+    console.log("Version 1.2");
+    console.log("==============================");
+
+    const works = loadWorks();
+
+    validateWorks(works);
+
+    console.log(
+        `登録作品数：${works.length}件`
+    );
+
+    const pageCount =
+        generateWorkPages(works);
+
+    const sitemapCount =
+        generateSitemap(works);
+
+    console.log(
+        `生成HTML：${pageCount}件`
+    );
+
+    console.log(
+        `サイトマップURL総数：${sitemapCount}件`
+    );
+
+    console.log(
+        "SEO生成処理が完了しました！"
+    );
+
+    console.log("==============================");
+
+}
+
+// --------------------------------------
+// 実行
+// --------------------------------------
+
+try{
+
+    main();
+
+}catch(error){
+
+    console.error(
+        "SEO生成処理に失敗しました。"
+    );
+
+    console.error(error);
+
+    process.exitCode = 1;
+
+}
