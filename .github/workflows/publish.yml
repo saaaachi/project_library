@@ -1,9 +1,30 @@
+
+# ======================================
+# Project Library Publish
+# Version 10.4
+# ======================================
+#
+# 追加機能：
+# ・category / fixedTags 必須チェック
+# ・SEO作品ページ自動生成
+# ・sitemap.xml自動更新
+# ・SEO生成結果の検証
+# ・SEOファイルを同時コミット
+#
+# 既存機能：
+# ・PDF正式配置
+# ・サムネイル正式配置
+# ・works.js更新
+# ・ID自動採番
+# ・metadata削除
+# ・一時ファイル削除
+# ======================================
+
 name: Project Library Publish
 
 on:
   workflow_dispatch:
     inputs:
-
       title:
         description: '作品タイトル'
         required: true
@@ -46,1035 +67,522 @@ concurrency:
 
 
 jobs:
-
   publish:
-
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
-
     steps:
 
       # --------------------------------------
-      # GitHubリポジトリ取得
+      # リポジトリ取得
       # --------------------------------------
 
       - name: Repository checkout
-
         uses: actions/checkout@v4
+        with:
+          ref: main
 
+      # --------------------------------------
+      # Node.js準備
+      # --------------------------------------
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
       # --------------------------------------
       # 公開情報確認
       # --------------------------------------
 
       - name: Show publish information
+        env:
+          TITLE: ${{ inputs.title }}
+          CATEGORY: ${{ inputs.category }}
+          FIXED_TAGS: ${{ inputs.fixedTags }}
+          FREE_TAGS: ${{ inputs.freeTags }}
+          UPLOAD_ID: ${{ inputs.uploadId }}
+          PDF_PATH: ${{ inputs.pdfPath }}
+          THUMBNAIL_PATH: ${{ inputs.thumbnailPath }}
 
         run: |
-
           echo "======================================"
           echo "Project Library Publish"
-          echo "Version 10.3"
+          echo "Version 10.4"
           echo "======================================"
-
-          echo "Title:"
-          echo "${{ github.event.inputs.title }}"
-
-          echo ""
-
-          echo "Category:"
-          echo "${{ github.event.inputs.category }}"
-
-          echo ""
-
-          echo "Fixed Tags:"
-          echo "${{ github.event.inputs.fixedTags }}"
-
-          echo ""
-
-          echo "Free Tags:"
-          echo "${{ github.event.inputs.freeTags }}"
-
-          echo ""
-
-          echo "Upload ID:"
-          echo "${{ github.event.inputs.uploadId }}"
-
-          echo ""
-
-          echo "PDF Path:"
-          echo "${{ github.event.inputs.pdfPath }}"
-
-          echo ""
-
-          echo "Thumbnail Path:"
-          echo "${{ github.event.inputs.thumbnailPath }}"
-
+          echo "Title: $TITLE"
+          echo "Category: $CATEGORY"
+          echo "Fixed Tags: $FIXED_TAGS"
+          echo "Free Tags: $FREE_TAGS"
+          echo "Upload ID: $UPLOAD_ID"
+          echo "PDF Path: $PDF_PATH"
+          echo "Thumbnail Path: $THUMBNAIL_PATH"
           echo "======================================"
-
 
       # --------------------------------------
       # 一時アップロードファイル確認
       # --------------------------------------
 
       - name: Check uploaded files
+        env:
+          UPLOAD_ID: ${{ inputs.uploadId }}
+          PDF_PATH: ${{ inputs.pdfPath }}
+          THUMBNAIL_PATH: ${{ inputs.thumbnailPath }}
 
         run: |
+          set -e
 
-          echo "アップロードファイル確認を開始します。"
+          echo "アップロードファイルを確認します。"
 
-
-          if [ -z "${{ github.event.inputs.pdfPath }}" ]; then
-
-            echo "❌ PDFパスが指定されていません。"
-
+          if [ -z "$UPLOAD_ID" ]; then
+            echo "❌ アップロードIDがありません。"
             exit 1
-
           fi
 
-
-          if [ -z "${{ github.event.inputs.thumbnailPath }}" ]; then
-
-            echo "❌ サムネイルパスが指定されていません。"
-
+          if [ -z "$PDF_PATH" ]; then
+            echo "❌ PDFパスがありません。"
             exit 1
-
           fi
 
-
-          if [ -z "${{ github.event.inputs.uploadId }}" ]; then
-
-            echo "❌ アップロードIDが指定されていません。"
-
+          if [ -z "$THUMBNAIL_PATH" ]; then
+            echo "❌ サムネイルパスがありません。"
             exit 1
-
           fi
 
-
-          echo ""
-          echo "PDF："
-
-          echo "${{ github.event.inputs.pdfPath }}"
-
-
-          if [ ! -f "${{ github.event.inputs.pdfPath }}" ]; then
-
+          if [ ! -f "$PDF_PATH" ]; then
             echo "❌ PDFファイルが見つかりません。"
-
             exit 1
-
           fi
 
-
-          echo "✅ PDFファイルを確認しました😊"
-
-
-          echo ""
-          echo "サムネイル："
-
-          echo "${{ github.event.inputs.thumbnailPath }}"
-
-
-          if [ ! -f "${{ github.event.inputs.thumbnailPath }}" ]; then
-
-            echo "❌ サムネイルファイルが見つかりません。"
-
+          if [ ! -f "$THUMBNAIL_PATH" ]; then
+            echo "❌ サムネイルが見つかりません。"
             exit 1
-
           fi
 
-
-          echo "✅ サムネイルファイルを確認しました😊"
-
+          echo "✅ アップロードファイル確認完了"
 
       # --------------------------------------
       # metadata確認
       # --------------------------------------
 
       - name: Check metadata
+        env:
+          UPLOAD_ID: ${{ inputs.uploadId }}
 
         run: |
+          set -e
 
-          METADATA_PATH=".project-library-upload/metadata/${{ github.event.inputs.uploadId }}.json"
-
-
-          echo "作品情報を確認します。"
-
-          echo ""
-          echo "Metadata："
-
-          echo "$METADATA_PATH"
-
+          METADATA_PATH=".project-library-upload/metadata/${UPLOAD_ID}.json"
 
           if [ ! -f "$METADATA_PATH" ]; then
-
-            echo "❌ metadataファイルが見つかりません。"
-
+            echo "❌ metadataが見つかりません。"
             exit 1
-
           fi
 
-
-          echo ""
-          echo "metadata内容："
-
-          cat "$METADATA_PATH"
-
-
-          echo ""
-          echo "======================================"
-          echo "✅ metadataを確認しました😊"
-          echo "======================================"
-
+          echo "metadataを確認しました。"
+          echo "$METADATA_PATH"
 
       # --------------------------------------
       # 正式フォルダ作成
       # --------------------------------------
 
       - name: Create final directories
-
         run: |
-
-          echo "正式フォルダを確認します。"
-
-
           mkdir -p assets/pdf
-
           mkdir -p assets/images/thumbnail
-
-
-          echo "✅ 正式フォルダを準備しました😊"
-
+          echo "✅ 正式フォルダ準備完了"
 
       # --------------------------------------
-      # PDFを正式フォルダへ移動
+      # PDF正式配置
       # --------------------------------------
 
       - name: Move PDF to final location
+        env:
+          PDF_PATH: ${{ inputs.pdfPath }}
 
         run: |
-
-          PDF_PATH="${{ github.event.inputs.pdfPath }}"
+          set -e
 
           PDF_FILENAME=$(basename "$PDF_PATH")
-
           FINAL_PDF_PATH="assets/pdf/$PDF_FILENAME"
-
-
-          echo "PDFを正式フォルダへ移動します。"
-
-          echo "元："
-
-          echo "$PDF_PATH"
-
-          echo ""
-
-          echo "先："
-
-          echo "$FINAL_PDF_PATH"
-
 
           cp "$PDF_PATH" "$FINAL_PDF_PATH"
 
+          test -f "$FINAL_PDF_PATH"
 
-          if [ -f "$FINAL_PDF_PATH" ]; then
-
-            echo ""
-            echo "✅ PDFの正式配置に成功しました😊"
-
-          else
-
-            echo ""
-            echo "❌ PDFの配置に失敗しました。"
-
-            exit 1
-
-          fi
-
+          echo "✅ PDF配置完了"
+          echo "$FINAL_PDF_PATH"
 
       # --------------------------------------
-      # サムネイルを正式フォルダへ移動
+      # サムネイル正式配置
       # --------------------------------------
 
       - name: Move thumbnail to final location
+        env:
+          THUMBNAIL_PATH: ${{ inputs.thumbnailPath }}
 
         run: |
-
-          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
+          set -e
 
           THUMBNAIL_FILENAME=$(basename "$THUMBNAIL_PATH")
-
           FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$THUMBNAIL_FILENAME"
-
-
-          echo "サムネイルを正式フォルダへ移動します。"
-
-          echo "元："
-
-          echo "$THUMBNAIL_PATH"
-
-          echo ""
-
-          echo "先："
-
-          echo "$FINAL_THUMBNAIL_PATH"
-
 
           cp "$THUMBNAIL_PATH" "$FINAL_THUMBNAIL_PATH"
 
+          test -f "$FINAL_THUMBNAIL_PATH"
 
-          if [ -f "$FINAL_THUMBNAIL_PATH" ]; then
-
-            echo ""
-            echo "✅ サムネイルの正式配置に成功しました😊"
-
-          else
-
-            echo ""
-            echo "❌ サムネイルの配置に失敗しました。"
-
-            exit 1
-
-          fi
-
+          echo "✅ サムネイル配置完了"
+          echo "$FINAL_THUMBNAIL_PATH"
 
       # --------------------------------------
-      # 正式配置されたファイル確認
+      # 正式配置ファイル確認
       # --------------------------------------
 
       - name: Verify final files
+        env:
+          PDF_PATH: ${{ inputs.pdfPath }}
+          THUMBNAIL_PATH: ${{ inputs.thumbnailPath }}
 
         run: |
+          set -e
 
-          PDF_PATH="${{ github.event.inputs.pdfPath }}"
+          FINAL_PDF_PATH="assets/pdf/$(basename "$PDF_PATH")"
+          FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$(basename "$THUMBNAIL_PATH")"
 
-          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
-
-
-          PDF_FILENAME=$(basename "$PDF_PATH")
-
-          THUMBNAIL_FILENAME=$(basename "$THUMBNAIL_PATH")
-
-
-          FINAL_PDF_PATH="assets/pdf/$PDF_FILENAME"
-
-          FINAL_THUMBNAIL_PATH="assets/images/thumbnail/$THUMBNAIL_FILENAME"
-
-
-          echo "======================================"
-          echo "正式配置ファイル確認"
-          echo "======================================"
-
-
-          echo ""
-
-          echo "PDF："
-
-          echo "$FINAL_PDF_PATH"
+          test -f "$FINAL_PDF_PATH"
+          test -f "$FINAL_THUMBNAIL_PATH"
 
           ls -lh "$FINAL_PDF_PATH"
-
-
-          echo ""
-
-          echo "サムネイル："
-
-          echo "$FINAL_THUMBNAIL_PATH"
-
           ls -lh "$FINAL_THUMBNAIL_PATH"
 
-
-          echo ""
-
-          echo "======================================"
-          echo "✅ 正式配置ファイルを確認しました😊"
-          echo "======================================"
-
+          echo "✅ 正式配置ファイル確認完了"
 
       # --------------------------------------
       # works.js更新
-      # Version 10.3
+      # Version 10.4
       # --------------------------------------
 
       - name: Update works.js
-
         env:
-          UPLOAD_ID: ${{ github.event.inputs.uploadId }}
+          UPLOAD_ID: ${{ inputs.uploadId }}
 
         run: |
-
-          echo "======================================"
-          echo "works.js自動更新"
-          echo "Version 10.3"
-          echo "======================================"
-
-
           node <<'NODE'
-
           const fs = require("fs");
           const path = require("path");
-
 
           const metadataPath =
             `.project-library-upload/metadata/${process.env.UPLOAD_ID}.json`;
 
-
-          const worksPath =
-            "assets/data/works.js";
-
-
-          console.log("Metadata：");
-
-          console.log(metadataPath);
-
-          console.log("");
-
-
-          console.log("works.js：");
-
-          console.log(worksPath);
-
-
-          // ----------------------------------
-          // metadata読み込み
-          // ----------------------------------
+          const worksPath = "assets/data/works.js";
 
           if (!fs.existsSync(metadataPath)) {
-
-            console.error(
-              "❌ metadataファイルが見つかりません。"
-            );
-
+            console.error("❌ metadataがありません。");
             process.exit(1);
-
           }
-
-
-          const metadata =
-            JSON.parse(
-              fs.readFileSync(
-                metadataPath,
-                "utf8"
-              )
-            );
-
-
-          console.log("");
-
-          console.log(
-            "作品情報を読み込みました😊"
-          );
-
-
-          console.log(
-            `タイトル：${metadata.title}`
-          );
-
-
-          // ----------------------------------
-          // works.js読み込み
-          // ----------------------------------
 
           if (!fs.existsSync(worksPath)) {
-
-            console.error(
-              "❌ works.jsが見つかりません。"
-            );
-
+            console.error("❌ works.jsがありません。");
             process.exit(1);
-
           }
 
+          const metadata = JSON.parse(
+            fs.readFileSync(metadataPath, "utf8")
+          );
 
-          const worksText =
-            fs.readFileSync(
-              worksPath,
-              "utf8"
-            );
-
+          const worksText = fs.readFileSync(
+            worksPath,
+            "utf8"
+          );
 
           // ----------------------------------
-          // works配列部分を取得
+          // works配列を取得
           // ----------------------------------
 
-          const startMarker =
-            "const works = [";
-
+          const startMarker = "const works = [";
 
           const endMarker =
             "// --------------------------\n// 共通関数";
 
-
-          const startIndex =
-            worksText.indexOf(startMarker);
-
-
-          const endIndex =
-            worksText.indexOf(endMarker);
-
+          const startIndex = worksText.indexOf(startMarker);
+          const endIndex = worksText.indexOf(endMarker);
 
           if (
             startIndex === -1 ||
-            endIndex === -1
+            endIndex === -1 ||
+            endIndex <= startIndex
           ) {
-
-            console.error(
-              "❌ works.jsの構造を確認できません。"
-            );
-
+            console.error("❌ works.jsの構造を確認できません。");
             process.exit(1);
-
           }
 
-
           const arrayStart =
-            startIndex +
-            startMarker.length;
+            startIndex + startMarker.length;
 
+          let arrayText = worksText
+            .slice(arrayStart, endIndex)
+            .trim();
 
-          let arrayText =
-            worksText
-              .slice(
-                arrayStart,
-                endIndex
-              )
-              .trim();
-
-
-          arrayText =
-            arrayText
-              .replace(
-                /\]\s*;\s*$/,
-                ""
-              )
-              .trim();
-
-
-          console.log("");
-
-          console.log(
-            "works配列データを解析します。"
-          );
-
-
-          // ----------------------------------
-          // 既存works配列取得
-          // ----------------------------------
+          arrayText = arrayText
+            .replace(/\]\s*;\s*$/, "")
+            .trim();
 
           let works;
 
-
           try {
-
-            works =
-              Function(
-                `"use strict"; return [${arrayText}]`
-              )();
-
+            works = Function(
+              `"use strict"; return [${arrayText}]`
+            )();
           } catch (error) {
-
-            console.error(
-              "❌ works.jsの既存データを読み込めませんでした。"
-            );
-
+            console.error("❌ works配列の解析に失敗しました。");
             console.error(error);
-
             process.exit(1);
-
           }
-
 
           if (!Array.isArray(works)) {
-
-            console.error(
-              "❌ worksデータが配列ではありません。"
-            );
-
+            console.error("❌ worksが配列ではありません。");
             process.exit(1);
-
           }
 
-
-          console.log(
-            `現在の作品数：${works.length}件`
-          );
-
-
           // ----------------------------------
-          // データ変換用関数
-          // Version 10.3
-          // JSON文字列にも対応
+          // データ変換関数
           // ----------------------------------
 
           function toArray(value) {
-
-            // ------------------------------
-            // すでに配列ならそのまま
-            // ------------------------------
-
             if (Array.isArray(value)) {
-
               return value
-                .map(
-                  item =>
-                    String(item).trim()
-                )
+                .map(item => String(item).trim())
                 .filter(Boolean);
-
             }
-
-
-            // ------------------------------
-            // 空なら空配列
-            // ------------------------------
 
             if (
               value === undefined ||
               value === null ||
               value === ""
             ) {
-
               return [];
-
             }
 
-
-            // ------------------------------
-            // JSON文字列なら配列へ変換
-            //
-            // 例：
-            // '["幼児向け"]'
-            // '["ぬりえ","車"]'
-            // ------------------------------
-
-            const text =
-              String(value).trim();
-
+            const text = String(value).trim();
 
             if (
               text.startsWith("[") &&
               text.endsWith("]")
-            ){
-
+            ) {
               try {
+                const parsed = JSON.parse(text);
 
-                const parsed =
-                  JSON.parse(text);
-
-
-                if (
-                  Array.isArray(parsed)
-                ){
-
+                if (Array.isArray(parsed)) {
                   return parsed
-                    .map(
-                      item =>
-                        String(item).trim()
-                    )
+                    .map(item => String(item).trim())
                     .filter(Boolean);
-
                 }
-
-              } catch(error) {
-
+              } catch (error) {
                 console.log(
-                  "JSON配列として解析できなかったため、通常の文字列として処理します。"
+                  "JSON配列ではないため通常の文字列として処理します。"
                 );
-
               }
-
             }
-
-
-            // ------------------------------
-            // 通常の文字列
-            // ------------------------------
 
             return text
               .split(/[、,]/)
-              .map(
-                item =>
-                  item.trim()
-              )
+              .map(item => item.trim())
               .filter(Boolean);
-
           }
 
+          function toNumber(value, defaultValue = 0) {
+            const number = Number(value);
 
-          function toNumber(
-            value,
-            defaultValue = 0
-          ) {
-
-            const number =
-              Number(value);
-
-
-            if (
-              Number.isFinite(number)
-            ) {
-
-              return number;
-
-            }
-
-
-            return defaultValue;
-
+            return Number.isFinite(number)
+              ? number
+              : defaultValue;
           }
 
+          // ----------------------------------
+          // 必須カテゴリ確認
+          // ----------------------------------
+
+          const category = toArray(metadata.category);
+          const fixedTags = toArray(metadata.fixedTags);
+          const freeTags = toArray(metadata.freeTags);
+          const series = toArray(metadata.series);
+
+          if (category.length === 0) {
+            console.error(
+              "❌ 大カテゴリ（category）は最低1つ必要です。"
+            );
+            process.exit(1);
+          }
+
+          if (fixedTags.length === 0) {
+            console.error(
+              "❌ 小カテゴリ（fixedTags）は最低1つ必要です。"
+            );
+            process.exit(1);
+          }
+
+          console.log("category:", category);
+          console.log("fixedTags:", fixedTags);
+          console.log("freeTags:", freeTags);
 
           // ----------------------------------
           // ID決定
           // ----------------------------------
 
-          let id =
-            toNumber(
-              metadata.workId
-            );
-
-
-          const isNewWork =
-            !id;
-
+          let id = toNumber(metadata.workId);
+          const isNewWork = !id;
 
           if (isNewWork) {
+            const numericIds = works
+              .map(work => Number(work.id))
+              .filter(value =>
+                Number.isFinite(value) && value > 0
+              );
 
-            const numericIds =
-              works
-                .map(
-                  work =>
-                    Number(work.id)
-                )
-                .filter(
-                  value =>
-                    Number.isFinite(value)
-                    &&
-                    value > 0
-                );
+            const maxId = numericIds.length
+              ? Math.max(...numericIds)
+              : 0;
 
+            id = maxId + 1;
 
-            const maxId =
-              numericIds.length
-                ? Math.max(
-                    ...numericIds
-                  )
-                : 0;
-
-
-            id =
-              maxId + 1;
-
-
-            console.log("");
-
-            console.log(
-              "新規作品としてIDを自動採番します😊"
-            );
-
-
-            console.log(
-              `新しいID：${id}`
-            );
-
+            console.log(`新規作品ID：${id}`);
           } else {
-
-            console.log("");
-
-            console.log(
-              `既存作品ID：${id}`
-            );
-
+            console.log(`既存作品ID：${id}`);
           }
-
 
           // ----------------------------------
           // workNo決定
           // ----------------------------------
 
-          let workNo =
-            String(
-              metadata.workNo || ""
-            ).trim();
+          let workNo = String(
+            metadata.workNo || ""
+          ).trim();
 
-
-          if (
-            !/^PL-\d{6}$/.test(workNo)
-          ) {
-
+          if (!/^PL-\d{6}$/.test(workNo)) {
             workNo =
-              `PL-${String(id).padStart(6,"0")}`;
-
+              `PL-${String(id).padStart(6, "0")}`;
           }
-
 
           // ----------------------------------
           // 正式ファイルパス
           // ----------------------------------
 
-          const pdfFilename =
-            path.basename(
-              metadata.pdfPath
-            );
+          const pdfFilename = path.basename(
+            metadata.pdfPath
+          );
 
-
-          const thumbnailFilename =
-            path.basename(
-              metadata.thumbnailPath
-            );
-
+          const thumbnailFilename = path.basename(
+            metadata.thumbnailPath
+          );
 
           const pdfPath =
             `assets/pdf/${pdfFilename}`;
 
-
           const thumbnailPath =
             `assets/images/thumbnail/${thumbnailFilename}`;
-
-
-          // ----------------------------------
-          // 配列データを正規化
-          // ----------------------------------
-
-          const category =
-            toArray(
-              metadata.category
-            );
-
-
-          const fixedTags =
-            toArray(
-              metadata.fixedTags
-            );
-
-
-          const freeTags =
-            toArray(
-              metadata.freeTags
-            );
-
-
-          const series =
-            toArray(
-              metadata.series
-            );
-
-
-          console.log("");
-
-          console.log(
-            "データ正規化結果："
-          );
-
-
-          console.log(
-            "category:",
-            JSON.stringify(category)
-          );
-
-
-          console.log(
-            "fixedTags:",
-            JSON.stringify(fixedTags)
-          );
-
-
-          console.log(
-            "freeTags:",
-            JSON.stringify(freeTags)
-          );
-
-
-          console.log(
-            "series:",
-            JSON.stringify(series)
-          );
-
 
           // ----------------------------------
           // works.js用データ作成
           // ----------------------------------
 
           const newWork = {
+            id: id,
 
-            id:
-              id,
+            workNo: workNo,
 
-            workNo:
-              workNo,
+            title: metadata.title || "",
 
-            title:
-              metadata.title || "",
+            category: category,
 
-            category:
-              category,
+            fixedTags: fixedTags,
 
-            fixedTags:
-              fixedTags,
+            freeTags: freeTags,
 
-            freeTags:
-              freeTags,
+            series: series,
 
-            series:
-              series,
+            level: toNumber(metadata.level, 1),
 
-            level:
-              toNumber(
-                metadata.level,
-                1
-              ),
+            age: metadata.age || "",
 
-            age:
-              metadata.age || "",
+            size: metadata.size || "",
 
-            size:
-              metadata.size || "",
+            tools: toArray(metadata.tools),
 
-            tools:
-              toArray(
-                metadata.tools
-              ),
+            description: metadata.description || "",
 
-            description:
-              metadata.description || "",
+            thumbnail: thumbnailPath,
 
-            thumbnail:
-              thumbnailPath,
+            pdf: pdfPath,
 
-            pdf:
-              pdfPath,
+            isNew: metadata.isNew !== false,
 
-            isNew:
-              metadata.isNew !== false,
+            recommend: metadata.recommend === true,
 
-            recommend:
-              metadata.recommend === true,
+            publishDate: metadata.publishDate || "",
 
-            publishDate:
-              metadata.publishDate || "",
+            updateDate: metadata.updateDate || "",
 
-            updateDate:
-              metadata.updateDate || "",
+            etsy: metadata.etsy || "",
 
-            etsy:
-              metadata.etsy || "",
+            related: Array.isArray(metadata.related)
+              ? metadata.related
+              : [],
 
-            related:
-              Array.isArray(
-                metadata.related
-              )
-                ? metadata.related
-                : [],
+            viewCount: 0,
 
-            viewCount:
-              0,
+            downloadCount: 0,
 
-            downloadCount:
-              0,
-
-            favorite:
-              false
-
+            favorite: false
           };
 
-
           // ----------------------------------
-          // 既存作品チェック
+          // 既存作品更新・新規追加
           // ----------------------------------
 
-          const existingIndex =
-            works.findIndex(
-              work =>
-                Number(work.id) === id
-            );
+          const existingIndex = works.findIndex(
+            work => Number(work.id) === id
+          );
 
-
-          if (
-            existingIndex !== -1
-          ){
-
-            console.log("");
-
-            console.log(
-              `既存作品 id:${id} を更新します。`
-            );
-
-
-            works[existingIndex] =
-              newWork;
-
+          if (existingIndex !== -1) {
+            console.log(`既存作品 ${id} を更新します。`);
+            works[existingIndex] = newWork;
           } else {
-
-            console.log("");
-
-            console.log(
-              `新しい作品 id:${id} を追加します。`
-            );
-
-
-            works.push(
-              newWork
-            );
-
+            console.log(`新規作品 ${id} を追加します。`);
+            works.push(newWork);
           }
-
 
           // ----------------------------------
           // ID重複チェック
           // ----------------------------------
 
-          const ids =
-            works.map(
-              work =>
-                Number(work.id)
-            );
+          const ids = works.map(
+            work => Number(work.id)
+          );
 
-
-          const uniqueIds =
-            new Set(ids);
-
-
-          if (
-            ids.length !==
-            uniqueIds.size
-          ){
-
-            console.error(
-              "❌ ID重複が発生しています。"
-            );
-
+          if (ids.length !== new Set(ids).size) {
+            console.error("❌ IDが重複しています。");
             process.exit(1);
-
           }
 
-
           // ----------------------------------
-          // works.js生成
+          // works.js書き込み
           // ----------------------------------
 
           const commonFunctions =
-            worksText.slice(
-              endIndex
-            );
-
+            worksText.slice(endIndex);
 
           const newWorksText =
             "// ==========================\n" +
             "// Project Library\n" +
             "// works.js\n" +
-            "// Version 10.3\n" +
+            "// Version 10.4\n" +
             "// ==========================\n\n" +
             "const works = " +
-            JSON.stringify(
-              works,
-              null,
-              4
-            ) +
+            JSON.stringify(works, null, 4) +
             ";\n\n" +
             commonFunctions;
-
 
           fs.writeFileSync(
             worksPath,
@@ -1082,240 +590,237 @@ jobs:
             "utf8"
           );
 
-
-          console.log("");
-
-          console.log(
-            "🎉 works.jsを更新しました！"
-          );
-
-
-          console.log(
-            `作品数：${works.length}件`
-          );
-
-
-          console.log(
-            `追加/更新ID：${id}`
-          );
-
-
-          console.log(
-            `workNo：${workNo}`
-          );
-
-
-          console.log(
-            `タイトル：${metadata.title}`
-          );
-
-
-          console.log("");
-
-          console.log(
-            "======================================"
-          );
-
-
+          console.log("======================================");
+          console.log("✅ works.js更新完了");
+          console.log(`作品数：${works.length}`);
+          console.log(`作品ID：${id}`);
+          console.log(`workNo：${workNo}`);
+          console.log("======================================");
           NODE
 
-
       # --------------------------------------
-      # works.js更新結果確認
+      # works.js更新確認
       # --------------------------------------
 
       - name: Verify works.js
-
         run: |
+          set -e
+
+          test -f assets/data/works.js
+
+          grep -n 'title' assets/data/works.js | tail -10
+          grep -n 'workNo' assets/data/works.js | tail -10
+
+          echo "✅ works.js確認完了"
+
+      # --------------------------------------
+      # SEO Generator構文確認
+      # --------------------------------------
+
+      - name: Check SEO Generator
+        run: |
+          set -e
+
+          test -f tools/generate-seo.js
+
+          node --check tools/generate-seo.js
+
+          echo "✅ SEO Generator構文確認完了"
+
+      # --------------------------------------
+      # SEOページ・サイトマップ生成
+      # --------------------------------------
+
+      - name: Generate SEO pages and sitemap
+        run: |
+          set -e
 
           echo "======================================"
-          echo "works.js確認"
+          echo "SEOページ自動生成"
           echo "======================================"
 
+          node tools/generate-seo.js
 
-          grep -n \
-            'title' \
-            assets/data/works.js \
-            | tail -10
+          echo "✅ SEO生成処理完了"
 
+      # --------------------------------------
+      # SEO生成結果確認
+      # --------------------------------------
 
-          echo ""
+      - name: Verify SEO output
+        run: |
+          set -e
 
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          import sys
 
-          grep -n \
-            'workNo' \
-            assets/data/works.js \
-            | tail -10
+          works_dir = Path("works")
+          sitemap_path = Path("sitemap.xml")
 
+          pages = sorted(works_dir.glob("*.html"))
 
-          echo ""
+          if not pages:
+              sys.exit("❌ SEO作品ページがありません。")
 
-          echo "======================================"
+          if not sitemap_path.is_file():
+              sys.exit("❌ sitemap.xmlがありません。")
 
-          echo "✅ works.jsの更新を確認しました😊"
+          sitemap = sitemap_path.read_text(
+              encoding="utf-8"
+          )
 
-          echo "======================================"
+          urls = re.findall(
+              r"<loc>\s*([^<]+)\s*</loc>",
+              sitemap
+          )
 
+          for page in pages:
+              html = page.read_text(
+                  encoding="utf-8"
+              )
+
+              if 'rel="canonical"' not in html:
+                  sys.exit(
+                      f"❌ canonicalがありません: {page}"
+                  )
+
+              if 'id="workArea"' not in html:
+                  sys.exit(
+                      f"❌ workAreaがありません: {page}"
+                  )
+
+              expected_url = (
+                  "https://saaaachi.github.io/"
+                  "project_library/works/"
+                  + page.name
+              )
+
+              if expected_url not in urls:
+                  sys.exit(
+                      f"❌ sitemapにURLがありません: {page}"
+                  )
+
+          print("======================================")
+          print("✅ SEO生成結果確認完了")
+          print(f"作品ページ数：{len(pages)}")
+          print(f"サイトマップURL数：{len(urls)}")
+          print("======================================")
+          PY
 
       # --------------------------------------
       # metadata削除
       # --------------------------------------
 
       - name: Remove metadata
+        env:
+          UPLOAD_ID: ${{ inputs.uploadId }}
 
         run: |
+          set -e
 
-          METADATA_PATH=".project-library-upload/metadata/${{ github.event.inputs.uploadId }}.json"
-
-
-          echo "metadataを削除します。"
-
-          echo "$METADATA_PATH"
-
+          METADATA_PATH=".project-library-upload/metadata/${UPLOAD_ID}.json"
 
           rm -f "$METADATA_PATH"
 
-
           if [ -e "$METADATA_PATH" ]; then
-
             echo "❌ metadataが残っています。"
-
             exit 1
-
           fi
 
-
-          echo "✅ metadataを削除しました😊"
-
+          echo "✅ metadata削除完了"
 
       # --------------------------------------
-      # 一時PDF・サムネイル削除
+      # 一時ファイル削除
       # --------------------------------------
 
       - name: Remove temporary upload files
+        env:
+          PDF_PATH: ${{ inputs.pdfPath }}
+          THUMBNAIL_PATH: ${{ inputs.thumbnailPath }}
 
         run: |
-
-          PDF_PATH="${{ github.event.inputs.pdfPath }}"
-
-          THUMBNAIL_PATH="${{ github.event.inputs.thumbnailPath }}"
-
-
-          echo "一時ファイルを削除します。"
-
+          set -e
 
           rm -f "$PDF_PATH"
-
           rm -f "$THUMBNAIL_PATH"
 
-
-          echo "一時ファイル削除後："
-
-
           if [ -e "$PDF_PATH" ]; then
-
-            echo "❌ PDF一時ファイルが残っています。"
-
+            echo "❌ 一時PDFが残っています。"
             exit 1
-
           fi
-
 
           if [ -e "$THUMBNAIL_PATH" ]; then
-
-            echo "❌ サムネイル一時ファイルが残っています。"
-
+            echo "❌ 一時サムネイルが残っています。"
             exit 1
-
           fi
 
-
-          echo "✅ 一時ファイル削除完了😊"
-
+          echo "✅ 一時ファイル削除完了"
 
       # --------------------------------------
       # Git設定
       # --------------------------------------
 
       - name: Configure Git
-
         run: |
-
           git config user.name "Project Library Bot"
-
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
 
       # --------------------------------------
       # 変更内容確認
       # --------------------------------------
 
       - name: Show changed files
-
         run: |
-
           echo "======================================"
           echo "Git変更内容"
           echo "======================================"
 
-
           git status --short
-
 
           echo "======================================"
 
-
       # --------------------------------------
-      # 正式ファイル保存
+      # 正式ファイルとSEOファイル保存
       # --------------------------------------
 
       - name: Commit and push published files
+        env:
+          WORK_TITLE: ${{ inputs.title }}
 
         run: |
+          set -e
 
-          git add assets/pdf
-
-          git add assets/images/thumbnail
-
+          # 既存の保存対象
+          git add -A assets/pdf
+          git add -A assets/images/thumbnail
           git add assets/data/works.js
+          git add -A .project-library-upload
 
-          git add .project-library-upload
-
+          # Version 10.4 追加
+          # -Aで削除済みSEOページも反映
+          git add -A works/
+          git add sitemap.xml
 
           if git diff --cached --quiet; then
-
             echo "❌ 保存する変更がありません。"
-
             exit 1
-
           fi
 
+          git commit -m "publish: ${WORK_TITLE}"
 
-          git commit \
-            -m "publish: ${{ github.event.inputs.title }}"
-
-
-          git push
-
+          git push origin HEAD:main
 
           echo ""
-
           echo "======================================"
-
-          echo "🎉 Project Library Version 10.3"
-
+          echo "🎉 Project Library Publish"
+          echo "Version 10.4"
           echo "======================================"
-
           echo "PDF：保存完了"
-
           echo "サムネイル：保存完了"
-
           echo "works.js：更新完了"
-
           echo "metadata：削除完了"
-
-          echo "======================================"
-
-          echo "正式公開ファイルの保存に成功しました！"
-
+          echo "SEO作品ページ：更新完了"
+          echo "sitemap.xml：更新完了"
           echo "======================================"
