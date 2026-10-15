@@ -1,0 +1,134 @@
+
+# ======================================
+# Project Library
+# SEO Publish Workflow
+# Version 1.0
+# ======================================
+
+name: Project Library SEO Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: project-library-publish
+  cancel-in-progress: false
+
+jobs:
+  publish-seo:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------------------
+      # Repository checkout
+      # ----------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # ----------------------------------
+      # Node.js
+      # ----------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # ----------------------------------
+      # Check generator syntax
+      # ----------------------------------
+      - name: Check JavaScript syntax
+        run: node --check tools/generate-seo.js
+
+      # ----------------------------------
+      # Generate SEO pages
+      # ----------------------------------
+      - name: Generate SEO pages
+        run: node tools/generate-seo.js
+
+      # ----------------------------------
+      # Validate generated files
+      # ----------------------------------
+      - name: Validate SEO output
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          pages = list(Path("works").glob("*.html"))
+
+          assert pages, "作品HTMLがありません"
+          assert Path("sitemap.xml").is_file(), \
+              "sitemap.xmlがありません"
+
+          tree = ET.parse("sitemap.xml")
+
+          ns = {
+              "s": "http://www.sitemaps.org/schemas/sitemap/0.9"
+          }
+
+          urls = [
+              e.text for e in tree.findall(".//s:loc", ns)
+          ]
+
+          assert len(urls) == len(pages) + 2, \
+              "サイトマップのURL数が一致しません"
+
+          for page in pages:
+              content = page.read_text(encoding="utf-8")
+
+              assert 'rel="canonical"' in content, \
+                  f"{page}: canonicalがありません"
+
+              assert 'id="workArea"' in content, \
+                  f"{page}: 作品表示領域がありません"
+
+              expected = (
+                  "https://saaaachi.github.io/"
+                  "project_library/works/"
+                  + page.name
+              )
+
+              assert expected in urls, \
+                  f"{page}: sitemapに登録されていません"
+
+          print(f"作品HTML: {len(pages)}件 OK")
+          print(f"サイトマップ: {len(urls)}件 OK")
+          print("SEO検証成功")
+
+          PY
+
+      # ----------------------------------
+      # Disable Jekyll processing
+      # ----------------------------------
+      - name: Prepare GitHub Pages
+        run: touch .nojekyll
+
+      # ----------------------------------
+      # Commit generated SEO files
+      # ----------------------------------
+      - name: Commit and push SEO files
+        run: |
+          git config user.name "Project Library Bot"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A works/
+          git add sitemap.xml
+          git add .nojekyll
+
+          if git diff --cached --quiet; then
+            echo "SEOファイルに変更はありません。"
+            exit 0
+          fi
+
+          git commit -m "seo: publish generated pages"
+          git push origin HEAD:main
+
+          echo "SEOページの保存が完了しました"
