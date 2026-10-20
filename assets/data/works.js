@@ -2039,6 +2039,43 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 59,
+        "workNo": "PL-000059",
+        "title": "計算ドリル　36日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算",
+            "ひき算",
+            "かけ算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題36日目です。\r\nたし算とひき算とかけ算の問題です。\r\n46日目以降にわり算もあります。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_36日目_1792468539377.jpg",
+        "pdf": "assets/pdf/計算ドリル_36日目_1792468539377.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-20",
+        "updateDate": "2026-10-20",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
