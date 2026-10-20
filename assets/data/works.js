@@ -1854,6 +1854,43 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 54,
+        "workNo": "PL-000054",
+        "title": "計算ドリル　31日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算",
+            "ひき算",
+            "かけ算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題31日目です。\r\nたし算とひき算とかけ算の問題です。\r\n46日目以降にわり算もあります。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_31日目_1792467780691.jpg",
+        "pdf": "assets/pdf/計算ドリル_31日目_1792467780691.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-10-20",
+        "updateDate": "2026-10-20",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
