@@ -2335,6 +2335,43 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 67,
+        "workNo": "PL-000067",
+        "title": "計算ドリル　44日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算",
+            "ひき算",
+            "かけ算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題44日目です。\r\nたし算とひき算とかけ算の問題です。\r\n46日目以降にわり算もあります。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_44日目_1792554380172.jpg",
+        "pdf": "assets/pdf/計算ドリル_44日目_1792554380172.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-21",
+        "updateDate": "2026-10-21",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
