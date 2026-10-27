@@ -2927,6 +2927,43 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 83,
+        "workNo": "PL-000083",
+        "title": "計算ドリル　60日目",
+        "category": [
+            "子ども向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "算数"
+        ],
+        "freeTags": [
+            "計算",
+            "たし算",
+            "ひき算",
+            "かけ算"
+        ],
+        "series": [
+            "算数"
+        ],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "算数の問題60日目です。\r\nたし算とひき算とかけ算とわり算問題です。\r\n※6番のみ答えがマイナスになります。",
+        "thumbnail": "assets/images/thumbnail/計算ドリル_60日目_1793073827469.jpg",
+        "pdf": "assets/pdf/計算ドリル_60日目_1793073827469.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-10-27",
+        "updateDate": "2026-10-27",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
