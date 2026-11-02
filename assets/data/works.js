@@ -2995,6 +2995,37 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 85,
+        "workNo": "PL-000085",
+        "title": "ひらがな練習　なぞりがき　か行",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "なぞり書き"
+        ],
+        "freeTags": [
+            "ひらがな"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "か行のひらがななぞり書き練習です。\r\n絵はぬりえとしても活用できます。",
+        "thumbnail": "assets/images/thumbnail/ひらがな練習_なぞりがき_か行_1793591675023.jpg",
+        "pdf": "assets/pdf/ひらがな練習_なぞりがき_か行_1793591675023.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-11-02",
+        "updateDate": "2026-11-02",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
