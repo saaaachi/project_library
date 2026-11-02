@@ -3181,6 +3181,37 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 91,
+        "workNo": "PL-000091",
+        "title": "ひらがな練習　なぞりがき　や行",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "なぞり書き"
+        ],
+        "freeTags": [
+            "ひらがな"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "や行のひらがななぞり書き練習です。\r\n絵はぬりえとしても活用できます。",
+        "thumbnail": "assets/images/thumbnail/ひらがな練習_なぞりがき_や行_1793591835766.jpg",
+        "pdf": "assets/pdf/ひらがな練習_なぞりがき_や行_1793591835766.pdf",
+        "isNew": true,
+        "recommend": false,
+        "publishDate": "2026-11-02",
+        "updateDate": "2026-11-02",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
