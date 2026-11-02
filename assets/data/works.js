@@ -2964,6 +2964,37 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 84,
+        "workNo": "PL-000084",
+        "title": "ひらがな練習　なぞりがき　あ行",
+        "category": [
+            "幼児向け"
+        ],
+        "fixedTags": [
+            "なぞり書き"
+        ],
+        "freeTags": [
+            "ひらがな"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "あ行のひらがななぞり書き練習です。\r\n絵はぬりえとしても活用できます。",
+        "thumbnail": "assets/images/thumbnail/ひらがな練習_なぞりがき_あ行_1793591642509.jpg",
+        "pdf": "assets/pdf/ひらがな練習_なぞりがき_あ行_1793591642509.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-11-02",
+        "updateDate": "2026-11-02",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
