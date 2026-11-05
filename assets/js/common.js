@@ -2,7 +2,7 @@
 /* ==========================
    Project Library
    common.js
-   Version 6.3
+   Version 6.4
    ==========================
 
    ・通常ページ対応
@@ -13,6 +13,7 @@
    ・検索・メニュー
    ・NEW判定
    ・年号自動更新
+   ・PC右側広告の自動設置
 
    ========================== */
 
@@ -51,10 +52,6 @@ function fixComponentLinks(target){
         return;
     }
 
-    // ----------------------------------
-    // サイト内リンク
-    // ----------------------------------
-
     target.querySelectorAll(
         "a[href]"
     ).forEach(link => {
@@ -65,9 +62,6 @@ function fixComponentLinks(target){
         if(!href){
             return;
         }
-
-        // 外部URL、ページ内リンク、
-        // 絶対パスなどは変更しない
 
         if(
             href.startsWith("#") ||
@@ -85,10 +79,6 @@ function fixComponentLinks(target){
 
     });
 
-
-    // ----------------------------------
-    // 画像パス
-    // ----------------------------------
 
     target.querySelectorAll(
         "img[src]"
@@ -130,7 +120,7 @@ async function loadComponent(id, file){
         document.getElementById(id);
 
     if(!target){
-        return;
+        return false;
     }
 
     const componentPath =
@@ -142,16 +132,15 @@ async function loadComponent(id, file){
             await fetch(componentPath);
 
         if(!response.ok){
-            throw new Error(
-                componentPath
-            );
+            throw new Error(componentPath);
         }
 
         target.innerHTML =
             await response.text();
 
-        // SEOページのリンク・画像を補正
         fixComponentLinks(target);
+
+        return true;
 
     }catch(error){
 
@@ -160,6 +149,120 @@ async function loadComponent(id, file){
             " の読み込みに失敗しました",
             error
         );
+
+        return false;
+
+    }
+
+}
+
+
+// =====================================================
+// PC右側広告スペースを自動設置
+// =====================================================
+
+function createRightAdSidebar(){
+
+    const container =
+        document.querySelector(
+            "body > .container"
+        );
+
+    if(!container){
+        return false;
+    }
+
+    const main =
+        container.querySelector("main");
+
+    if(!main){
+        return false;
+    }
+
+    let adSidebar =
+        document.getElementById("adSidebar");
+
+    if(!adSidebar){
+
+        adSidebar =
+            document.createElement("aside");
+
+        adSidebar.id =
+            "adSidebar";
+
+        adSidebar.className =
+            "right-ad-sidebar";
+
+        // メインコンテンツの右側に追加
+        main.insertAdjacentElement(
+            "afterend",
+            adSidebar
+        );
+
+    }
+
+    return true;
+
+}
+
+
+// =====================================================
+// 右側広告読み込み
+// =====================================================
+
+async function setupRightAdSidebar(){
+
+    const created =
+        createRightAdSidebar();
+
+    if(!created){
+        return;
+    }
+
+    const loaded =
+        await loadComponent(
+            "adSidebar",
+            "components/ads/sidebar.html"
+        );
+
+    if(!loaded){
+        return;
+    }
+
+    const ad =
+        document.querySelector(
+            "#adSidebar .adsbygoogle"
+        );
+
+    if(!ad){
+        return;
+    }
+
+    // AdSenseが読み込まれている場合のみ広告を初期化
+    if(
+        typeof window.adsbygoogle !== "undefined" &&
+        !ad.dataset.initialized
+    ){
+
+        try{
+
+            (window.adsbygoogle =
+                window.adsbygoogle || []).push({});
+
+            ad.dataset.initialized = "true";
+
+            console.log(
+                "右側広告を初期化しました。"
+            );
+
+        }catch(error){
+
+            console.warn(
+                "右側広告の初期化に失敗しました。",
+                error
+            );
+
+        }
 
     }
 
@@ -323,10 +426,8 @@ window.addEventListener(
             "components/ads/bottom.html"
         );
 
-        await loadComponent(
-            "adSidebar",
-            "components/ads/sidebar.html"
-        );
+        // 右側広告を自動設置
+        await setupRightAdSidebar();
 
         setupMenu();
 
@@ -359,10 +460,7 @@ function setupDynamicSidebar(){
 
     }
 
-
-    // ----------------------------------
     // 対象者カテゴリ
-    // ----------------------------------
 
     const categoryMenu =
         document.getElementById(
@@ -385,12 +483,8 @@ function setupDynamicSidebar(){
                     works.filter(work => {
 
                         return (
-                            Array.isArray(
-                                work.category
-                            ) &&
-                            work.category.includes(
-                                category
-                            )
+                            Array.isArray(work.category) &&
+                            work.category.includes(category)
                         );
 
                     }).length;
@@ -406,10 +500,7 @@ ${category} (${count})
     }
 
 
-    // ----------------------------------
     // ジャンル
-    // fixedTagsから自動取得
-    // ----------------------------------
 
     const genreMenu =
         document.getElementById(
@@ -420,11 +511,7 @@ ${category} (${count})
 
     works.forEach(work => {
 
-        if(
-            !Array.isArray(
-                work.fixedTags
-            )
-        ){
+        if(!Array.isArray(work.fixedTags)){
             return;
         }
 
@@ -447,16 +534,15 @@ ${category} (${count})
     if(genreMenu){
 
         const genres =
-            Object.entries(
-                genreCounts
-            ).sort((a,b) => {
+            Object.entries(genreCounts)
+                .sort((a,b) => {
 
-                return a[0].localeCompare(
-                    b[0],
-                    "ja"
-                );
+                    return a[0].localeCompare(
+                        b[0],
+                        "ja"
+                    );
 
-            });
+                });
 
         if(genres.length === 0){
 
@@ -483,10 +569,7 @@ ${tag} (${count})
     }
 
 
-    // ----------------------------------
     // 人気タグ
-    // freeTagsの使用数から上位4つ
-    // ----------------------------------
 
     const popularTagMenu =
         document.getElementById(
@@ -497,11 +580,7 @@ ${tag} (${count})
 
     works.forEach(work => {
 
-        if(
-            !Array.isArray(
-                work.freeTags
-            )
-        ){
+        if(!Array.isArray(work.freeTags)){
             return;
         }
 
@@ -524,22 +603,20 @@ ${tag} (${count})
     if(popularTagMenu){
 
         const popularTags =
-            Object.entries(
-                freeTagCounts
-            )
-            .sort((a,b) => {
+            Object.entries(freeTagCounts)
+                .sort((a,b) => {
 
-                if(b[1] !== a[1]){
-                    return b[1] - a[1];
-                }
+                    if(b[1] !== a[1]){
+                        return b[1] - a[1];
+                    }
 
-                return a[0].localeCompare(
-                    b[0],
-                    "ja"
-                );
+                    return a[0].localeCompare(
+                        b[0],
+                        "ja"
+                    );
 
-            })
-            .slice(0,4);
+                })
+                .slice(0,4);
 
         if(popularTags.length === 0){
 
@@ -566,9 +643,7 @@ ${tag} (${count})
     }
 
 
-    // =================================================
     // サイドバークリックイベント
-    // =================================================
 
     const sidebarMenus = [
         {
@@ -596,15 +671,11 @@ ${tag} (${count})
             event => {
 
                 const link =
-                    event.target.closest(
-                        "a"
-                    );
+                    event.target.closest("a");
 
                 if(
                     !link ||
-                    !menu.element.contains(
-                        link
-                    )
+                    !menu.element.contains(link)
                 ){
                     return;
                 }
@@ -617,21 +688,15 @@ ${tag} (${count})
                             location.href
                         );
 
-                    if(
-                        menu.type ===
-                        "category"
-                    ){
+                    if(menu.type === "category"){
 
                         const category =
-                            url.searchParams.get(
-                                "category"
-                            );
+                            url.searchParams.get("category");
 
                         if(category){
 
                             logSidebarClick(
-                                "カテゴリ: " +
-                                category
+                                "カテゴリ: " + category
                             );
 
                         }
@@ -639,16 +704,10 @@ ${tag} (${count})
                     }else{
 
                         const tag =
-                            url.searchParams.get(
-                                "tag"
-                            );
+                            url.searchParams.get("tag");
 
                         if(tag){
-
-                            logSidebarClick(
-                                tag
-                            );
-
+                            logSidebarClick(tag);
                         }
 
                     }
@@ -669,7 +728,7 @@ ${tag} (${count})
 
 
     console.log(
-        "Project Library 動的サイドバー Version 6.3"
+        "Project Library 動的サイドバー Version 6.4"
     );
 
 }
@@ -682,27 +741,19 @@ ${tag} (${count})
 function setupMenu(){
 
     const menuButton =
-        document.getElementById(
-            "menuButton"
-        );
+        document.getElementById("menuButton");
 
     const sidebar =
-        document.querySelector(
-            ".sidebar"
-        );
+        document.querySelector(".sidebar");
 
     const closeMenu =
-        document.getElementById(
-            "closeMenu"
-        );
+        document.getElementById("closeMenu");
 
     if(menuButton && sidebar){
 
         menuButton.onclick = () => {
 
-            sidebar.classList.add(
-                "open"
-            );
+            sidebar.classList.add("open");
 
         };
 
@@ -712,9 +763,7 @@ function setupMenu(){
 
         closeMenu.onclick = () => {
 
-            sidebar.classList.remove(
-                "open"
-            );
+            sidebar.classList.remove("open");
 
         };
 
@@ -730,9 +779,7 @@ function setupMenu(){
 function setupSearch(){
 
     const searchInput =
-        document.getElementById(
-            "searchInput"
-        );
+        document.getElementById("searchInput");
 
     if(!searchInput){
         return;
@@ -752,22 +799,16 @@ function setupSearch(){
             if(keyword === ""){
 
                 location.href =
-                    commonPageUrl(
-                        "library.html"
-                    );
+                    commonPageUrl("library.html");
 
                 return;
 
             }
 
             location.href =
-                commonPageUrl(
-                    "library.html"
-                ) +
+                commonPageUrl("library.html") +
                 "?search=" +
-                encodeURIComponent(
-                    keyword
-                );
+                encodeURIComponent(keyword);
 
         }
     );
@@ -788,16 +829,10 @@ document.addEventListener(
         }
 
         const sidebar =
-            document.querySelector(
-                ".sidebar"
-            );
+            document.querySelector(".sidebar");
 
         if(sidebar){
-
-            sidebar.classList.remove(
-                "open"
-            );
-
+            sidebar.classList.remove("open");
         }
 
     }
@@ -813,38 +848,26 @@ document.addEventListener(
     event => {
 
         const sidebar =
-            document.querySelector(
-                ".sidebar"
-            );
+            document.querySelector(".sidebar");
 
         const menuButton =
-            document.getElementById(
-                "menuButton"
-            );
+            document.getElementById("menuButton");
 
         if(
             !sidebar ||
-            !sidebar.classList.contains(
-                "open"
-            )
+            !sidebar.classList.contains("open")
         ){
             return;
         }
 
         if(
-            sidebar.contains(
-                event.target
-            ) ||
-            menuButton?.contains(
-                event.target
-            )
+            sidebar.contains(event.target) ||
+            menuButton?.contains(event.target)
         ){
             return;
         }
 
-        sidebar.classList.remove(
-            "open"
-        );
+        sidebar.classList.remove("open");
 
     }
 );
@@ -857,9 +880,7 @@ document.addEventListener(
 function setupCurrentYear(){
 
     const year =
-        document.getElementById(
-            "currentYear"
-        );
+        document.getElementById("currentYear");
 
     if(year){
 
@@ -876,5 +897,5 @@ function setupCurrentYear(){
 // =====================================================
 
 console.log(
-    "Project Library common.js Version 6.3"
+    "Project Library common.js Version 6.4"
 );
