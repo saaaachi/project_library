@@ -1852,10 +1852,11 @@ Style Version 7.3
 
 
 
+
 /* =====================================================
    Project Library
    PC右側広告
-   Version 1.0
+   Version 1.1
 ===================================================== */
 
 /* 初期状態では非表示 */
@@ -1863,35 +1864,46 @@ Style Version 7.3
     display: none;
 }
 
-/* 十分な横幅があるPCだけ表示 */
-@media (min-width: 1350px) {
+/* PC：画面幅1100px以上で右側広告を表示 */
+@media (min-width: 1100px) {
 
     body > .container {
+        width: 100%;
         max-width: 1600px;
         display: grid;
+
         grid-template-columns:
-            220px
+            200px
             minmax(0, 1fr)
-            280px;
-        gap: 24px;
+            220px;
+
+        gap: 20px;
         align-items: start;
+    }
+
+    body > .container > main {
+        min-width: 0;
     }
 
     body > .container > #adSidebar {
         display: block;
         width: 100%;
         min-width: 0;
+
         position: sticky;
         top: 20px;
+        align-self: start;
     }
 
     .right-ad-inner {
         width: 100%;
         min-height: 250px;
         padding: 10px;
+
         background: #FAFAFA;
         border: 1px solid #EEEEEE;
         border-radius: 12px;
+
         overflow: hidden;
     }
 
@@ -1905,6 +1917,13 @@ Style Version 7.3
     .right-ad-inner .adsbygoogle {
         display: block;
         width: 100%;
+    }
+}
+
+/* スマホ・タブレットでは右側広告を非表示 */
+@media (max-width: 1099px) {
+    #adSidebar {
+        display: none !important;
     }
 }
 
