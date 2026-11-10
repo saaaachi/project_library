@@ -3243,6 +3243,40 @@ const works = [
         "viewCount": 0,
         "downloadCount": 0,
         "favorite": false
+    },
+    {
+        "id": 93,
+        "workNo": "PL-000093",
+        "title": "言葉とイラストのマッチング　1",
+        "category": [
+            "幼児向け",
+            "シニア・リハビリ"
+        ],
+        "fixedTags": [
+            "失語症",
+            "高次脳機能障害"
+        ],
+        "freeTags": [
+            "ひらがな",
+            "言葉"
+        ],
+        "series": [],
+        "level": 1,
+        "age": "",
+        "size": "A4",
+        "tools": [],
+        "description": "失語症向けのプリントですが高次脳機能障害の方にもご利用いただけるかと思います。\r\n幼児や大人もご利用ください。\r\n下部に答えも載っています。",
+        "thumbnail": "assets/images/thumbnail/言葉とイラストのマッチング_1_1794313612469.jpg",
+        "pdf": "assets/pdf/言葉とイラストのマッチング_1_1794313612469.pdf",
+        "isNew": true,
+        "recommend": true,
+        "publishDate": "2026-11-10",
+        "updateDate": "2026-11-10",
+        "etsy": "",
+        "related": [],
+        "viewCount": 0,
+        "downloadCount": 0,
+        "favorite": false
     }
 ];
 
